@@ -1,0 +1,219 @@
+/* Responsive Design System */
+:root {
+  /* Fluid typography */
+  --fluid-min-width: 320;
+  --fluid-max-width: 1400;
+  --fluid-min-scale: 1.1;
+  --fluid-max-scale: 1.2;
+  
+  /* Breakpoints */
+  --breakpoint-xs: 360px;
+  --breakpoint-sm: 576px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 992px;
+  --breakpoint-xl: 1200px;
+  --breakpoint-xxl: 1400px;
+  
+  /* Spacing */
+  --space-unit: 1rem;
+  --space-xxs: calc(0.25 * var(--space-unit));
+  --space-xs: calc(0.5 * var(--space-unit));
+  --space-sm: calc(0.75 * var(--space-unit));
+  --space-md: calc(1.25 * var(--space-unit));
+  --space-lg: calc(2 * var(--space-unit));
+  --space-xl: calc(3.25 * var(--space-unit));
+  --space-xxl: calc(5.25 * var(--space-unit));
+}
+
+/* Base responsive typography */
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Responsive containers */
+.container {
+  width: 100%;
+  padding-right: var(--space-md, 1.25rem);
+  padding-left: var(--space-md, 1.25rem);
+  margin-right: auto;
+  margin-left: auto;
+  max-width: 100%;
+}
+
+@media (min-width: 576px) {
+  .container {
+    max-width: 540px;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 720px;
+  }
+}
+
+@media (min-width: 992px) {
+  .container {
+    max-width: 960px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .container {
+    max-width: 1140px;
+  }
+}
+
+@media (min-width: 1400px) {
+  .container {
+    max-width: 1320px;
+  }
+}
+
+/* Responsive typography */
+:root {
+  --text-xs: 0.75rem;   /* 12px */
+  --text-sm: 0.875rem;  /* 14px */
+  --text-base: 1rem;    /* 16px */
+  --text-lg: 1.125rem;  /* 18px */
+  --text-xl: 1.25rem;   /* 20px */
+  --text-2xl: 1.5rem;   /* 24px */
+  --text-3xl: 1.875rem; /* 30px */
+  --text-4xl: 2.25rem;  /* 36px */
+  --text-5xl: 3rem;     /* 48px */
+  --text-6xl: 3.75rem;  /* 60px */
+}
+
+h1, .h1 { font-size: var(--text-4xl); }
+h2, .h2 { font-size: var(--text-3xl); }
+h3, .h3 { font-size: var(--text-2xl); }
+h4, .h4 { font-size: var(--text-xl); }
+h5, .h5 { font-size: var(--text-lg); }
+h6, .h6 { font-size: var(--text-base); }
+
+@media (min-width: 768px) {
+  h1, .h1 { font-size: var(--text-5xl); }
+  h2, .h2 { font-size: var(--text-4xl); }
+  h3, .h3 { font-size: var(--text-3xl); }
+  h4, .h4 { font-size: var(--text-2xl); }
+  h5, .h5 { font-size: var(--text-xl); }
+  h6, .h6 { font-size: var(--text-lg); }
+}
+
+/* Responsive images */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Responsive iframes */
+iframe,
+embed,
+object,
+video {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Responsive tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: var(--space-md);
+}
+
+/* Responsive utilities */
+.hidden-xs {
+  display: none !important;
+}
+
+.visible-xs {
+  display: block !important;
+}
+
+@media (min-width: 576px) {
+  .hidden-sm {
+    display: none !important;
+  }
+  
+  .visible-sm {
+    display: block !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .hidden-md {
+    display: none !important;
+  }
+  
+  .visible-md {
+    display: block !important;
+  }
+}
+
+@media (min-width: 992px) {
+  .hidden-lg {
+    display: none !important;
+  }
+  
+  .visible-lg {
+    display: block !important;
+  }
+}
+
+/* Print styles */
+@media print {
+  *,
+  *::before,
+  *::after {
+    background: transparent !important;
+    color: #000 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+  
+  a,
+  a:visited {
+    text-decoration: underline;
+  }
+  
+  a[href]::after {
+    content: " (" attr(href) ")";
+  }
+  
+  pre,
+  blockquote {
+    border: 1px solid #999;
+    page-break-inside: avoid;
+  }
+  
+  thead {
+    display: table-header-group;
+  }
+  
+  tr,
+  img {
+    page-break-inside: avoid;
+  }
+  
+  img {
+    max-width: 100% !important;
+  }
+  
+  p,
+  h2,
+  h3 {
+    orphans: 3;
+    widows: 3;
+  }
+  
+  h2,
+  h3 {
+    page-break-after: avoid;
+  }
+}
