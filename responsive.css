@@ -18,6 +18,8 @@
   /* Navigation */
   .navbar {
     padding: 0.75rem 1rem;
+    position: relative;
+    z-index: 1000;
   }
   
   .navbar-container {
@@ -101,32 +103,47 @@
   
   /* Home Section */
   .home-section {
-    padding: 4rem 0 3rem;
+    padding: 5rem 0 3rem;
     min-height: auto;
+    position: relative;
+    z-index: 1;
   }
   
   .home-container {
-    flex-direction: column-reverse;
+    flex-direction: column;
     text-align: center;
     gap: 2rem;
   }
   
   .home-left {
     text-align: center;
+    padding: 1rem 0 1rem 0;
+    margin-top: 8rem;
   }
   
   .home-title {
     font-size: 2rem;
     line-height: 1.2;
+    margin-bottom: 1rem;
+    margin-top: 0;
+    display: block !important;
+    visibility: visible !important;
+    white-space: normal !important;
   }
   
   .home-subtitle {
     font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    display: block !important;
+    visibility: visible !important;
   }
   
   .home-desc {
     font-size: 0.95rem;
     padding: 0 0.5rem;
+    margin-bottom: 2rem;
+    display: block !important;
+    visibility: visible !important;
   }
   
   .home-btns {
@@ -143,8 +160,9 @@
   }
   
   .home-right {
-    width: 200px;
-    height: 200px;
+    width: 180px;
+    height: 180px;
+    margin-top: 1rem;
   }
   
   .home-photo {
@@ -257,7 +275,7 @@
   }
   
   .project-title, .case-study-title {
-    font-size: 1.2rem;
+    font-size: 1.01rem;
     margin-bottom: 1rem;
   }
   
@@ -508,7 +526,7 @@
   }
 }
 
-/* Medium Devices (768px - 991px) - Tablets */
+/* ===== MEDIUM DEVICES (768px - 991px) - TABLETS ===== */
 @media (min-width: 768px) and (max-width: 991px) {
   .home-container {
     flex-direction: row;
@@ -553,9 +571,15 @@
     grid-template-columns: repeat(2, 1fr);
     gap: 2rem;
   }
+  
+  /* Maintain original project title size for tablets and desktop */
+  .project-title, .case-study-title {
+    font-size: 1.01rem !important;
+    margin-bottom: 0.2rem !important;
+  }
 }
 
-/* Large Devices (992px - 1199px) */
+/* ===== LARGE DEVICES (992px - 1199px) ===== */
 @media (min-width: 992px) and (max-width: 1199px) {
   .projects-cards-row {
     grid-template-columns: repeat(3, 1fr);
@@ -564,9 +588,15 @@
   .skills-cards-row {
     grid-template-columns: repeat(3, 1fr);
   }
+  
+  /* Maintain original project title size for desktop */
+  .project-title, .case-study-title {
+    font-size: 1.01rem !important;
+    margin-bottom: 0.2rem !important;
+  }
 }
 
-/* Extra Large Devices (1200px and up) */
+/* ===== EXTRA LARGE DEVICES (1200px and up) ===== */
 @media (min-width: 1200px) {
   .projects-cards-row {
     grid-template-columns: repeat(3, 1fr);
@@ -574,6 +604,12 @@
   
   .skills-cards-row {
     grid-template-columns: repeat(3, 1fr);
+  }
+  
+  /* Maintain original project title size for large desktop */
+  .project-title, .case-study-title {
+    font-size: 1.01rem !important;
+    margin-bottom: 0.2rem !important;
   }
 }
 

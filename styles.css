@@ -908,10 +908,19 @@ body.dark-theme .home-bg {
   padding-top: 0;
 }
 .home-photo {
-  width: 320px;
-  height: 320px;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
   border-radius: 50%;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.home-photo:hover {
+  transform: scale(1.1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+.home-photo {
   box-shadow: 0 4px 32px rgba(42,122,226,0.10);
   border: 6px solid #fff;
   background: linear-gradient(135deg, #2a7ae2 0%, #a259ff 100%);
@@ -922,10 +931,10 @@ body.dark-theme .home-bg {
 }
 
 .home-photo:hover {
-  transform: scale(1.25) translateY(-8px) rotateZ(-2deg);
-  box-shadow: 0 16px 48px 0 rgba(42,122,226,0.22), 0 2px 16px 0 rgba(0,0,0,0.10), 0 1.5px 8px 0 rgba(42,122,226,0.10), 0 0 32px 8px #3b82f6aa, 0 0 60px 12px #a259ff66;
-  filter: brightness(1.12) saturate(1.15);
-  z-index: 2;
+  transform: scale(1.15) translateY(-5px) rotateZ(-1deg);
+  box-shadow: 0 20px 40px rgba(42,122,226,0.3), 0 8px 16px rgba(0,0,0,0.15);
+  filter: brightness(1.1) saturate(1.2);
+  z-index: 10;
 }
 
 /* Thought Bubble Style */
@@ -2649,14 +2658,32 @@ body.dark-theme .project-tag:hover {
 .project-category {
   font-size: 0.98rem;
   font-weight: 600;
-  color: #2a7ae2;
-  background: none;
+  color: #2a7ae2 !important;
   border-radius: 6px;
   padding: 0 0.2rem;
 }
-.project-category.mobile { color: #1db954; }
-.project-category.web { color: #a259ff; }
-.project-category.research { color: #e84393; }
+
+.project-category.mobile { 
+  color: #2a7ae2 !important; 
+  background: transparent !important;
+}
+.project-category.web { 
+  color: #2a7ae2 !important; 
+  background: transparent !important;
+}
+.project-category.research { 
+  color: #2a7ae2 !important; 
+  background: transparent !important;
+}
+.project-category.case-study { 
+  color: #2a7ae2 !important; 
+}
+
+/* Force all project categories to blue */
+.projects-cards-row .project-category,
+.project-card .project-category {
+  color: #2a7ae2 !important;
+}
 .project-title, .project-desc {
   word-wrap: break-word;
   overflow-wrap: break-word;
@@ -5789,12 +5816,14 @@ body.dark-theme .my-story-scroll-card {
 .my-story-chapter h2 {
   font-size: 1.18rem;
   font-weight: 700;
-  margin-bottom: 0.5rem;
+  margin-bottom: 1rem;
+  margin-top: 1.5rem;
   color: #2a7ae2;
   display: flex;
   align-items: center;
   gap: 0.5rem;
   letter-spacing: 0.5px;
+  line-height: 1.4;
 }
 .my-story-scroll-card p {
   font-size: 1.13rem;
