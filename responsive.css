@@ -5,6 +5,91 @@
 /* Extra Small Devices (320px - 575px) */
 @media (max-width: 575px) {
   
+  /* Better project cards for very small screens */
+  .projects-cards-row {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  /* Improve navigation for very small screens */
+  .nav-links {
+    width: 90%;
+    max-width: 280px;
+  }
+  
+  /* Better home section for very small screens */
+  .home-title {
+    font-size: 2rem;
+    line-height: 1.1;
+  }
+  
+  .home-subtitle {
+    font-size: 1.1rem;
+  }
+  
+  .home-desc {
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+  
+  /* Better project cards */
+  .project-card {
+    padding: 1rem 1.2rem;
+    min-width: 0;
+    max-width: none;
+    width: 100%;
+    margin: 0;
+    box-sizing: border-box;
+  }
+  
+  .project-title, .case-study-title {
+    font-size: 1rem;
+  }
+  
+  .project-desc {
+    font-size: 0.9rem;
+  }
+  
+  /* About section improvements */
+  .about-cards {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  /* Skills section */
+  .skills-cards-row {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+    padding: 0 0.5rem;
+  }
+  
+  .skill-card-pm {
+    padding: 1rem 1.2rem;
+    min-width: 0;
+    max-width: none;
+    width: 100%;
+    margin: 0;
+    box-sizing: border-box;
+  }
+  
+  .skill-card {
+    padding: 0.7rem 1rem;
+    min-width: 0;
+    max-width: none;
+    width: 100%;
+    margin: 0;
+    box-sizing: border-box;
+  }
+  
+  .skill-card-large {
+    padding: 0.8rem 1.1rem;
+    min-width: 0;
+    max-width: none;
+    width: 100%;
+    margin: 0;
+    box-sizing: border-box;
+  }
+  
   /* Base Typography */
   html {
     font-size: 14px;
@@ -510,6 +595,70 @@
     font-size: 2.2rem;
   }
   
+  /* Project cards for small tablets */
+  .projects-cards-row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.3rem;
+  }
+  
+  .project-card {
+    padding: 1.2rem 1.5rem;
+    min-width: 0;
+    max-width: none;
+    width: 100%;
+    margin: 0;
+    box-sizing: border-box;
+  }
+  
+  /* Skill cards for small tablets */
+  .skills-cards-row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.3rem;
+  }
+  
+  .skill-card-pm {
+    padding: 1.4rem 1.6rem;
+    min-width: 0;
+    max-width: none;
+    width: 100%;
+    margin: 0;
+    box-sizing: border-box;
+  }
+  
+  .skill-card {
+    padding: 0.9rem 1.2rem;
+    min-width: 0;
+    max-width: none;
+    width: 100%;
+    margin: 0;
+    box-sizing: border-box;
+  }
+  
+  .skill-card-large {
+    padding: 1.2rem 1.4rem;
+    min-width: 0;
+    max-width: none;
+    width: 100%;
+    margin: 0;
+    box-sizing: border-box;
+  }
+  
+  /* Navigation improvements */
+  .navbar-container {
+    padding: 0 1rem;
+  }
+  
+  /* Home section responsive */
+  .home-container {
+    flex-direction: column;
+    gap: 2rem;
+    text-align: center;
+  }
+  
+  .home-left, .home-right {
+    width: 100%;
+  }
+  
   .about-cards {
     grid-template-columns: repeat(2, 1fr);
     gap: 1.5rem;
@@ -531,6 +680,70 @@
   .home-container {
     flex-direction: row;
     gap: 3rem;
+  }
+  
+  /* Project cards for tablets */
+  .projects-cards-row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.4rem;
+  }
+  
+  .project-card {
+    padding: 1.3rem 1.6rem;
+    min-width: 0;
+    max-width: none;
+    width: 100%;
+    margin: 0;
+    box-sizing: border-box;
+  }
+  
+  /* Better spacing for sections */
+  .section {
+    padding: 4rem 0;
+  }
+  
+  /* Navigation adjustments */
+  .nav-links {
+    padding: 5rem 2rem 2rem;
+  }
+  
+  /* Skills and about sections */
+  .about-cards {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+  
+  /* Skills section for tablets */
+  .skills-cards-row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.4rem;
+  }
+  
+  .skill-card-pm {
+    padding: 1.5rem 1.6rem;
+    min-width: 0;
+    max-width: none;
+    width: 100%;
+    margin: 0;
+    box-sizing: border-box;
+  }
+  
+  .skill-card {
+    padding: 1rem 1.3rem;
+    min-width: 0;
+    max-width: none;
+    width: 100%;
+    margin: 0;
+    box-sizing: border-box;
+  }
+  
+  .skill-card-large {
+    padding: 1.3rem 1.5rem;
+    min-width: 0;
+    max-width: none;
+    width: 100%;
+    margin: 0;
+    box-sizing: border-box;
   }
   
   .home-left {
@@ -583,6 +796,21 @@
 @media (min-width: 992px) and (max-width: 1199px) {
   .projects-cards-row {
     grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+  
+  .container {
+    max-width: 960px;
+  }
+  
+  /* Better home section layout */
+  .home-container {
+    gap: 4rem;
+  }
+  
+  /* About cards for large screens */
+  .about-cards {
+    grid-template-columns: repeat(4, 1fr);
   }
   
   .skills-cards-row {
@@ -615,6 +843,25 @@
 
 /* ===== LANDSCAPE ORIENTATIONS ===== */
 @media (max-height: 500px) and (orientation: landscape) {
+  
+  /* Better landscape layout */
+  .lock-container {
+    padding: 1rem;
+  }
+  
+  .home-container {
+    flex-direction: row;
+    gap: 2rem;
+  }
+  
+  .projects-cards-row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+  
+  .section {
+    padding: 2rem 0;
+  }
   .lock-container {
     padding: 1rem;
   }
