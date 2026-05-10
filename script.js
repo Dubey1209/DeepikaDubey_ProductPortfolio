@@ -114,6 +114,13 @@ if (menuToggle && navLinks) {
   // Handle dropdown toggles
   dropdownToggles.forEach(toggle => {
     toggle.addEventListener('click', toggleDropdown);
+
+    const indicator = document.createElement('span');
+    indicator.className = 'dropdown-indicator';
+    indicator.innerHTML = '<svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    if (window.innerWidth <= 768) {
+      toggle.appendChild(indicator);
+    }
     
     // Add keyboard navigation for dropdowns
     toggle.addEventListener('keydown', (e) => {
@@ -136,20 +143,6 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-// Initialize dropdown toggles
-dropdownToggles.forEach(toggle => {
-  toggle.addEventListener('click', toggleDropdown);
-  
-  // Add dropdown indicator
-  const indicator = document.createElement('span');
-  indicator.className = 'dropdown-indicator';
-  indicator.innerHTML = '<svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-  
-  if (window.innerWidth <= 768) {
-    toggle.appendChild(indicator);
-  }
-});
-
 // Handle window resize
 let resizeTimer;
 window.addEventListener('resize', () => {
@@ -165,11 +158,6 @@ window.addEventListener('resize', () => {
       });
     }
   }, 250);
-});
-
-// Prevent form submission (demo only)
-document.querySelector('.contact-form').addEventListener('submit', function(e) {
-  e.preventDefault();
 });
 
 // Fade-in on scroll for story-scroll-segment
@@ -384,8 +372,13 @@ document.addEventListener('keydown', function(e) {
 });
 
 // Close modal when clicking outside content
-document.getElementById('experienceModal').addEventListener('click', function(e) {
-  if (e.target === this) {
-    closeExperienceModal();
+document.addEventListener('DOMContentLoaded', function () {
+  const experienceModal = document.getElementById('experienceModal');
+  if (experienceModal) {
+    experienceModal.addEventListener('click', function (e) {
+      if (e.target === this) {
+        closeExperienceModal();
+      }
+    });
   }
 }); 

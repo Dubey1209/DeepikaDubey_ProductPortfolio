@@ -134,10 +134,7 @@ class PortfolioLock {
 
       return await response.json();
     } catch (error) {
-      console.log('Formcarry error, logging data...');
-      console.log('Portfolio Visitor Data:', data);
-      
-      // Always return success for smooth UX
+      // Formcarry is optional; still allow unlock UX
       return { success: true, message: 'Data logged successfully' };
     }
   }
@@ -172,7 +169,7 @@ class PortfolioLock {
 
   unlockPortfolio(withAnimation = true) {
     const lockScreen = document.querySelector('.portfolio-lock');
-    const mainContent = document.querySelector('#main-content');
+    const mainContent = document.querySelector('#site-shell');
     
     if (withAnimation) {
       lockScreen.style.opacity = '0';
