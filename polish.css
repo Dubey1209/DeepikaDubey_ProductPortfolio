@@ -1,0 +1,213 @@
+/* Layout, safe areas, touch-friendly cards, subtle motion — loads after responsive.css */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  overflow-x: clip;
+  scroll-behavior: smooth;
+}
+
+body {
+  overflow-x: clip;
+}
+
+/* Fluid container + notched devices */
+.container {
+  width: min(94vw, 1100px) !important;
+  max-width: min(94vw, 1100px) !important;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: max(0.75rem, env(safe-area-inset-left, 0px));
+  padding-right: max(0.75rem, env(safe-area-inset-right, 0px));
+}
+
+.navbar {
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+/* Anchor scroll under fixed navbar */
+main .section,
+.footer-section {
+  scroll-margin-top: calc(4.75rem + env(safe-area-inset-top, 0px));
+}
+
+#home.home-section {
+  scroll-margin-top: 0;
+}
+
+/* Soft ambient background */
+body {
+  background-color: #f9f9f9;
+  background-image:
+    radial-gradient(ellipse 130% 90% at 0% -30%, rgba(42, 122, 226, 0.09), transparent 55%),
+    radial-gradient(ellipse 100% 70% at 100% 0%, rgba(162, 89, 255, 0.07), transparent 50%),
+    radial-gradient(ellipse 90% 60% at 50% 110%, rgba(42, 122, 226, 0.05), transparent 55%);
+  background-attachment: fixed;
+}
+
+/* Layer gradients over existing dark base from styles.css */
+body.dark-theme {
+  background-color: #181c24;
+  background-image:
+    linear-gradient(180deg, #181c24 0%, #181c24 100%),
+    radial-gradient(ellipse 130% 90% at 0% -25%, rgba(42, 122, 226, 0.14), transparent 55%),
+    radial-gradient(ellipse 100% 70% at 100% 5%, rgba(162, 89, 255, 0.11), transparent 50%);
+  background-attachment: fixed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  body {
+    background-attachment: scroll;
+  }
+}
+
+/* Lock screen padding on phones with home indicator */
+.portfolio-lock .lock-container {
+  padding-left: max(1rem, env(safe-area-inset-left, 0px));
+  padding-right: max(1rem, env(safe-area-inset-right, 0px));
+  padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+}
+
+/* —— Project cards: phones & tablets — hover strip is unusable without mouse —— */
+@media (max-width: 992px) {
+  .interactive-card {
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+    padding-bottom: 0.25rem;
+  }
+
+  .interactive-card .project-front {
+    transform: none !important;
+    height: auto;
+  }
+
+  .interactive-card .project-actions {
+    position: relative;
+    inset: auto;
+    transform: none !important;
+    margin-top: 0.85rem;
+    padding: 1rem 1.15rem;
+    border-radius: 14px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.07);
+  }
+
+  .interactive-card .project-btn {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .interactive-card:hover {
+    transform: translateY(-4px);
+  }
+
+  .interactive-card:hover .project-front {
+    transform: none !important;
+  }
+
+  .interactive-card:hover .project-actions {
+    transform: none !important;
+  }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .interactive-card:hover .project-front {
+    transform: none !important;
+  }
+
+  .interactive-card:hover .project-actions {
+    transform: none !important;
+  }
+}
+
+/* Scroll reveal — only when JS runs (html.js-scroll-reveal) */
+@media (prefers-reduced-motion: no-preference) {
+  html.js-scroll-reveal main .section:not(#home):not(.reveal-in) {
+    opacity: 0;
+    transform: translateY(26px);
+    transition:
+      opacity 0.8s cubic-bezier(0.2, 0.8, 0.2, 1),
+      transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+    will-change: opacity, transform;
+  }
+
+  html.js-scroll-reveal main .section:not(#home).reveal-in {
+    opacity: 1;
+    transform: none;
+    will-change: auto;
+  }
+}
+
+/* Micro-polish */
+a {
+  text-underline-offset: 0.2em;
+}
+
+.btn,
+.btn-primary,
+.btn-outline {
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease,
+    filter 0.22s ease;
+}
+
+.btn:active,
+.btn-primary:active,
+.btn-outline:active {
+  transform: scale(0.98);
+}
+
+.btn:focus-visible,
+.btn-primary:focus-visible,
+.btn-outline:focus-visible,
+.project-btn:focus-visible,
+.menu-toggle:focus-visible,
+.theme-toggle-btn:focus-visible {
+  outline: 2px solid #2a7ae2;
+  outline-offset: 3px;
+}
+
+body.dark-theme .btn:focus-visible,
+body.dark-theme .btn-primary:focus-visible,
+body.dark-theme .btn-outline:focus-visible,
+body.dark-theme .project-btn:focus-visible,
+body.dark-theme .menu-toggle:focus-visible,
+body.dark-theme .theme-toggle-btn:focus-visible {
+  outline-color: #60a5fa;
+}
+
+/* Gentle shimmer on section titles (already gradient text in places — add soft glow on hover area via cards) */
+.project-card {
+  transition:
+    transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.45s ease;
+}
+
+/* Scroll indicator: smoother pulse */
+@media (prefers-reduced-motion: no-preference) {
+  .scroll-indicator {
+    animation: polishScrollHint 2.8s ease-in-out infinite;
+  }
+
+  @keyframes polishScrollHint {
+    0%,
+    100% {
+      opacity: 0.65;
+      transform: translateX(-50%) translateY(0);
+    }
+    50% {
+      opacity: 1;
+      transform: translateX(-50%) translateY(6px);
+    }
+  }
+}
