@@ -1208,6 +1208,151 @@
   // re-aim then too, or she keeps staring where the cursor used to be.
   window.addEventListener('scroll', queueAim, { passive: true });
 
+  // ---- at rest --------------------------------------------------------------
+  //
+  // Left alone she does not freeze. Once nobody has moved for a few seconds
+  // she lives a little on her own: glances about, rolls her eyes up and
+  // round, smiles to herself, thinks, hums; and after a long quiet, now and
+  // then, says something. Any movement hands her gaze back to the visitor.
+
+  var IDLE_AFTER = 4500;
+  var lastActive = now();
+  var idling = false;
+  var idleTimer = 0;
+  var idleSteps = [];
+  var lastIdleLine = 0;
+
+  var IDLE_LINES = {
+    face: GIGGLE,
+    lines: [
+      '♪ hmm hm hmm… ♪',
+      'still there? I’ll wait, no rush',
+      [THINKING, 'what should I build next…'],
+      'scroll down, the work is good, I promise',
+      [WINK, 'taking a tiny break. same as you?'],
+      [THINKING, 'hmm, did I ship that fix?'],
+    ],
+  };
+
+  function clearIdleSteps() {
+    idleSteps.forEach(clearTimeout);
+    idleSteps = [];
+  }
+
+  function later(fn, ms) {
+    idleSteps.push(setTimeout(fn, ms));
+  }
+
+  // Turns her head herself, as a cursor would, so the gaze and the lean stay
+  // in step with the frames.
+  function gazeTo(index, ms) {
+    if (reacting >= 0 || !idling) return;
+    var turnX = (index % 3) - (lookIndex % 3);
+    var turnY = Math.floor(index / 3) - Math.floor(lookIndex / 3);
+    lookIndex = index;
+    wantLook = index;
+    col = index % 3;
+    row = Math.floor(index / 3);
+    body.show('look', index, ms || 300);
+    nudge(turnX * 0.45, turnY * 0.25);
+  }
+
+  var GLANCES = [3, 5, 0, 2, 1, 6, 8];
+
+  var IDLE_ACTS = [
+    // A look round the room, sometimes a second one, then back.
+    [38, function () {
+      var first = GLANCES[Math.floor(Math.random() * GLANCES.length)];
+      gazeTo(first);
+      var hold = 900 + Math.random() * 1000;
+      if (Math.random() < 0.4) {
+        var second = GLANCES[Math.floor(Math.random() * GLANCES.length)];
+        later(function () { gazeTo(second); }, hold);
+        hold += 800 + Math.random() * 700;
+      }
+      later(function () { gazeTo(CENTRE); }, hold);
+      return hold + 400;
+    }],
+    // An eye roll: up and round, a beat at the top, back with a blink.
+    [16, function () {
+      var path = [3, 0, 1, 2, 5];
+      path.forEach(function (index, i) {
+        later(function () { gazeTo(index, 150); }, i * 190);
+      });
+      var back = path.length * 190 + 260;
+      later(function () { gazeTo(CENTRE, 220); }, back);
+      later(blink, back + 380);
+      return back + 700;
+    }],
+    // A content smile to herself.
+    [16, function () {
+      react(GIGGLE, 1300);
+      return 1600;
+    }],
+    // A moment of thought, chin on hand.
+    [14, function () {
+      react(THINKING, 2300);
+      return 2600;
+    }],
+    // A slow double blink, the most human thing there is.
+    [16, function () {
+      blink();
+      later(blink, 420);
+      return 900;
+    }],
+  ];
+
+  function pickIdleAct() {
+    var total = IDLE_ACTS.reduce(function (sum, act) { return sum + act[0]; }, 0);
+    var r = Math.random() * total;
+    for (var i = 0; i < IDLE_ACTS.length; i += 1) {
+      r -= IDLE_ACTS[i][0];
+      if (r <= 0) return IDLE_ACTS[i][1];
+    }
+    return IDLE_ACTS[0][1];
+  }
+
+  function scheduleIdle(ms) {
+    clearTimeout(idleTimer);
+    if (reducedMotion) return;
+    idleTimer = setTimeout(idleTick, ms || 2400 + Math.random() * 2600);
+  }
+
+  function idleTick() {
+    var quiet = now() - lastActive;
+    if (!visible || reacting >= 0 || bubble.classList.contains('is-in') || quiet < IDLE_AFTER) {
+      scheduleIdle();
+      return;
+    }
+    idling = true;
+    var busy;
+    if (quiet > 25000 && now() - lastIdleLine > 35000 && Math.random() < 0.45) {
+      lastIdleLine = now();
+      gazeTo(CENTRE);
+      var line = pickLine('idle', IDLE_LINES);
+      var hold = holdFor(line.text);
+      react(line.face, hold);
+      say(line.text, hold);
+      busy = hold;
+    } else {
+      busy = pickIdleAct()();
+    }
+    scheduleIdle(busy + 1800 + Math.random() * 3200);
+  }
+
+  function wake() {
+    lastActive = now();
+    if (!idling) return;
+    idling = false;
+    clearIdleSteps();
+    if (pointer) queueAim();
+    else requestLook(CENTRE);
+  }
+
+  ['pointermove', 'pointerdown', 'keydown', 'wheel', 'touchstart', 'scroll'].forEach(function (type) {
+    window.addEventListener(type, wake, { passive: true });
+  });
+
   el.addEventListener('click', poke);
   el.addEventListener('keydown', function (e) {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -1321,11 +1466,15 @@
   function start() {
     scheduleBlink();
     scheduleBreeze();
+    scheduleIdle();
   }
 
   function stop() {
     clearTimeout(blinkTimer);
     clearTimeout(breezeTimer);
+    clearTimeout(idleTimer);
+    clearIdleSteps();
+    idling = false;
   }
 
   // The first time she is seen in a visit, once the page has finished its
