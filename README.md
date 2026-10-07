@@ -77,7 +77,7 @@ GSAP 3.12.7, ScrollTrigger 3.12.7, Lenis 1.1.20, page-flip 2.0.7, and
 ## Cache busting
 
 Every stylesheet and script is referenced with a **single shared** `?v=` token
-(currently `20261018`; the mascot sheet URLs in `atelier.css` carry it too).
+(currently `20261019`; the mascot sheet URLs in `atelier.css` carry it too).
 When you change any CSS, JS or mascot sheet, bump that token —
 in both `index.html` and `my-story.html`.
 
@@ -126,8 +126,8 @@ her thought cloud opens to her left (`--cloud-tail: right` in the hero), so it
 never runs off the page; on phones it sits above her head as before. Once per
 visit, after the hero's entrance and the lock screen, she says hello
 (`GREETINGS`; the test harness marks her as having greeted so captures do not
-depend on the timer). About's side column is now a spec card, "Deepika, as a
-product", with the old Now / Work / Lens index plus a few lines of her own.
+depend on the timer). About is now a single centred column, its three notes
+numbered 01–03 like the chapters of My Story.
 
 It follows the idea of [page-mascot](https://koboyo.com/page-mascot), which is a React
 component; this is a plain-JS version (`mascot.js`) so the site keeps no React
