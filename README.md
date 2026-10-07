@@ -343,37 +343,33 @@ as of the Phase 3 merge.
    `atelier.css` rule for `.project-category`. It lived in `polish.css`, which
    loaded *before* `atelier.css`, but specificity outranks order, so the
    hardcoded blue won in dark mode. Now `var(--accent)`, at `atelier.css:255`.
-2. **The dropdown has no shadow at all.** `base.css:1466` sets `box-shadow: none
-   !important` on `.dropdown-content`, which beats the intended `6px 8px 0
-   var(--ink)` at `atelier.css:2139` however specific that rule is. Originally
-   recorded here as "dark mode renders the old `0 8px 16px rgba(0,0,0,0.3)`
-   shadow" — wrong: the prober found that rule inert and deleting it changed
-   nothing, because the `!important` none was already winning. Both themes get a
-   flat dropdown.
-3. **Dropdown hover leaks two properties.** `base.css:225-226` and
-   `base.css:236` (`color: #ffffff !important`, `border-left-color: #2a7ae2
-   !important`) survive because the `atelier.css` rule only sets `background`.
-   These are `:hover` rules, which the prober reports as unverifiable, so they
-   need fixing by hand.
-4. **The success toast has no dark variant.** `atelier.css:278` gives
-   `.lock-notification--success` a hardcoded `#1a1713` background, which stays
-   near-black in dark mode. Worth checking its text contrast.
-5. **Tapping "Work" in the mobile drawer also scrolls the page.**
-   `toggleDropdown` in `script.js` calls `preventDefault`, but the same file
-   separately binds a smooth-scroll handler to every `a[href^="#"]` — and one
-   listener calling `preventDefault` does not stop another listener on the same
-   element. Both run, so the submenu opens *and* the page jumps to Case
-   Studies.
-6. **Drawer items can become unreachable.** `atelier.css:2134` sets
-   `flex-wrap: wrap` on `.nav-links` globally. On mobile the drawer is a
-   fixed-height `flex-direction: column`, so when the items exceed the viewport
-   height — which happens as soon as the submenu expands — they wrap into a
-   second column beyond the drawer's width and are clipped off-screen. Story
-   and Contact are the casualties.
+2. ~~**The dropdown has no shadow at all.**~~ **Not a bug.** Measured in a
+   browser, the desktop dropdown renders `6px 8px 0 var(--ink)` in both themes.
+   The `box-shadow: none !important` in `base.css` sits inside `(max-width:
+   800px)`, where the submenu is an inline list inside the drawer and a shadow
+   would be wrong.
+3. ~~**Dropdown hover leaks two properties.**~~ **Fixed.** Two `body.dark-theme
+   .dropdown-content a:hover` rules in `base.css` forced `color: #ffffff
+   !important`, so dark hover went pure white instead of `--ink`. Deleted; the
+   `atelier.css` hover rule now also covers `:focus-visible`, which the deleted
+   rules had been the only thing highlighting in dark mode.
+4. ~~**The success toast has no dark variant.**~~ **Not a bug.** The hardcoded
+   `#1a1713` and `#8b3a2a` backgrounds were always beaten by `html.atelier
+   .lock-notification--success, --error { background: var(--card) !important }`,
+   and both pages that load `atelier.css` carry `class="atelier"`. The dead
+   rules are deleted.
+5. ~~**Tapping "Work" in the mobile drawer also scrolls the page.**~~ **Fixed.**
+   `toggleDropdown` calls `preventDefault`, but the smooth-scroll handler bound
+   to every `a[href^="#"]` ran anyway. It now returns early when
+   `e.defaultPrevented` is already set.
+6. ~~**Drawer items can become unreachable.**~~ **Fixed.** The global
+   `flex-wrap: wrap` on `.nav-links` wrapped drawer items into a second,
+   clipped column once the submenu expanded. The `(max-width: 800px)` drawer
+   rule sets `flex-wrap: nowrap`, and the drawer's existing `overflow-y: auto`
+   scrolls instead.
 
-Bugs 2 and 3 are dead declarations in `base.css` that only survive on
-specificity; they are prime candidates for the Phase 3 pruning. Bugs 5 and 6
-are covered by the `nav-drawer-*` scenarios, so they can be fixed safely.
+The two that were "not a bug" were both read off the cascade without checking
+the media query or the root class. Measure before recording a bug.
 
 ### A trap to remember when tokenising
 
@@ -383,9 +379,6 @@ hardcoded instance of either is therefore ambiguous, and substituting the wrong
 token inverts the colour in dark mode. Two places depend on staying hardcoded
 because they need *fixed* contrast against a `--spin` background:
 `motion.css:1126` and `atelier.css:2770`.
-
-`atelier.css:279` is a third hardcoded instance, and it is bug 4 above rather
-than a deliberate exception.
 
 ## Dead-rule audit
 
@@ -575,8 +568,7 @@ mattered. That is the shape of this codebase, and why the phase is slow.
   - [x] pruned 44 superseded dark-theme rules from `base.css` (167 lines)
   - [x] pruned the rest of `base.css`: 139 rules, 632 lines
   - [ ] probe `atelier.css` and `motion.css`
-  - [ ] fix bugs 2 and 3 by hand — an `!important` and two `:hover` rules the
-        prober cannot judge, and all three change the page on purpose
+  - [x] fix the known bugs: 3, 5 and 6 fixed; 2 and 4 turned out not to be bugs
 - [ ] **Phase 4** — unify breakpoints
 - [ ] **Phase 5** — extract content into a data layer
 - [ ] **Phase 6** — decide the future of the lock screen

@@ -143,6 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
     anchor.addEventListener('click', (e) => {
+      if (e.defaultPrevented) return;
       const targetId = anchor.getAttribute('href');
       if (!targetId || targetId === '#' || targetId.length <= 1) return;
       const target = document.querySelector(targetId);

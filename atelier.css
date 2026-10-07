@@ -275,14 +275,6 @@ body.dark-theme .story-btn-hint::after {
   transform: translateX(0);
 }
 
-.lock-notification--success {
-  background: #1a1713;
-}
-
-.lock-notification--error {
-  background: #8b3a2a;
-}
-
 /* —— Mobile polish (loads last) —— */
 @media (max-width: 767px) {.home-container {
     padding-bottom: 3rem;
@@ -819,7 +811,7 @@ html.atelier body.dark-theme .atelier-mascot-layer {
 }
 
 html.atelier .atelier-mascot-look {
-  background-image: url('mascots/deepika-directions.webp?v=20261009');
+  background-image: url('mascots/deepika-directions.webp?v=20261010');
 }
 
 /* Frames cross-fade instead of cutting. The look layer fades out under a
@@ -831,7 +823,7 @@ html.atelier .atelier-mascot-react {
 }
 
 html.atelier .atelier-mascot-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261009');
+  background-image: url('mascots/deepika-reactions.webp?v=20261010');
   opacity: 0;
 }
 
@@ -2293,7 +2285,8 @@ html.atelier .dropdown-content a {
   color: var(--ink) !important;
 }
 
-html.atelier .dropdown-content a:hover {
+html.atelier .dropdown-content a:hover,
+html.atelier .dropdown-content a:focus-visible {
   background: var(--paper) !important;
 }
 
@@ -3653,6 +3646,7 @@ html.atelier .lock-notification--error {
     border-right: none !important;
     border-left: 1.5px solid var(--line);
     backdrop-filter: none;
+    flex-wrap: nowrap;
   }
 
   html.atelier body.dark-theme .nav-links,

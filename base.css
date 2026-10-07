@@ -215,28 +215,6 @@ a:hover {
   border-bottom: 2px solid #2a7ae2;
 }
 
-/* Dark theme for dropdown */
-
-
-body.dark-theme .dropdown-content a:hover,
-body.dark-theme .dropdown-content a:focus,
-body.dark-theme .dropdown-content a:active {
-  background-color: rgba(42, 122, 226, 0.3) !important;
-  color: #ffffff !important;
-  border-left-color: #2a7ae2 !important;
-}
-
-/* Make sure the text is always visible in dark mode */
-
-/* Override any other styles that might be affecting the text color */
-body.dark-theme .dropdown-content a:hover,
-body.dark-theme .dropdown-content a:focus,
-body.dark-theme .dropdown-content a:active,
-body.dark-theme .dropdown-content a.active {
-  color: #ffffff !important;
-  background-color: rgba(42, 122, 226, 0.4) !important;
-}
-
 /* Ensure the dropdown items have proper spacing and alignment */
 .dropdown-content a {
   padding: 10px 15px !important;
