@@ -819,16 +819,64 @@ html.atelier body.dark-theme .atelier-mascot-layer {
 }
 
 html.atelier .atelier-mascot-look {
-  background-image: url('mascots/deepika-directions.webp');
+  background-image: url('mascots/deepika-directions.webp?v=20261008');
 }
 
 html.atelier .atelier-mascot-react {
-  background-image: url('mascots/deepika-reactions.webp');
+  background-image: url('mascots/deepika-reactions.webp?v=20261008');
   visibility: hidden;
 }
 
 html.atelier .atelier-mascot.is-reacting .atelier-mascot-react {
   visibility: visible;
+}
+
+/* Body language on the wrapper. Breathing, hops and wiggles animate the
+   separate scale / translate / rotate properties so they can overlap without
+   overriding each other or the layers' pointer lean. */
+html.atelier .atelier-mascot {
+  transform-origin: 50% 100%;
+  animation: mascot-breathe 4.2s ease-in-out infinite;
+}
+
+html.atelier .atelier-mascot.is-hopping {
+  animation: mascot-breathe 4.2s ease-in-out infinite, mascot-hop 0.5s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+html.atelier .atelier-mascot.is-wiggling {
+  animation: mascot-breathe 4.2s ease-in-out infinite, mascot-wiggle 0.9s ease-in-out;
+}
+
+/* The SVG filter mascot.js injects; it displaces only the side hair. */
+html.atelier .atelier-mascot.is-breezy {
+  filter: url(#mascot-breeze);
+}
+
+@keyframes mascot-breathe {
+  0%, 100% { scale: 1 1; }
+  50% { scale: 1.006 1.014; }
+}
+
+@keyframes mascot-hop {
+  0%, 100% { translate: 0 0; }
+  35% { translate: 0 -12px; }
+  70% { translate: 0 2px; }
+}
+
+@keyframes mascot-wiggle {
+  0%, 100% { rotate: 0deg; }
+  20% { rotate: -3deg; }
+  40% { rotate: 3deg; }
+  60% { rotate: -2deg; }
+  80% { rotate: 1.5deg; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.atelier .atelier-mascot,
+  html.atelier .atelier-mascot.is-hopping,
+  html.atelier .atelier-mascot.is-wiggling {
+    animation: none;
+  }
 }
 
 html.atelier .atelier-about-frame figcaption {

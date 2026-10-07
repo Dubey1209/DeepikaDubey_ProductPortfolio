@@ -77,7 +77,8 @@ GSAP 3.12.7, ScrollTrigger 3.12.7, Lenis 1.1.20, page-flip 2.0.7, and
 ## Cache busting
 
 Every stylesheet and script is referenced with a **single shared** `?v=` token
-(currently `20261007`). When you change any CSS or JS file, bump that token —
+(currently `20261008`; the mascot sheet URLs in `atelier.css` carry it too).
+When you change any CSS, JS or mascot sheet, bump that token —
 in both `index.html` and `my-story.html`.
 
 If two changes ship on the same day, add a suffix (`-2`): the Phase 3 merge
@@ -128,10 +129,17 @@ It is two 3×3 sprite sheets in `mascots/`:
   / level / down, columns left / centre / right). The frame follows the
   pointer, aimed at the face.
 - `deepika-reactions.webp` — blink, wink, grin, gasp, giggle, shy, starry,
-  thinking, sleepy. A click (or Enter/Space when focused) shows a random one
-  for about a second; blinks happen on their own every 3–6s; after 20s without
-  pointer movement she dozes until the pointer moves. Blinking and dozing are
-  off under `prefers-reduced-motion`.
+  thinking, sleepy. Each is tied to something the visitor does (grin when the
+  pointer arrives, shy when it rests on her face, giggle when it scrubs over
+  her, a random one per click, thinking after four quick clicks, sometimes
+  starry when a link is hovered) or to idling (blinks, thinking or a wink
+  after 7s, sleepy after 20s, a startled gasp on waking). The table at the top
+  of `mascot.js` is the full list.
+
+She also breathes, hops on a poke, wiggles when tickled, and every 8–17s a
+breeze moves her side hair: an SVG filter displaces the picture by drifting
+noise, masked so the face and body stay still. All of the self-started motion
+is off under `prefers-reduced-motion`.
 
 There is no card: the sheets have a transparent background and the avatar sits
 straight on the page. The nine frames are steps, so `mascot.js` also sets

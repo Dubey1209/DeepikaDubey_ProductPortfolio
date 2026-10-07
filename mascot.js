@@ -1,5 +1,6 @@
-// About-section mascot: looks towards the cursor, reacts when poked, blinks on
-// its own, and dozes off when left alone.
+// About-section mascot: looks towards the cursor, reacts to what the visitor
+// does, blinks and breathes on her own, dozes off when left alone, and now and
+// then a breeze lifts her hair.
 //
 // Plain-JS take on the page-mascot idea (github.com/nilbuild/page-mascot),
 // which is a React component; this site has no React and no build step. The
@@ -9,6 +10,16 @@
 //   reactions   0 blink   1 wink      2 grin
 //               3 gasp    4 giggle    5 shy
 //               6 starry  7 thinking  8 sleepy
+//
+// What triggers each reaction:
+//   pointer arrives on her      grin + hop (at most every 15s)
+//   pointer rests on her face   shy
+//   pointer scrubs over her     giggle + wiggle (tickled)
+//   click / Enter / Space       wink, grin, gasp, giggle, starry or shy + hop
+//   four quick clicks           thinking ("what are you doing?")
+//   any link or button hovered  sometimes starry
+//   7s without the pointer      thinking or wink, once
+//   20s without the pointer     sleepy, until the pointer moves: then gasp
 //
 // The markup works without this script: CSS shows the centre direction frame.
 
@@ -25,17 +36,33 @@
   var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   var BLINK = 0;
+  var WINK = 1;
+  var GRIN = 2;
+  var GASP = 3;
+  var GIGGLE = 4;
+  var SHY = 5;
+  var STARRY = 6;
+  var THINKING = 7;
   var SLEEPY = 8;
-  var POKES = [1, 2, 3, 4, 5, 6, 7];
+  var POKES = [WINK, GRIN, GASP, GIGGLE, STARRY, SHY];
+
+  var IDLE_AFTER_MS = 7000;
   var DOZE_AFTER_MS = 20000;
 
+  var current = -1;
   var reactTimer = 0;
   var blinkTimer = 0;
+  var idleTimer = 0;
   var dozeTimer = 0;
+  var breezeTimer = 0;
   var lastPoke = -1;
   var visible = true;
   var pointer = null;
   var frameQueued = false;
+
+  function now() {
+    return Date.now();
+  }
 
   function position(layer, index) {
     var col = index % 3;
@@ -43,7 +70,9 @@
     layer.style.backgroundPosition = col * 50 + '% ' + row * 50 + '%';
   }
 
-  var current = -1;
+  function isReacting() {
+    return el.classList.contains('is-reacting');
+  }
 
   function showReaction(index, ms) {
     current = index;
@@ -51,21 +80,39 @@
     el.classList.add('is-reacting');
     clearTimeout(reactTimer);
     if (ms) {
-      reactTimer = setTimeout(function () {
-        el.classList.remove('is-reacting');
-      }, ms);
+      reactTimer = setTimeout(endReaction, ms);
     }
+  }
+
+  // Reactions she starts herself never cut off one the visitor caused.
+  function autoReaction(index, ms) {
+    if (visible && !isReacting()) showReaction(index, ms);
   }
 
   function endReaction() {
     clearTimeout(reactTimer);
     el.classList.remove('is-reacting');
+    current = -1;
   }
+
+  function body(cls, ms) {
+    if (reducedMotion) return;
+    el.classList.remove(cls);
+    void el.offsetWidth;
+    el.classList.add(cls);
+    setTimeout(function () {
+      el.classList.remove(cls);
+    }, ms);
+  }
+
+  // ---- gaze ---------------------------------------------------------------
+
+  var faceSince = 0;
 
   function lookAt(x, y) {
     var rect = el.getBoundingClientRect();
     var dx = x - (rect.left + rect.width / 2);
-    // Aim at the face, which sits in the upper part of the card.
+    // Aim at the face, which sits in the upper part of the figure.
     var dy = y - (rect.top + rect.height * 0.38);
     var dist = Math.sqrt(dx * dx + dy * dy);
 
@@ -75,7 +122,8 @@
     var row = 1;
     var nx = dist ? dx / dist : 0;
     var ny = dist ? dy / dist : 0;
-    if (dist > rect.width * 0.3) {
+    var nearFace = dist <= rect.width * 0.3;
+    if (!nearFace) {
       col = nx < -0.38 ? 0 : nx > 0.38 ? 2 : 1;
       row = ny < -0.38 ? 0 : ny > 0.38 ? 2 : 1;
     }
@@ -86,6 +134,15 @@
     var pull = Math.min(1, dist / (rect.width * 1.6));
     el.style.setProperty('--mascot-x', (nx * pull).toFixed(3));
     el.style.setProperty('--mascot-y', (ny * pull).toFixed(3));
+
+    if (!nearFace) {
+      faceSince = 0;
+    } else if (!faceSince) {
+      faceSince = now();
+    } else if (now() - faceSince > 900 && !isReacting()) {
+      showReaction(SHY, 1800);
+      faceSince = now() + 4000;
+    }
   }
 
   function onFrame() {
@@ -93,39 +150,209 @@
     if (pointer && visible) lookAt(pointer.x, pointer.y);
   }
 
-  function scheduleDoze() {
+  // ---- idle, doze, wake -----------------------------------------------------
+
+  function scheduleIdle() {
+    clearTimeout(idleTimer);
     clearTimeout(dozeTimer);
     if (reducedMotion) return;
+    idleTimer = setTimeout(function () {
+      if (Math.random() < 0.6) autoReaction(THINKING, 1700);
+      else autoReaction(WINK, 700);
+    }, IDLE_AFTER_MS);
     dozeTimer = setTimeout(function () {
       if (visible) showReaction(SLEEPY, 0);
     }, DOZE_AFTER_MS);
   }
 
   function wake() {
-    if (el.classList.contains('is-reacting') && current === SLEEPY) {
-      endReaction();
+    if (isReacting() && current === SLEEPY) {
+      showReaction(GASP, 700);
+      body('is-hopping', 500);
     }
-    scheduleDoze();
+    scheduleIdle();
   }
 
   function scheduleBlink() {
     clearTimeout(blinkTimer);
     if (reducedMotion) return;
     blinkTimer = setTimeout(function () {
-      if (visible && !el.classList.contains('is-reacting')) showReaction(BLINK, 140);
+      autoReaction(BLINK, 140);
+      // Now and then a double blink, which reads as more alive than a metronome.
+      if (Math.random() < 0.25) {
+        setTimeout(function () {
+          autoReaction(BLINK, 120);
+        }, 300);
+      }
       scheduleBlink();
-    }, 2800 + Math.random() * 3200);
+    }, 2600 + Math.random() * 3400);
   }
 
+  // ---- breeze ---------------------------------------------------------------
+  //
+  // An SVG filter displaces the picture by a noise field. The noise is
+  // multiplied by a mask that is zero over the face, crown and body centre, so
+  // only the long hair at the sides moves. The noise drifts back and forth and
+  // its strength swells and fades, which reads as a gust.
+
+  var SVG_NS = 'http://www.w3.org/2000/svg';
+  var MASK =
+    'data:image/svg+xml,' +
+    encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none">' +
+        '<defs>' +
+        '<linearGradient id="h" x1="0" x2="1">' +
+        '<stop offset="0" stop-color="#fff"/><stop offset=".24" stop-color="#fff"/>' +
+        '<stop offset=".38" stop-color="#000"/><stop offset=".62" stop-color="#000"/>' +
+        '<stop offset=".76" stop-color="#fff"/><stop offset="1" stop-color="#fff"/>' +
+        '</linearGradient>' +
+        '<linearGradient id="v" x1="0" y1="0" x2="0" y2="1">' +
+        '<stop offset=".28" stop-color="#000"/><stop offset=".5" stop-color="#fff"/>' +
+        '</linearGradient>' +
+        '<mask id="m"><rect width="100" height="100" fill="url(#v)"/></mask>' +
+        '</defs>' +
+        '<rect width="100" height="100" fill="#000"/>' +
+        '<rect width="100" height="100" fill="url(#h)" mask="url(#m)"/>' +
+        '</svg>'
+    );
+
+  var breeze = null;
+
+  function buildBreeze() {
+    var svg = document.createElementNS(SVG_NS, 'svg');
+    svg.setAttribute('aria-hidden', 'true');
+    svg.setAttribute('width', '0');
+    svg.setAttribute('height', '0');
+    svg.style.position = 'absolute';
+    svg.innerHTML =
+      '<filter id="mascot-breeze" x="-10%" y="-5%" width="120%" height="110%" color-interpolation-filters="sRGB">' +
+      '<feTurbulence type="fractalNoise" baseFrequency="0.012 0.035" numOctaves="2" seed="7" result="noise"/>' +
+      '<feOffset in="noise" dx="0" dy="0" result="flow"/>' +
+      // Opaque noise, so the arithmetic below works on plain colour values.
+      '<feColorMatrix in="flow" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0 1" result="solid"/>' +
+      '<feImage preserveAspectRatio="none" x="0" y="0" width="340" height="400" result="mask"/>' +
+      // map = 0.5 + (noise - 0.5) * mask: neutral (no displacement) where mask is 0.
+      '<feComposite in="solid" in2="mask" operator="arithmetic" k1="1" k2="0" k3="-0.5" k4="0.5" result="map"/>' +
+      '<feDisplacementMap in="SourceGraphic" in2="map" scale="0" xChannelSelector="R" yChannelSelector="G"/>' +
+      '</filter>';
+    document.body.appendChild(svg);
+    var image = svg.querySelector('feImage');
+    image.setAttribute('href', MASK);
+    breeze = {
+      offset: svg.querySelector('feOffset'),
+      image: image,
+      displace: svg.querySelector('feDisplacementMap'),
+      running: false,
+    };
+  }
+
+  function gust() {
+    if (!breeze || breeze.running || !visible || current === SLEEPY) return;
+    var rect = el.getBoundingClientRect();
+    breeze.image.setAttribute('width', rect.width);
+    breeze.image.setAttribute('height', rect.height);
+    breeze.running = true;
+    el.classList.add('is-breezy');
+
+    var DURATION = 2600;
+    var start = performance.now();
+    var strength = 7 + Math.random() * 5;
+    var dir = Math.random() < 0.5 ? -1 : 1;
+
+    function step(t) {
+      var p = (t - start) / DURATION;
+      if (p >= 1) {
+        breeze.displace.setAttribute('scale', '0');
+        el.classList.remove('is-breezy');
+        breeze.running = false;
+        return;
+      }
+      var swell = Math.pow(Math.sin(Math.PI * p), 2);
+      var phase = (t - start) / 1000;
+      breeze.displace.setAttribute('scale', (strength * swell).toFixed(2));
+      breeze.offset.setAttribute('dx', (dir * 22 * Math.sin(phase * 4.2)).toFixed(1));
+      breeze.offset.setAttribute('dy', (8 * Math.sin(phase * 2.7)).toFixed(1));
+      requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  function scheduleBreeze() {
+    clearTimeout(breezeTimer);
+    if (!breeze) return;
+    breezeTimer = setTimeout(function () {
+      gust();
+      scheduleBreeze();
+    }, 8000 + Math.random() * 9000);
+  }
+
+  // ---- visitor input --------------------------------------------------------
+
+  var clicks = [];
+
   function poke() {
+    var t = now();
+    clicks = clicks.filter(function (c) {
+      return t - c < 2500;
+    });
+    clicks.push(t);
+    scheduleIdle();
+
+    if (clicks.length >= 4) {
+      clicks = [];
+      showReaction(THINKING, 1500);
+      return;
+    }
+
     var pick;
     do {
       pick = POKES[Math.floor(Math.random() * POKES.length)];
     } while (pick === lastPoke);
     lastPoke = pick;
     showReaction(pick, 1100);
-    scheduleDoze();
+    if (pick === GIGGLE) body('is-wiggling', 900);
+    else body('is-hopping', 500);
   }
+
+  var lastGreet = 0;
+
+  el.addEventListener('pointerenter', function () {
+    if (now() - lastGreet < 15000 || isReacting()) return;
+    lastGreet = now();
+    showReaction(GRIN, 900);
+    body('is-hopping', 500);
+  });
+
+  // Tickle: the pointer reversing direction quickly several times over her.
+  var reversals = [];
+  var lastDir = 0;
+
+  el.addEventListener('pointermove', function (e) {
+    if (Math.abs(e.movementX) < 6) return;
+    var dir = e.movementX > 0 ? 1 : -1;
+    if (dir === lastDir) return;
+    lastDir = dir;
+    var t = now();
+    reversals = reversals.filter(function (r) {
+      return t - r < 900;
+    });
+    reversals.push(t);
+    if (reversals.length >= 5) {
+      reversals = [];
+      showReaction(GIGGLE, 1300);
+      body('is-wiggling', 900);
+    }
+  });
+
+  var lastStarry = 0;
+
+  document.addEventListener('pointerover', function (e) {
+    var target = e.target.closest && e.target.closest('a, button');
+    if (!target || el.contains(target)) return;
+    if (now() - lastStarry < 8000 || Math.random() > 0.35) return;
+    lastStarry = now();
+    autoReaction(STARRY, 900);
+  });
 
   window.addEventListener(
     'pointermove',
@@ -148,19 +375,30 @@
     }
   });
 
+  // ---- start / pause --------------------------------------------------------
+
+  if (!reducedMotion) buildBreeze();
+
+  function start() {
+    scheduleBlink();
+    scheduleIdle();
+    scheduleBreeze();
+  }
+
+  function stop() {
+    clearTimeout(blinkTimer);
+    clearTimeout(idleTimer);
+    clearTimeout(dozeTimer);
+    clearTimeout(breezeTimer);
+  }
+
   if ('IntersectionObserver' in window) {
     new IntersectionObserver(function (entries) {
       visible = entries[0].isIntersecting;
-      if (visible) {
-        scheduleBlink();
-        scheduleDoze();
-      } else {
-        clearTimeout(blinkTimer);
-        clearTimeout(dozeTimer);
-      }
+      if (visible) start();
+      else stop();
     }).observe(el);
   } else {
-    scheduleBlink();
-    scheduleDoze();
+    start();
   }
 })();
