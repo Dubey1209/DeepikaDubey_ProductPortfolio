@@ -327,7 +327,9 @@
       // angle matters, close by it takes a real move to turn her head.
       var reach = Math.max(dist, rect.width * 0.95);
       col = axis(col, dx / reach);
-      row = axis(row, dy / reach);
+      // The downward frames were drawn without her smile and read as sad, so
+      // below her she keeps the level frame and the lean tips her head down.
+      row = Math.min(axis(row, dy / reach), 1);
     }
     requestLook(row * 3 + col);
 
@@ -1077,7 +1079,6 @@
     story: ['the long version… grab a snack', 'it starts with a very curious kid', 'my whole story? you’re sweet'],
     contact: ['yes! say hi, I reply', 'hiring for product? I can think and ship', 'slide into my inbox, professionally'],
     resume: ['one page. zero fluff. promise', 'my resume: the shippable version of me', 'download me, I’m lightweight'],
-    who: ['that’s me! keep scrolling', 'who am I? the answer is right below', 'spoiler: a PM who ships'],
     toLight: ['lights on? okay, squint time', 'bright mode, for the brave', 'switching to daylight? good morning!'],
     toDark: ['dark mode? my eyes say thank you', 'lights off? cosy mode incoming', 'night shift? I’m ready'],
   };
@@ -1101,7 +1102,6 @@
   function guideKey(target) {
     if (target.id === 'theme-toggle') return document.body.classList.contains('dark-theme') ? 'toLight' : 'toDark';
     if (target.closest('.home-btns')) return 'resume';
-    if (target.classList.contains('home-who')) return 'who';
     if (!target.closest('.navbar')) return '';
     return GUIDE_HREFS[target.getAttribute('href')] || '';
   }

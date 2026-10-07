@@ -101,7 +101,10 @@
       var t = e.target;
       html.classList.toggle('fx-text', !!(t && t.closest && t.closest('input, textarea, select')));
       html.classList.toggle('fx-pointer', !!(t && t.closest && t.closest('a, button, label, .unlock-btn')));
-      html.classList.toggle('fx-view', !!(t && t.closest && t.closest('.project-card, .atelier-essay')));
+      html.classList.toggle('fx-on-fill', !!(t && t.closest && t.closest('.fx-fill')));
+      // Over a card's own buttons the big "View" disc would cover them.
+      html.classList.toggle('fx-view', !!(t && t.closest && t.closest('.project-card, .atelier-essay') &&
+        !t.closest('a, button')));
     }, { passive: true });
 
     if (!moveBallX) {
@@ -121,11 +124,16 @@
       el.classList.add('fx-mag');
       if (fill) {
         el.classList.add('fx-fill');
-        if (!el.querySelector('.fx-fill-label, .btn-text, svg')) {
-          var wrap = document.createElement('span');
-          wrap.className = 'fx-fill-label';
-          while (el.firstChild) wrap.appendChild(el.firstChild);
-          el.appendChild(wrap);
+        if (!el.querySelector('.fx-fill-label, .btn-text')) {
+          // Bare text sits below the positioned fill, so every text node gets
+          // its own layer; elements beside it (icons) are lifted by CSS.
+          Array.prototype.slice.call(el.childNodes).forEach(function (node) {
+            if (node.nodeType !== 3 || !node.textContent.trim()) return;
+            var wrap = document.createElement('span');
+            wrap.className = 'fx-fill-label';
+            el.insertBefore(wrap, node);
+            wrap.appendChild(node);
+          });
         }
       }
       el.addEventListener('mousemove', function (e) {
@@ -172,7 +180,7 @@
   function bindHeroMag() {
     if (!magFn) return;
     document.querySelectorAll('.home-btns .btn').forEach(function (el) { magFn(el, 0.48, true); });
-    document.querySelectorAll('.home-who, .logo, .nav-links > li > a, .nav-links .dropbtn').forEach(function (el) {
+    document.querySelectorAll('.logo, .nav-links > li > a, .nav-links .dropbtn').forEach(function (el) {
       magFn(el, 0.28, false);
     });
   }
@@ -199,7 +207,7 @@
 
     var cinemaOn = bindScrollCinema();
     if (!cinemaOn) bindFadeFallback();
-    bindDraw();
+    bindCues();
 
     var cgpa = document.querySelector('.atelier-edu-stat strong');
     if (cgpa && cgpa.textContent.trim() === '8.3' && !cgpa.dataset.fxCount) {
@@ -235,19 +243,21 @@
     }
   }
 
-  function bindDraw() {
-    var marks = document.querySelectorAll('.atelier-about-mark');
-    if (!marks.length || html.dataset.fxDraw || !('IntersectionObserver' in window)) return;
-    html.dataset.fxDraw = '1';
+  // One-shot cues (the underline drawing, the stamp landing) that CSS plays
+  // once their element is on screen.
+  function bindCues() {
+    var cues = document.querySelectorAll('.atelier-about-mark, .atelier-about-notes');
+    if (!cues.length || html.dataset.fxCues || !('IntersectionObserver' in window)) return;
+    html.dataset.fxCues = '1';
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
         if (!entry.isIntersecting) return;
-        entry.target.classList.add('is-drawn');
+        entry.target.classList.add('is-cued');
         io.unobserve(entry.target);
       });
-    }, { rootMargin: '0px 0px -15% 0px', threshold: 1 });
-    marks.forEach(function (el) { io.observe(el); });
-    html.classList.add('has-draw');
+    }, { rootMargin: '0px 0px -15% 0px', threshold: 0.35 });
+    cues.forEach(function (el) { io.observe(el); });
+    html.classList.add('has-cues');
   }
 
   function bindFadeFallback() {
@@ -575,7 +585,6 @@
     var line2 = home.querySelectorAll('.hero-line-2 .fx-ch > span');
     var subtitle = home.querySelector('.home-subtitle');
     var desc = home.querySelector('.home-desc');
-    var who = home.querySelector('.home-who');
     var btns = home.querySelector('.home-btns');
     var g = window.gsap;
     var finished = false;
@@ -597,7 +606,7 @@
     var ruleEl = home.querySelector('.hero-rule');
 
     function showCopy() {
-      [kicker, subtitle, desc, who, btns].forEach(function (el) {
+      [kicker, subtitle, desc, btns].forEach(function (el) {
         if (!el) return;
         el.style.opacity = '1';
         el.style.visibility = 'visible';
@@ -627,7 +636,6 @@
       if (kicker) g.set(kicker, { clearProps: 'transform,opacity,visibility,letterSpacing' });
       if (subtitle) g.set(subtitle, { clearProps: 'transform,opacity,visibility,filter' });
       if (desc) g.set(desc, { clearProps: 'transform,opacity,visibility,filter' });
-      if (who) g.set(who, { clearProps: 'transform,opacity,visibility' });
       if (btns) g.set(btns, { clearProps: 'transform,opacity,visibility,scale' });
       showCopy();
     }
@@ -701,12 +709,6 @@
       tl.fromTo(desc, { y: 20, autoAlpha: 0 }, {
         y: 0, autoAlpha: 1, duration: 0.9, ease: 'power3.out'
       }, 0.88);
-    }
-
-    if (who) {
-      tl.fromTo(who, { y: 14, autoAlpha: 0 }, {
-        y: 0, autoAlpha: 1, duration: 0.75, ease: 'power3.out'
-      }, 1.02);
     }
 
     if (btns) {

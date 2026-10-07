@@ -77,7 +77,7 @@ GSAP 3.12.7, ScrollTrigger 3.12.7, Lenis 1.1.20, page-flip 2.0.7, and
 ## Cache busting
 
 Every stylesheet and script is referenced with a **single shared** `?v=` token
-(currently `20261021`; the mascot sheet URLs in `atelier.css` carry it too).
+(currently `20261022`; the mascot sheet URLs in `atelier.css` carry it too).
 When you change any CSS, JS or mascot sheet, bump that token —
 in both `index.html` and `my-story.html`.
 
@@ -127,23 +127,42 @@ never runs off the page; on phones it sits above her head as before. Once per
 visit, after the hero's entrance and the lock screen, she says hello
 (`GREETINGS`; the test harness marks her as having greeted so captures do not
 depend on the timer). In the hero she is ~9% larger (372×438; 240×282 on
-phones).
+phones). She never uses the bottom row of the direction sheet: those frames
+were drawn without her smile and read as sad, so with the pointer below her
+she keeps the level frame and the spring lean tips her head down.
 
 About is a centred column with no photo. The working loop is a row of chips
-(built → measured → shipped → "should it exist?"), the pull quote gets a
-hand-drawn underline under "earn a place" (drawn by `bindDraw()` in
-`motion.js` when it scrolls into view; drawn from the start without the
-observer or under reduced motion), and the three notes are tilted sticker
-cards, numbered 01–03 like the chapters of My Story, each with a line icon,
-and a "shipped ✓" stamp on the third. Tilt and hover lift use the
+(built → measured → shipped → "should it exist?") whose arrows nudge forward
+in turn while the last chip catches a passing shine; the pull quote gets a
+hand-drawn underline under "earn a place"; and the three notes are tilted
+sticker cards, numbered 01–03 like the chapters of My Story, each with a line
+icon, and a "shipped ✓" stamp on the third. The underline drawing, the icons
+popping in and the stamp landing are one-shot cues: `bindCues()` in
+`motion.js` adds `is-cued` when they scroll into view, and they are only
+hidden beforehand once `has-cues` says the observer is running (under
+reduced motion they are simply shown). Tilt and hover lift use the
 `rotate`/`translate` properties because the scroll reveals own `transform`.
 The legacy case-studies glow (`::before` in `base.css`, `top: -50%`) reached
 up over these cards and swallowed their hover, so its pseudo-elements are
 `pointer-events: none`.
 
+Elsewhere each section gets one quiet gesture rather than new content: a
+fun-fact card's kicker hairline stretches into an accent as it lifts, a
+hovered coursework subject steps forward behind a dot, "Open to product
+roles" has a soft live ping, and the full stop of the footer's "Let's ship."
+is the accent colour and hops when hovered.
+
+Buttons that fill on hover (`magnetic(..., true)` in `motion.js`) wrap each
+bare text node in `.fx-fill-label`, so the text stays above the fill even next
+to an icon (the case-study buttons used to vanish into their own fill), and
+the fill is centred on the cursor rather than growing from `base.css`'s left
+origin. Over a fill button the cursor ring shrinks to a dot, and inside a
+work card the big "View" disc steps aside for the card's own links and
+buttons instead of covering them.
+
 She is also a tour guide while the hero is on screen (`GUIDE` in `mascot.js`):
-resting the mouse on a nav link, the theme switch, the resume button or "Who
-am I?" for 280ms gets a remark about where it leads ("skills: tested in
+resting the mouse on a nav link, the theme switch or the resume button for
+280ms gets a remark about where it leads ("skills: tested in
 production, not just listed", "dark mode? my eyes say thank you"), at most once
 per 6s per target. Her gaze already follows the pointer, so she looks up at
 the link while she says it; the face is left alone, since a reaction would

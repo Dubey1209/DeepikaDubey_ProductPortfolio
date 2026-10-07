@@ -80,6 +80,19 @@ html.has-fx-cursor.fx-pointer .fx-cursor-ball {
   border-color: var(--spin, #c45c26);
 }
 
+/* A filling button is its own hover feedback: the ring melts into a dot. */
+html.has-fx-cursor.fx-on-fill .fx-cursor-ball {
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border-color: var(--spin, #c45c26);
+  background: var(--spin, #c45c26);
+}
+
+html.has-fx-cursor.fx-on-fill .fx-cursor-dot {
+  opacity: 0;
+}
+
 html.has-fx-cursor.fx-text .fx-cursor-dot,
 html.has-fx-cursor.fx-text .fx-cursor-ball {
   opacity: 0;
@@ -177,7 +190,6 @@ html.has-fx-cursor.fx-text .fx-cursor-ball {
 .home-section.hero-live .home-kicker,
 .home-section.hero-live .home-subtitle,
 .home-section.hero-live .home-desc,
-.home-section.hero-live .home-who,
 .home-section.hero-live .home-btns,
 .home-section.hero-live .home-rotate,
 .home-section.hero-live .home-kicker .fx-ch > span {
@@ -551,6 +563,8 @@ html.atelier .fx-fill::before {
   height: 14px;
   border-radius: 50%;
   transform: translate(-50%, -50%) scale(0);
+  /* base.css grows button fills from the left; this one is centred on the cursor. */
+  transform-origin: 50% 50% !important;
   transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
