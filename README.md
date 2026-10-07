@@ -77,7 +77,7 @@ GSAP 3.12.7, ScrollTrigger 3.12.7, Lenis 1.1.20, page-flip 2.0.7, and
 ## Cache busting
 
 Every stylesheet and script is referenced with a **single shared** `?v=` token
-(currently `20261030`; the mascot sheet URLs in `atelier.css` carry it too).
+(currently `20261031`; the mascot sheet URLs in `atelier.css` carry it too).
 When you change any CSS, JS or mascot sheet, bump that token —
 in both `index.html` and `my-story.html`.
 
@@ -129,11 +129,14 @@ visit, after the hero's entrance and the lock screen, she says hello
 depend on the timer). A visitor who has just typed their name on the lock
 screen gets a welcome instead: `portfolio-lock.js` passes the name in the
 `portfolio-unlocked` event, and `welcome()` in `mascot.js` plays four beats
-using their first name: a grin and a wave hello (`wave()` raises a small
-drawn hand and sleeve, `.atelier-mascot-hand`, beside her head), a shy blush
-("this isn't just a portfolio, you know…", a pink flush over her cheeks,
-`.atelier-mascot-blush`, while hearts rise), starry eyes ("a little gist of my
-life"), then a giggle and "make yourself at home". The plain hello waves too.
+using their first name: a grin and sparkles, a shy blush ("this isn't just
+a portfolio, you know…", a pink flush over her cheeks, `.atelier-mascot-blush`,
+while hearts rise), a wink ("a little gist of my life"), then a giggle and
+"make yourself at home". A drawn waving hand was tried and removed: it never
+looked like part of her. The star-eyes cell (6) of the reactions sheet is not
+used anywhere (its sparkles came out oversized and blurry); `STARRY` in
+`mascot.js` is an alias for the grin, and the story book and 404 page use
+grin, giggle or wink instead.
 A returning session unlocks without a name and gets the ordinary hello. Left
 alone she does not freeze: after ~6s with no pointer, scroll or key, the "at
 rest" loop in `mascot.js` does one small thing every 5–10s: a slow glance, a

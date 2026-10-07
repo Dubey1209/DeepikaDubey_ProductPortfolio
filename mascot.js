@@ -60,7 +60,9 @@
   var GASP = 3;
   var GIGGLE = 4;
   var SHY = 5;
-  var STARRY = 6;
+  // Cell 6 (star eyes) read as blurry, oversized sparkles, so her "excited"
+  // moments use the open grin instead.
+  var STARRY = GRIN;
   var THINKING = 7;
   var CENTRE = 4;
   // Reactions whose drawing reaches outside the face (her hand), so they
@@ -1589,41 +1591,13 @@
     }, 3600);
   }
 
-  // She raises a hand and waves hello. The sheets have no arm drawn up, so
-  // the hand is its own little drawing in her palette, waving at the wrist.
-  var HAND =
-    '<svg viewBox="0 0 60 150" aria-hidden="true">' +
-      '<g class="atelier-mascot-hand-skin">' +
-        '<rect x="47" y="30" width="8" height="17" rx="4" transform="rotate(50 51 38)"/>' +
-        '<rect x="13" y="13" width="8" height="21" rx="4" transform="rotate(-14 17 24)"/>' +
-        '<rect x="21" y="7" width="8" height="24" rx="4" transform="rotate(-4 25 19)"/>' +
-        '<rect x="30" y="7" width="8" height="24" rx="4" transform="rotate(5 34 19)"/>' +
-        '<rect x="38" y="13" width="8" height="20" rx="4" transform="rotate(15 42 23)"/>' +
-        '<rect x="14" y="26" width="31" height="29" rx="13"/>' +
-      '</g>' +
-      '<path class="atelier-mascot-hand-cuff" d="M14 56q0-5 5-5h21q5 0 5 5l4 94h-39z"/>' +
-      '<path class="atelier-mascot-hand-stripe" d="M15 66h30M14 84h33M13 102h35M12 120h37"/>' +
-    '</svg>';
-
-  function wave() {
-    if (reducedMotion) return;
-    var hand = document.createElement('span');
-    hand.className = 'atelier-mascot-hand';
-    hand.setAttribute('aria-hidden', 'true');
-    hand.innerHTML = HAND;
-    el.appendChild(hand);
-    setTimeout(function () {
-      if (hand.parentNode) hand.parentNode.removeChild(hand);
-    }, 3000);
-  }
-
   function welcome(name) {
     pendingWelcome = '';
     var first = firstName(name);
     var beats = [
-      { face: GRIN, text: first ? 'hi ' + first + '! so happy you’re here' : 'hi! so happy you’re here', fx: 'spark', wave: true },
+      { face: GRIN, text: first ? 'hi ' + first + '! so happy you’re here' : 'hi! so happy you’re here', fx: 'spark' },
       { face: SHY, text: 'this isn’t just a portfolio, you know…', fx: 'heart', blush: true },
-      { face: STARRY, text: 'it’s a little gist of my life: the work, and the girl behind it' },
+      { face: WINK, text: 'it’s a little gist of my life: the work, and the girl behind it' },
       { face: GIGGLE, text: first ? 'make yourself at home, ' + first + ' ♡' : 'make yourself at home ♡' },
     ];
     var at = 0;
@@ -1637,7 +1611,6 @@
         say(beat.text, hold);
         el.classList.toggle('is-blushing', !!beat.blush);
         if (beat.fx) burst(beat.fx);
-        if (beat.wave) wave();
       }, at);
       at += hold + 280;
     });
@@ -1680,7 +1653,6 @@
       var hold = holdFor(line.text);
       react(line.face, hold);
       say(line.text, hold);
-      wave();
     }, 2200);
   }
 

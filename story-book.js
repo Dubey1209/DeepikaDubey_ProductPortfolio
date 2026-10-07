@@ -89,10 +89,10 @@
   // second face. [face, second face, scribble]. Faces: 0 eyes closed, 1 wink,
   // 2 grin, 3 gasp, 4 giggle, 5 shy, 6 starry, 7 thinking, 8 unimpressed.
   var MOODS = [
-    [3, 6, 'wait, what?!'], [6, 2, 'best. day.'], [2, 4, 'hehe'], [4, 1, 'lol, true'],
-    [1, 2, 'between us'], [7, 6, 'hmm… oh!'], [2, 6, 'yay!'], [5, 4, 'eep'],
+    [3, 2, 'wait, what?!'], [2, 4, 'best. day.'], [2, 4, 'hehe'], [4, 1, 'lol, true'],
+    [1, 2, 'between us'], [7, 2, 'hmm… oh!'], [2, 1, 'yay!'], [5, 4, 'eep'],
     [4, 2, 'haha'], [7, 1, 'plot twist'], [8, 4, 'really?'], [0, 2, 'deep breath'],
-    [6, 4, 'look at that'], [1, 6, 'more soon']
+    [4, 2, 'look at that'], [1, 2, 'more soon']
   ];
 
   // One small found object per text page, so no two neighbours look alike.
@@ -401,8 +401,8 @@
   sheets.push(sheet(
     '<div class="wb-write sb-open">' +
       '<p class="sb-open-kicker sb-tape is-tape-a">The end</p>' +
-      '<span class="sb-mood-wrap" data-face="6" data-alt="1">' +
-        cameo('is-sticker is-mood', 4, false, 6) +
+      '<span class="sb-mood-wrap" data-face="2" data-alt="1">' +
+        cameo('is-sticker is-mood', 4, false, 2) +
         '<span class="sb-mood-note" aria-hidden="true">thank you!</span>' +
       '</span>' +
       '<h3 class="sb-open-title">Watch me. I\'m just getting started.</h3>' +
