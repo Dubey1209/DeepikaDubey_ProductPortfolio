@@ -1152,6 +1152,59 @@ html.atelier .atelier-mascot.is-blushing .atelier-mascot-blush {
   to { opacity: 0.65; }
 }
 
+/* Her waving hand: rises from below her shoulder, waves at the wrist four
+   times, and lowers again. */
+html.atelier .atelier-mascot-hand {
+  position: absolute;
+  z-index: 5;
+  left: 75%;
+  top: 22%;
+  width: 15%;
+  pointer-events: none;
+  transform-origin: 50% 100%;
+  -webkit-mask-image: linear-gradient(#000 72%, transparent 96%);
+  mask-image: linear-gradient(#000 72%, transparent 96%);
+  animation: mascot-wave 2.8s cubic-bezier(0.37, 0, 0.3, 1) forwards;
+}
+
+html.atelier .atelier-mascot-hand svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+html.atelier .atelier-mascot-hand-skin {
+  fill: #f2b88b;
+  stroke: #3b2419;
+  stroke-width: 2.2;
+}
+
+html.atelier .atelier-mascot-hand-cuff {
+  fill: #4a2d22;
+  stroke: #3b2419;
+  stroke-width: 2.2;
+}
+
+html.atelier .atelier-mascot-hand-stripe {
+  fill: none;
+  stroke: #eadcc4;
+  stroke-width: 2.4;
+}
+
+@keyframes mascot-wave {
+  0% { opacity: 0; translate: 0 45%; rotate: 0deg; }
+  12% { opacity: 1; translate: 0 0; rotate: -4deg; }
+  22% { rotate: 11deg; }
+  32% { rotate: -6deg; }
+  42% { rotate: 11deg; }
+  52% { rotate: -6deg; }
+  62% { rotate: 9deg; }
+  72% { rotate: -3deg; }
+  86% { opacity: 1; translate: 0 0; rotate: 2deg; }
+  100% { opacity: 0; translate: 0 40%; rotate: 0deg; }
+}
+
 html.atelier .atelier-mascot-burst {
   position: absolute;
   inset: 0;
@@ -1231,12 +1284,12 @@ html.atelier .atelier-mascot-burst.is-spark > span {
    scaling the picture continuously kept it permanently resampled and soft. */
 html.atelier .atelier-mascot-look,
 html.atelier .atelier-mascot-layer.is-look {
-  background-image: url('mascots/deepika-directions.webp?v=20261028');
+  background-image: url('mascots/deepika-directions.webp?v=20261029');
 }
 
 html.atelier .atelier-mascot-react,
 html.atelier .atelier-mascot-layer.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261028');
+  background-image: url('mascots/deepika-reactions.webp?v=20261029');
 }
 
 html.atelier .atelier-mascot-react {
@@ -1251,8 +1304,8 @@ html.atelier .atelier-mascot-react {
    underneath; an oval reached the jaw and showed a second chin. */
 html.atelier .atelier-mascot-face {
   opacity: 0;
-  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261028');
-  mask-image: url('mascots/deepika-face-mask.png?v=20261028');
+  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261029');
+  mask-image: url('mascots/deepika-face-mask.png?v=20261029');
   -webkit-mask-size: 300% 300%;
   mask-size: 300% 300%;
   -webkit-mask-repeat: no-repeat;
@@ -4934,14 +4987,14 @@ html.atelier .sb-cameo-art {
   top: 11%;
   width: 120%;
   aspect-ratio: 680 / 800;
-  background-image: url('mascots/deepika-directions.webp?v=20261028');
+  background-image: url('mascots/deepika-directions.webp?v=20261029');
   background-repeat: no-repeat;
   background-size: 300% 300%;
   background-position: 50% 50%;
 }
 
 html.atelier .sb-cameo-art.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261028');
+  background-image: url('mascots/deepika-reactions.webp?v=20261029');
 }
 
 html.atelier .sb-cameo-art.is-face {

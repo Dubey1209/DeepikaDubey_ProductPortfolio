@@ -77,7 +77,7 @@ GSAP 3.12.7, ScrollTrigger 3.12.7, Lenis 1.1.20, page-flip 2.0.7, and
 ## Cache busting
 
 Every stylesheet and script is referenced with a **single shared** `?v=` token
-(currently `20261028`; the mascot sheet URLs in `atelier.css` carry it too).
+(currently `20261029`; the mascot sheet URLs in `atelier.css` carry it too).
 When you change any CSS, JS or mascot sheet, bump that token —
 in both `index.html` and `my-story.html`.
 
@@ -128,15 +128,26 @@ visit, after the hero's entrance and the lock screen, she says hello
 (`GREETINGS`; the test harness marks her as having greeted so captures do not
 depend on the timer). A visitor who has just typed their name on the lock
 screen gets a welcome instead: `portfolio-lock.js` passes the name in the
-`portfolio-unlocked` event, and `welcome()` in `mascot.js` plays three beats
-using their first name: starry eyes with sparkles, a shy blush (a pink flush
-over her cheeks, `.atelier-mascot-blush`, while hearts rise from them), then a
-giggle and "welcome in". A returning session unlocks without a name and gets
-the ordinary hello. Left alone she does not freeze: after ~4.5s with no
-pointer, scroll or key, the "at rest" loop in `mascot.js` has her glance
-about, roll her eyes up and round, smile or think to herself and double
-blink; after ~25s of quiet she now and then says something (`IDLE_LINES`).
-Any movement hands her gaze straight back to the pointer. In the hero she is ~9% larger (372×438; 240×282 on
+`portfolio-unlocked` event, and `welcome()` in `mascot.js` plays four beats
+using their first name: a grin and a wave hello (`wave()` raises a small
+drawn hand and sleeve, `.atelier-mascot-hand`, beside her head), a shy blush
+("this isn't just a portfolio, you know…", a pink flush over her cheeks,
+`.atelier-mascot-blush`, while hearts rise), starry eyes ("a little gist of my
+life"), then a giggle and "make yourself at home". The plain hello waves too.
+A returning session unlocks without a name and gets the ordinary hello. Left
+alone she does not freeze: after ~6s with no pointer, scroll or key, the "at
+rest" loop in `mascot.js` does one small thing every 5–10s: a slow glance, a
+shy smile with a blush, a giggle, a grin, thinking, an occasional eye roll
+or double blink. Blinks come every 3.6–8s and close slowly. After 30s of
+quiet she sometimes says something (`IDLE_LINES`). Any movement hands her
+gaze straight back to the pointer.
+
+Following the pointer she turns one gaze cell at a time (left → centre →
+right, never straight across), with a quick 170ms fade and a small head dip
+on each step, so it reads as a turn rather than a cross-fade morph between two
+poses. A slow two-wave sway and breathing (`sway()`) is added to the spring
+so she is never a still cut-out; the offset is snapped to the pixel grid and
+tiny tilts are dropped so the sway does not soften the picture. In the hero she is ~9% larger (372×438; 240×282 on
 phones). The bottom row of the direction sheet was drawn without her smile,
 so she looked sad whenever the pointer was below her. `smileDown` in
 `tools/build-mascot.mjs` fixes it in the build: it paints the flat mouth out

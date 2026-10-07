@@ -249,19 +249,19 @@
     blinkTimer = setTimeout(function () {
       blink();
       // Now and then a double blink, which reads as more alive than a metronome.
-      if (Math.random() < 0.22) setTimeout(blink, 380);
+      if (Math.random() < 0.12) setTimeout(blink, 520);
       scheduleBlink();
-    }, 2800 + Math.random() * 3600);
+    }, 3600 + Math.random() * 4400);
   }
 
   // Lids close fast and open a little slower, as real ones do. Only the face
   // layer moves, so a blink touches nothing but the eyes.
   function blink() {
     if (!visible || reacting >= 0 || lookIndex !== CENTRE || body.key !== 'look:' + CENTRE) return;
-    face.show('react', BLINK, 70);
+    face.show('react', BLINK, 90);
     setTimeout(function () {
-      if (reacting < 0) face.hide(130);
-    }, 150);
+      if (reacting < 0) face.hide(190);
+    }, 170);
   }
 
   // ---- gaze -----------------------------------------------------------------
@@ -275,10 +275,14 @@
   // Thresholds with hysteresis: a frame is entered past ENTER and kept until
   // the cursor comes back past LEAVE, so a cursor sitting on a boundary does
   // not flick between two frames.
-  var ENTER = 0.45;
-  var LEAVE = 0.28;
+  var ENTER = 0.5;
+  var LEAVE = 0.24;
   // She settles on a direction only once the cursor has held it this long.
-  var SETTLE_MS = 110;
+  var SETTLE_MS = 150;
+  // Each step of a head turn. A turn moves one frame at a time, through the
+  // frames in between, as a head does; jumping left-to-right in one cross-fade
+  // showed two heads at once and read as a machine.
+  var TURN_MS = 170;
 
   function axis(current, v) {
     if (current === 0) return v < -LEAVE ? 0 : v > ENTER ? 2 : 1;
@@ -298,12 +302,18 @@
 
   function commitLook() {
     if (wantLook === lookIndex) return;
-    var turnX = (wantLook % 3) - (lookIndex % 3);
-    var turnY = Math.floor(wantLook / 3) - Math.floor(lookIndex / 3);
-    lookIndex = wantLook;
-    if (reacting >= 0) return;
-    body.show('look', lookIndex, 300);
-    nudge(turnX * 0.55, turnY * 0.3);
+    var c = lookIndex % 3;
+    var r = Math.floor(lookIndex / 3);
+    var turnX = Math.sign((wantLook % 3) - c);
+    var turnY = Math.sign(Math.floor(wantLook / 3) - r);
+    lookIndex = (r + turnY) * 3 + c + turnX;
+    if (reacting < 0) {
+      body.show('look', lookIndex, TURN_MS);
+      // The head leads with a slight dip, and the body follows through.
+      nudge(turnX * 0.32, turnY * 0.18 + 0.1);
+    }
+    clearTimeout(lookTimer);
+    if (lookIndex !== wantLook) lookTimer = setTimeout(commitLook, TURN_MS - 20);
   }
 
   function aim() {
@@ -386,11 +396,22 @@
     wakeSpring();
   }
 
+  // Standing still she still breathes and sways a touch, on slow incommensurate
+  // waves so it never repeats like a loop; perfectly motionless between
+  // gestures she read as a cut-out.
+  function sway(t) {
+    return {
+      x: 0.11 * Math.sin(t / 2300) + 0.05 * Math.sin(t / 1370 + 1.3),
+      y: 0.16 * Math.sin(t / 1900) + 0.04 * Math.sin(t / 830),
+    };
+  }
+
   function stepSpring(t) {
     var dt = lastT ? Math.min(0.034, (t - lastT) / 1000) : 0.016;
     lastT = t;
+    var drift = sway(t);
     ['x', 'y'].forEach(function (k) {
-      var force = STIFFNESS * (target[k] - pos[k]) - DAMPING * vel[k];
+      var force = STIFFNESS * (target[k] + drift[k] - pos[k]) - DAMPING * vel[k];
       vel[k] += force * dt;
       pos[k] += vel[k] * dt;
     });
@@ -400,13 +421,7 @@
     var speed = vel.x * SHIFT_X;
     var tilt = Math.max(-MAX_TILT, Math.min(MAX_TILT, speed * TILT * 60));
 
-    var resting =
-      Math.abs(target.x - pos.x) < 0.002 &&
-      Math.abs(target.y - pos.y) < 0.002 &&
-      Math.abs(vel.x) < 0.004 &&
-      Math.abs(vel.y) < 0.004;
-
-    if (resting || !visible) {
+    if (!visible) {
       var dpr = window.devicePixelRatio || 1;
       pos.x = target.x;
       pos.y = target.y;
@@ -416,7 +431,10 @@
       springOn = false;
       return;
     }
-    setLean(px, py, tilt);
+    // The sway never stops, so keep the picture on the pixel grid and only
+    // rotate it for a real turn; otherwise she would be resampled and soft.
+    var grid = window.devicePixelRatio || 1;
+    setLean(Math.round(px * grid) / grid, Math.round(py * grid) / grid, Math.abs(tilt) < 0.3 ? 0 : tilt);
     requestAnimationFrame(stepSpring);
   }
 
@@ -1175,7 +1193,7 @@
     }
     document.title = pageTitle;
     if (!visible || now() - leftAt < 4000) return;
-    setTimeout(function () {
+        setTimeout(function () {
       if (reacting >= 0) return;
       var line = pickLine('back', WELCOME_BACK);
       var hold = holdFor(line.text);
@@ -1215,7 +1233,7 @@
   // round, smiles to herself, thinks, hums; and after a long quiet, now and
   // then, says something. Any movement hands her gaze back to the visitor.
 
-  var IDLE_AFTER = 4500;
+  var IDLE_AFTER = 6000;
   var lastActive = now();
   var idling = false;
   var idleTimer = 0;
@@ -1245,60 +1263,74 @@
 
   // Turns her head herself, as a cursor would, so the gaze and the lean stay
   // in step with the frames.
-  function gazeTo(index, ms) {
+  function gazeTo(index) {
     if (reacting >= 0 || !idling) return;
-    var turnX = (index % 3) - (lookIndex % 3);
-    var turnY = Math.floor(index / 3) - Math.floor(lookIndex / 3);
-    lookIndex = index;
-    wantLook = index;
     col = index % 3;
     row = Math.floor(index / 3);
-    body.show('look', index, ms || 300);
-    nudge(turnX * 0.45, turnY * 0.25);
+    wantLook = index;
+    commitLook();
+  }
+
+  function blushFor(ms) {
+    el.classList.add('is-blushing');
+    setTimeout(function () { el.classList.remove('is-blushing'); }, ms);
   }
 
   var GLANCES = [3, 5, 0, 2, 1, 6, 8];
 
+  // Slow on purpose: a person at rest does one small thing, then nothing for
+  // a while. Weights favour the soft, sweet ones.
   var IDLE_ACTS = [
     // A look round the room, sometimes a second one, then back.
-    [38, function () {
+    [30, function () {
       var first = GLANCES[Math.floor(Math.random() * GLANCES.length)];
       gazeTo(first);
-      var hold = 900 + Math.random() * 1000;
-      if (Math.random() < 0.4) {
+      var hold = 1700 + Math.random() * 1400;
+      if (Math.random() < 0.3) {
         var second = GLANCES[Math.floor(Math.random() * GLANCES.length)];
         later(function () { gazeTo(second); }, hold);
-        hold += 800 + Math.random() * 700;
+        hold += 1400 + Math.random() * 1000;
       }
       later(function () { gazeTo(CENTRE); }, hold);
-      return hold + 400;
+      return hold + 600;
     }],
-    // An eye roll: up and round, a beat at the top, back with a blink.
-    [16, function () {
-      var path = [3, 0, 1, 2, 5];
-      path.forEach(function (index, i) {
-        later(function () { gazeTo(index, 150); }, i * 190);
-      });
-      var back = path.length * 190 + 260;
-      later(function () { gazeTo(CENTRE, 220); }, back);
-      later(blink, back + 380);
-      return back + 700;
+    // A shy little smile and a blush, to nobody in particular.
+    [20, function () {
+      react(SHY, 2600);
+      blushFor(2600);
+      return 2900;
     }],
-    // A content smile to herself.
+    // A soft smile to herself, eyes closing happily.
     [16, function () {
-      react(GIGGLE, 1300);
-      return 1600;
+      react(GIGGLE, 1800);
+      return 2100;
+    }],
+    // A warm grin, as if remembering something nice.
+    [12, function () {
+      react(GRIN, 1600);
+      return 1900;
     }],
     // A moment of thought, chin on hand.
-    [14, function () {
-      react(THINKING, 2300);
-      return 2600;
+    [10, function () {
+      react(THINKING, 2600);
+      return 2900;
     }],
-    // A slow double blink, the most human thing there is.
-    [16, function () {
+    // An eye roll, unhurried: up and round, a beat, back with a blink.
+    [6, function () {
+      var path = [3, 0, 1, 2];
+      path.forEach(function (index, i) {
+        later(function () { gazeTo(index); }, i * 260);
+      });
+      var back = path.length * 260 + 500;
+      later(function () { gazeTo(CENTRE); }, back);
+      later(blink, back + 600);
+      return back + 1000;
+    }],
+    // A slow double blink.
+    [6, function () {
       blink();
-      later(blink, 420);
-      return 900;
+      later(blink, 600);
+      return 1100;
     }],
   ];
 
@@ -1315,7 +1347,7 @@
   function scheduleIdle(ms) {
     clearTimeout(idleTimer);
     if (reducedMotion) return;
-    idleTimer = setTimeout(idleTick, ms || 2400 + Math.random() * 2600);
+    idleTimer = setTimeout(idleTick, ms || 3500 + Math.random() * 3000);
   }
 
   function idleTick() {
@@ -1326,7 +1358,7 @@
     }
     idling = true;
     var busy;
-    if (quiet > 25000 && now() - lastIdleLine > 35000 && Math.random() < 0.45) {
+    if (quiet > 30000 && now() - lastIdleLine > 45000 && Math.random() < 0.4) {
       lastIdleLine = now();
       gazeTo(CENTRE);
       var line = pickLine('idle', IDLE_LINES);
@@ -1337,7 +1369,7 @@
     } else {
       busy = pickIdleAct()();
     }
-    scheduleIdle(busy + 1800 + Math.random() * 3200);
+    scheduleIdle(busy + 4500 + Math.random() * 5000);
   }
 
   function wake() {
@@ -1467,6 +1499,7 @@
     scheduleBlink();
     scheduleBreeze();
     scheduleIdle();
+    wakeSpring();
   }
 
   function stop() {
@@ -1482,12 +1515,10 @@
   var GREETINGS = {
     face: GRIN,
     lines: [
-      'hi! I’m Deepika, welcome in',
-      'hey! so glad you’re here',
-      [WINK, 'hi! poke me, I don’t bite'],
-      'hello! the good stuff is just below',
-      [WINK, 'hi! I turn messy problems into products'],
-      'hey there! make yourself at home',
+      'hi! this isn’t just a portfolio, it’s a little gist of my life',
+      'hey, welcome in! pull up a chair, I’ll tell you my story',
+      [WINK, 'hi! the work is all here, and a little bit of me too'],
+      'hello! so glad you found your way here',
     ],
   };
   var GREETED_KEY = 'mascot-greeted';
@@ -1558,13 +1589,42 @@
     }, 3600);
   }
 
+  // She raises a hand and waves hello. The sheets have no arm drawn up, so
+  // the hand is its own little drawing in her palette, waving at the wrist.
+  var HAND =
+    '<svg viewBox="0 0 60 150" aria-hidden="true">' +
+      '<g class="atelier-mascot-hand-skin">' +
+        '<rect x="47" y="30" width="8" height="17" rx="4" transform="rotate(50 51 38)"/>' +
+        '<rect x="13" y="13" width="8" height="21" rx="4" transform="rotate(-14 17 24)"/>' +
+        '<rect x="21" y="7" width="8" height="24" rx="4" transform="rotate(-4 25 19)"/>' +
+        '<rect x="30" y="7" width="8" height="24" rx="4" transform="rotate(5 34 19)"/>' +
+        '<rect x="38" y="13" width="8" height="20" rx="4" transform="rotate(15 42 23)"/>' +
+        '<rect x="14" y="26" width="31" height="29" rx="13"/>' +
+      '</g>' +
+      '<path class="atelier-mascot-hand-cuff" d="M14 56q0-5 5-5h21q5 0 5 5l4 94h-39z"/>' +
+      '<path class="atelier-mascot-hand-stripe" d="M15 66h30M14 84h33M13 102h35M12 120h37"/>' +
+    '</svg>';
+
+  function wave() {
+    if (reducedMotion) return;
+    var hand = document.createElement('span');
+    hand.className = 'atelier-mascot-hand';
+    hand.setAttribute('aria-hidden', 'true');
+    hand.innerHTML = HAND;
+    el.appendChild(hand);
+    setTimeout(function () {
+      if (hand.parentNode) hand.parentNode.removeChild(hand);
+    }, 3000);
+  }
+
   function welcome(name) {
     pendingWelcome = '';
     var first = firstName(name);
     var beats = [
-      { face: STARRY, text: first ? first + '! you actually came' : 'oh! you actually came', fx: 'spark' },
-      { face: SHY, text: 'aww, now I’m blushing…', fx: 'heart', blush: true },
-      { face: GIGGLE, text: first ? 'welcome in, ' + first + '. make yourself at home' : 'welcome in. make yourself at home' },
+      { face: GRIN, text: first ? 'hi ' + first + '! so happy you’re here' : 'hi! so happy you’re here', fx: 'spark', wave: true },
+      { face: SHY, text: 'this isn’t just a portfolio, you know…', fx: 'heart', blush: true },
+      { face: STARRY, text: 'it’s a little gist of my life: the work, and the girl behind it' },
+      { face: GIGGLE, text: first ? 'make yourself at home, ' + first + ' ♡' : 'make yourself at home ♡' },
     ];
     var at = 0;
     beats.forEach(function (beat, i) {
@@ -1577,6 +1637,7 @@
         say(beat.text, hold);
         el.classList.toggle('is-blushing', !!beat.blush);
         if (beat.fx) burst(beat.fx);
+        if (beat.wave) wave();
       }, at);
       at += hold + 280;
     });
@@ -1619,6 +1680,7 @@
       var hold = holdFor(line.text);
       react(line.face, hold);
       say(line.text, hold);
+      wave();
     }, 2200);
   }
 
