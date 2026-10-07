@@ -984,6 +984,93 @@
     return Math.min(4200, 1600 + text.length * 45);
   }
 
+  // Little moments: a run of faces with a body move, a small effect and a
+  // line, so a tap is never quite predictable. The sheets only hold nine
+  // faces; it is the sequence, the move and the effect that make each one
+  // its own expression. Dealt like the lines, every one before any repeats.
+  // steps: [face, ms]; move: a class on her box (see .is-m-* in atelier.css).
+  var UNIMPRESSED = 8;
+  var MOMENTS = [
+    { id: 'hum', steps: [[GIGGLE, 900], [BLINK, 900], [GIGGLE, 700]], move: 'dance', fx: 'note', line: 'la la la… don’t mind me' },
+    { id: 'aha', steps: [[THINKING, 1000], [GASP, 260], [GRIN, 1300]], move: 'hop', fx: 'bulb', at: 1000, line: 'ooh! I just had an idea' },
+    { id: 'sneeze', steps: [[GASP, 420], [GASP, 380], [BLINK, 260], [GIGGLE, 1100]], move: 'sneeze', at: 800, sayAt: 700, line: 'a-a-achoo! …excuse me' },
+    { id: 'shy', steps: [[SHY, 2400]], move: 'tilt', fx: 'heart', blush: true, line: 'stop it, you’re making me blush' },
+    { id: 'dizzy', steps: [[GASP, 500], [BLINK, 500], [GIGGLE, 1000]], move: 'dizzy', fx: 'spark', line: 'whee! the page is spinning' },
+    { id: 'sleepy', steps: [[BLINK, 1700], [GASP, 500], [GRIN, 900]], move: 'doze', fx: 'zzz', sayAt: 1700, line: 'huh? no no, I’m awake!' },
+    { id: 'confused', steps: [[THINKING, 1500], [UNIMPRESSED, 900]], move: 'tilt', fx: 'ask', line: 'wait… what were we doing?' },
+    { id: 'proud', steps: [[GRIN, 1600]], move: 'bounce', fx: 'spark', line: 'nailed it, as usual' },
+    { id: 'secret', steps: [[WINK, 900], [SHY, 1200]], move: 'lean', blush: true, line: 'psst… I like you already' },
+    { id: 'judging', steps: [[UNIMPRESSED, 1500], [GIGGLE, 800]], move: 'shake', line: 'hmm. I’ll allow it' },
+    { id: 'tickled', steps: [[GIGGLE, 700], [BLINK, 200], [GIGGLE, 900]], move: 'squish', line: 'hehe, that tickles!' },
+    { id: 'nervous', steps: [[GASP, 700], [SHY, 1300]], move: 'shiver', fx: 'sweat', line: 'uh oh… was that a bug?' },
+    { id: 'aww', steps: [[SHY, 900], [GRIN, 1200]], move: 'hop', fx: 'heart', blush: true, line: 'aww, you’re sweet' },
+    { id: 'startled', steps: [[GASP, 900], [GIGGLE, 1000]], move: 'jump', fx: 'bang', line: 'eep! you scared me' },
+    { id: 'agree', steps: [[GRIN, 1500]], move: 'nod', line: 'yep, yep, totally agree' },
+    { id: 'cool', steps: [[WINK, 1500]], move: 'tilt', fx: 'spark', line: 'too cool for a bug report' },
+    { id: 'yawn', steps: [[GASP, 1100], [BLINK, 900], [GRIN, 600]], move: 'stretch', fx: 'zzz', line: '*yawn*… long design review' },
+    { id: 'cheer', steps: [[GRIN, 700], [GIGGLE, 700], [GRIN, 600]], move: 'bounce', fx: 'note', line: 'woohoo! you found me!' },
+    { id: 'pout', steps: [[UNIMPRESSED, 1100], [SHY, 1000]], move: 'shake', line: 'hmph. fine. one more boop' },
+    { id: 'calc', steps: [[THINKING, 1400], [GRIN, 900]], move: 'dance', fx: 'ask', line: 'calculating cuteness… 100%' },
+    { id: 'peek', steps: [[BLINK, 900], [WINK, 1000]], move: 'lean', fx: 'heart', line: 'peekaboo!' },
+    { id: 'wow', steps: [[GASP, 1100], [GRIN, 900]], move: 'jump', fx: 'spark', line: 'whoa, you have great taste' },
+  ];
+
+  var momentTimers = [];
+  var MOVES = ['dance', 'hop', 'sneeze', 'tilt', 'dizzy', 'doze', 'bounce', 'lean', 'shake', 'squish', 'shiver', 'jump', 'nod', 'stretch'];
+
+  function moveBody(name) {
+    if (reducedMotion || !name) return;
+    MOVES.forEach(function (m) { el.classList.remove('is-m-' + m); });
+    void el.offsetWidth;
+    el.classList.add('is-m-' + name);
+    momentTimers.push(setTimeout(function () { el.classList.remove('is-m-' + name); }, 2600));
+  }
+
+  function pickMoment() {
+    var used = said.moment || [];
+    var options = MOMENTS.filter(function (m) { return used.indexOf(m.id) < 0; });
+    if (!options.length) {
+      used = [];
+      options = MOMENTS.filter(function (m) { return m.id !== lastMoment; });
+    }
+    var m = options[Math.floor(Math.random() * options.length)];
+    lastMoment = m.id;
+    used.push(m.id);
+    said.moment = used;
+    try {
+      localStorage.setItem(SAID_KEY, JSON.stringify(said));
+    } catch (err) {
+      // Private mode: she just forgets between visits.
+    }
+    return m;
+  }
+  var lastMoment = '';
+
+  // quiet: no speech bubble, for moments she has on her own at rest.
+  function playMoment(m, quiet) {
+    momentTimers.forEach(clearTimeout);
+    momentTimers = [];
+    var total = m.steps.reduce(function (sum, s) { return sum + s[1]; }, 0);
+    var at = 0;
+    m.steps.forEach(function (s, i) {
+      var last = i === m.steps.length - 1;
+      momentTimers.push(setTimeout(function () {
+        if (s[0] === BLINK && !last) react(BLINK, s[1] + 200);
+        else react(s[0], last ? s[1] : s[1] + 200);
+      }, at));
+      at += s[1];
+    });
+    moveBody(m.move);
+    if (m.fx) momentTimers.push(setTimeout(function () { burst(m.fx); }, m.at || 120));
+    if (m.blush) blushFor(total + 300);
+    if (!quiet) {
+      var hold = Math.max(holdFor(m.line), total - (m.sayAt || 0));
+      momentTimers.push(setTimeout(function () { say(m.line, hold); }, m.sayAt || 180));
+      lastLine = m.line;
+    }
+    return total;
+  }
+
   var streak = 0;
   var lastPokeAt = 0;
 
@@ -1003,6 +1090,12 @@
       nudge(e.clientX < rect.left + rect.width / 2 ? 0.7 : -0.7, -0.35);
     }
 
+    if (streak < 5 && Math.random() < 0.5) {
+      playMoment(pickMoment());
+      return;
+    }
+    momentTimers.forEach(clearTimeout);
+    momentTimers = [];
     var line = pickLine(key, step);
     var hold = holdFor(line.text);
     react(line.face, hold);
@@ -1334,6 +1427,14 @@
       later(blink, 600);
       return 1100;
     }],
+    // Now and then one of her little moments, to herself: humming, dozing
+    // off, a sneeze, a happy wiggle.
+    [10, function () {
+      var quietOnes = ['hum', 'sleepy', 'sneeze', 'shy', 'tickled', 'yawn', 'aha', 'peek'];
+      var pick = quietOnes[Math.floor(Math.random() * quietOnes.length)];
+      var m = MOMENTS.filter(function (x) { return x.id === pick; })[0];
+      return playMoment(m, true) + 400;
+    }],
   ];
 
   function pickIdleAct() {
@@ -1559,11 +1660,40 @@
 
   // Particles in the mascot's own box: hearts rise from her cheeks, sparkles
   // pop around her head. Positions are fractions of the box (see spotAt).
+  // One-off marks drawn beside her head: [x %, y %, content], one per mark.
+  var DROP = '<svg viewBox="0 0 24 24"><path d="M12 2.5C9 7.5 6.5 10.6 6.5 14a5.5 5.5 0 0 0 11 0c0-3.4-2.5-6.5-5.5-11.5z"/></svg>';
+  var BULB = '<svg viewBox="0 0 24 24"><path class="b-glass" d="M12 2.8a6.6 6.6 0 0 0-3.9 11.9c.7.6 1.2 1.4 1.3 2.3h5.2c.1-.9.6-1.7 1.3-2.3A6.6 6.6 0 0 0 12 2.8z"/><path class="b-base" d="M9.6 18.4h4.8M10.2 20.6h3.6"/></svg>';
+  var MARKS = {
+    note: [[30, 22, '♪'], [74, 16, '♫'], [24, 10, '♫'], [80, 30, '♪']],
+    ask: [[75, 14, '?'], [83, 24, '?']],
+    bang: [[76, 13, '!'], [30, 15, '!']],
+    zzz: [[68, 22, 'z'], [75, 13, 'z'], [83, 4, 'Z']],
+    sweat: [[70, 30, DROP]],
+    bulb: [[53.5, 3, BULB]],
+  };
+
   function burst(kind) {
     if (reducedMotion) return;
     var wrap = document.createElement('span');
     wrap.className = 'atelier-mascot-burst is-' + kind;
     wrap.setAttribute('aria-hidden', 'true');
+    if (MARKS[kind]) {
+      MARKS[kind].forEach(function (mark, i) {
+        var m = document.createElement('span');
+        m.className = 'atelier-mascot-mark';
+        m.style.setProperty('--x', mark[0] + '%');
+        m.style.setProperty('--y', mark[1] + '%');
+        m.style.setProperty('--d', (i * 0.28).toFixed(2) + 's');
+        m.style.setProperty('--r', ((i % 2 ? 1 : -1) * (8 + Math.random() * 10)).toFixed(0) + 'deg');
+        m.innerHTML = mark[2];
+        wrap.appendChild(m);
+      });
+      el.appendChild(wrap);
+      setTimeout(function () {
+        if (wrap.parentNode) wrap.parentNode.removeChild(wrap);
+      }, 3200);
+      return;
+    }
     var count = kind === 'heart' ? 7 : 6;
     for (var i = 0; i < count; i += 1) {
       var p = document.createElement('span');
