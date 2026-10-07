@@ -788,6 +788,10 @@ html.atelier .atelier-mascot-layer {
   pointer-events: none;
   transform-origin: 50% 100%;
   transform: translate(var(--mascot-tx, 0px), var(--mascot-ty, 0px)) rotate(var(--mascot-tilt, 0deg));
+  /* Kept on their own layers for good. Promoted only while a fade ran, the
+     picture was redrawn a different way at the start and end of every fade
+     and visibly shimmered. */
+  will-change: opacity, transform;
   -webkit-mask-image: linear-gradient(
     to bottom,
     #000 68%,
@@ -836,16 +840,32 @@ html.atelier body.dark-theme .atelier-mascot-layer {
    scaling the picture continuously kept it permanently resampled and soft. */
 html.atelier .atelier-mascot-look,
 html.atelier .atelier-mascot-layer.is-look {
-  background-image: url('mascots/deepika-directions.webp?v=20261012');
+  background-image: url('mascots/deepika-directions.webp?v=20261013');
 }
 
 html.atelier .atelier-mascot-react,
 html.atelier .atelier-mascot-layer.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261012');
+  background-image: url('mascots/deepika-reactions.webp?v=20261013');
 }
 
 html.atelier .atelier-mascot-react {
   opacity: 0;
+}
+
+/* Expressions: the reaction sheet seen only where a face changes, so her hair
+   and outline stay exactly as they are. Two soft shapes, measured on the
+   centre frame: a wide band over brows, eyes and lashes (x .34-.72,
+   y .32-.44), which must be fully opaque out to the outer lashes or the open
+   eye underneath ghosts through a blink; and an oval over nose and mouth. */
+html.atelier .atelier-mascot-face {
+  opacity: 0;
+  filter: none !important;
+  -webkit-mask-image:
+    radial-gradient(ellipse 25% 9% at 53.5% 38%, #000 76%, transparent 100%),
+    radial-gradient(ellipse 15% 10.5% at 54% 49%, #000 66%, transparent 100%);
+  mask-image:
+    radial-gradient(ellipse 25% 9% at 53.5% 38%, #000 76%, transparent 100%),
+    radial-gradient(ellipse 15% 10.5% at 54% 49%, #000 66%, transparent 100%);
 }
 
 /* The SVG filter mascot.js injects; it displaces only the side hair. */
@@ -853,31 +873,33 @@ html.atelier .atelier-mascot.is-breezy {
   filter: url(#mascot-breeze);
 }
 
-/* What she says when poked repeatedly: a small note that rises in softly
-   beside her head and drifts away, never a pop-up. */
+/* What she says when poked repeatedly: a small note that grows out from
+   beside her cheek with a gentle overshoot, its words drifting in one by one,
+   and floats up and away when she is done. Never a pop-up. */
 html.atelier .atelier-mascot-bubble {
   position: absolute;
-  z-index: 3;
-  top: 7%;
-  left: 66%;
-  padding: 0.5rem 0.85rem;
+  z-index: 6;
+  top: 9%;
+  left: 68%;
+  padding: 0.55rem 0.9rem 0.6rem;
   border: 1.5px solid var(--ink);
-  border-radius: 1rem 1rem 1rem 0.3rem;
+  border-radius: 1.1rem 1.1rem 1.1rem 0.25rem;
   background: var(--card);
   color: var(--ink);
   box-shadow: 3px 4px 0 var(--ink);
   font-family: var(--sans);
-  font-size: 0.86rem;
+  font-size: 0.88rem;
   font-weight: 500;
-  line-height: 1.3;
+  line-height: 1.35;
+  letter-spacing: 0.005em;
   white-space: nowrap;
   pointer-events: none;
   opacity: 0;
-  transform: translate(-4px, 8px) scale(0.92);
+  transform: translate(-10px, 12px) scale(0.8) rotate(-4deg);
   transform-origin: 0% 100%;
   transition:
-    opacity 0.32s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.42s cubic-bezier(0.34, 1.4, 0.64, 1);
+    opacity 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.7s cubic-bezier(0.34, 1.5, 0.5, 1);
 }
 
 html.atelier .atelier-mascot-bubble.is-in {
@@ -887,10 +909,26 @@ html.atelier .atelier-mascot-bubble.is-in {
 
 html.atelier .atelier-mascot-bubble.is-out {
   opacity: 0;
-  transform: translate(2px, -6px) scale(0.98);
+  transform: translate(6px, -14px) scale(0.96) rotate(1.5deg);
   transition:
-    opacity 0.45s ease,
-    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    opacity 0.6s ease,
+    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html.atelier .atelier-mascot-word {
+  display: inline-block;
+  transition:
+    opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.45s ease;
+  transition-delay: calc(var(--i, 0) * 60ms + 80ms);
+}
+
+html.atelier .atelier-mascot-word.is-pre {
+  opacity: 0;
+  transform: translateY(0.5em);
+  filter: blur(3px);
+  transition: none;
 }
 
 @media (max-width: 760px) {
@@ -911,6 +949,13 @@ html.atelier .atelier-mascot-bubble.is-out {
   html.atelier .atelier-mascot-bubble.is-out {
     transition: opacity 0.2s linear;
     transform: none;
+  }
+
+  html.atelier .atelier-mascot-word,
+  html.atelier .atelier-mascot-word.is-pre {
+    transform: none;
+    filter: none;
+    transition: opacity 0.2s linear;
   }
 }
 

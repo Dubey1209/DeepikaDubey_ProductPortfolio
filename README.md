@@ -77,7 +77,7 @@ GSAP 3.12.7, ScrollTrigger 3.12.7, Lenis 1.1.20, page-flip 2.0.7, and
 ## Cache busting
 
 Every stylesheet and script is referenced with a **single shared** `?v=` token
-(currently `20261009`; the mascot sheet URLs in `atelier.css` carry it too).
+(currently `20261013`; the mascot sheet URLs in `atelier.css` carry it too).
 When you change any CSS, JS or mascot sheet, bump that token —
 in both `index.html` and `my-story.html`.
 
@@ -134,11 +134,16 @@ It is two 3×3 sprite sheets in `mascots/`:
   scrubs over her, a friendly face per click, sometimes starry when a link is
   hovered). The table at the top of `mascot.js` is the full list.
 
-Poke her repeatedly (clicks under 1.4s apart) and from the third poke she says
-something in a small speech bubble beside her head, escalating gently through
-four steps ("ouch!" with a gasp, then shy, then a giggle, then thinking: "is
-this a usability test?"). Each step has three lines and never repeats the last
-one, so it does not read as canned.
+Where she is poked decides how she reacts: nose (gasp, "boop! …that was my
+nose"), eyes (eyes shut, "ow, my eye!"), cheeks (shy, "aww, you're making me
+blush"), mouth, forehead, hair (gasp, "not the hair!"), chin and sweater
+(giggle, "hehe, that tickles!"). The spots are measured on the centre frame;
+see `spotAt` in `mascot.js`. The first poke gets only the face. From the second
+(pokes under 1.6s apart) she says a line that belongs to the face she is making,
+in a bubble whose words drift in one by one. From the fifth she starts teasing
+back (thinking: "hmm… is this a usability test?", then shy, then starry: "fine,
+you win"). A spot runs through all its lines before repeating one. Each poke
+also gives her a small flinch away from the finger.
 
 Every reaction frame faces straight out. So the reactions she starts herself
 (blinks, starry) only happen while she is already looking straight out, and
@@ -155,16 +160,29 @@ self-started motion is off under `prefers-reduced-motion`.
 
 How the motion is kept smooth:
 
-- **Every frame change is a cross-fade over the old frame.** The two layers are
-  interchangeable and can show either sheet; the new frame fades in on top
-  while the old one stays fully opaque underneath, so the figure never dims
-  mid-change. (Fading one out while the other fades in dipped to about 75%.)
-- **Frame boundaries have hysteresis.** A side frame is entered past 0.42 of
-  the way round and kept until the cursor comes back past 0.3, so a cursor
-  resting on a boundary does not flick between two frames.
+- **An expression changes only her face.** Reactions are shown on two extra
+  layers masked to the brows, eyes and lashes and to the nose and mouth, over
+  the centre direction frame, and the build aligns every reaction face onto
+  that frame's face. Hair, outline and sweater stay the same drawing, so a
+  blink moves only the eyelids. Swapping whole frames gave her away as separate
+  pictures: the hair and outline flickered on every expression. Thinking (a hand
+  at her chin) is the one reaction that replaces the whole figure.
+- **Head turns are overlapping cross-fades.** The new frame rises over the first
+  ~60% of the time and the old one falls over the last ~60%, so neither a dip
+  in the middle nor an outline vanishing at the end. A change that arrives
+  mid-fade waits for it rather than cutting it short. The layers stay
+  composited (`will-change`), because promoting them only while a fade ran
+  redrew the picture differently at both ends of every fade.
+- **She turns only on purpose.** Side frames have hysteresis (entered past 0.45,
+  left below 0.28); the direction is scaled down inside a radius around her, so
+  near her it takes a real move to turn her head; and a new direction must hold
+  for 110ms before she turns. Circling the cursor close to her used to flip her
+  head back and forth.
 - **The lean is a spring, not a CSS transition.** A transition restarts on every
   `pointermove` and stutters; the spring keeps its velocity and settles with a
-  hint of follow-through. `mascot.js` writes `--mascot-tx/-ty/-tilt` each frame.
+  hint of follow-through. Head turns and pokes give it a small push, so she
+  sways into a turn and flinches from a poke. `mascot.js` writes
+  `--mascot-tx/-ty/-tilt` each frame.
 
 How it is kept sharp:
 
@@ -199,7 +217,9 @@ Width alone does not catch a size jump, because it is mostly hair. The script
 also measures face width from skin pixels, and scales each sheet so its
 front-facing faces match the centre direction frame: the reactions sheet was
 drawn ~3% smaller, so every reaction shrank her head and the end of it grew it
-back.
+back. It then moves each reaction until its skin (face outline, ears, neck)
+overlaps the centre frame's best; they had been drawn up to 9px off, which made
+the face jump on every expression.
 
 Two cut-out details that each showed on the dark theme:
 

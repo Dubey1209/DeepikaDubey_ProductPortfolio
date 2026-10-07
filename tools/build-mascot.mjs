@@ -50,8 +50,14 @@ const SHEETS = [
     out: 'mascots/deepika-reactions.webp',
     columns: [{ from: 0 }, { from: 1 }, { from: 2 }],
     frontFacing: [0, 1, 2],
+    // mascot.js lays these faces over the centre direction frame, so each one
+    // is moved until its face sits exactly on that frame's face.
+    alignFaces: true,
   },
 ];
+
+// How far a reaction face may be moved onto the centre face, in output pixels.
+const ALIGN_REACH = 24;
 
 // A background pixel this close to the sampled background colour, and
 // connected to the edge of the sheet, becomes transparent. Flood-filling from
@@ -443,6 +449,65 @@ function cutOut(img, bg) {
   return rgba;
 }
 
+/** A finished piece drawn into an empty cell, as raw RGBA. */
+function placeInCell(piece, left, top, cellW, cellH) {
+  return sharp({ create: { width: cellW, height: cellH, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } } })
+    .composite([{ input: piece, left, top }])
+    .raw()
+    .toBuffer();
+}
+
+/** Opaque skin pixels: the same test measureCell uses for face width. */
+function skinMask(rgba, width, height) {
+  const mask = new Uint8Array(width * height);
+  for (let p = 0; p < mask.length; p += 1) {
+    const r = rgba[p * 4];
+    const g = rgba[p * 4 + 1];
+    const b = rgba[p * 4 + 2];
+    mask[p] = rgba[p * 4 + 3] > 128 && r > 190 && g > 140 && g < 222 && r - b > 62 ? 1 : 0;
+  }
+  return mask;
+}
+
+/**
+ * The shift that best lays one face's skin over another's, by overlap.
+ *
+ * Skin rather than the eyes and mouth, because those are exactly what differs
+ * between expressions; the outline of the face, the ears and the neck do not.
+ * Coarse pass first, then a one-pixel refinement around the winner.
+ */
+function alignTo(ref, mask, width, height) {
+  const x0 = Math.floor(width * 0.2);
+  const x1 = Math.floor(width * 0.8);
+  const y0 = Math.floor(height * 0.12);
+  const y1 = Math.floor(height * 0.66);
+  const overlap = (dx, dy) => {
+    let inter = 0;
+    let union = 0;
+    for (let y = y0; y < y1; y += 2) {
+      for (let x = x0; x < x1; x += 2) {
+        const a = ref[y * width + x];
+        const b = mask[(y + dy) * width + x + dx];
+        inter += a & b;
+        union += a | b;
+      }
+    }
+    return union ? inter / union : 0;
+  };
+  let best = { score: -1, dx: 0, dy: 0 };
+  const search = (cx, cy, reach, step) => {
+    for (let dy = cy - reach; dy <= cy + reach; dy += step) {
+      for (let dx = cx - reach; dx <= cx + reach; dx += step) {
+        const score = overlap(dx, dy);
+        if (score > best.score) best = { score, dx, dy };
+      }
+    }
+  };
+  search(0, 0, ALIGN_REACH, 3);
+  search(best.dx, best.dy, 2, 1);
+  return best;
+}
+
 /**
  * The silhouette as a signed distance field, one byte per source pixel:
  * 128 is the edge, and each source pixel inside (outside) adds (subtracts)
@@ -576,6 +641,7 @@ async function main() {
   const cellW = CELL_W * RESOLUTION;
   const cellH = CELL_H * RESOLUTION;
   const h = Math.round(commonH * scale);
+  let refSkin = null;
 
   for (const s of sheets) {
     const rgba = cutOut(s.img, s.bg);
@@ -642,19 +708,31 @@ async function main() {
         // with the cell bottom, the body's centre on the cell's centre.
         const anchor = flip ? c.right - c.anchorX : c.anchorX - c.left;
         let left = Math.round(cellW / 2 - anchor * sheetScale);
-        const top = cellH - h;
+        let top = cellH - h;
+
+        if (row === 1 && col === 1 && !s.alignFaces) {
+          refSkin = skinMask(await placeInCell(piece, left, top, cellW, cellH), cellW, cellH);
+        } else if (s.alignFaces && refSkin) {
+          const mask = skinMask(await placeInCell(piece, left, top, cellW, cellH), cellW, cellH);
+          const { dx, dy } = alignTo(refSkin, mask, cellW, cellH);
+          left -= dx;
+          top -= dy;
+          console.log(`  ${s.out} cell ${row * 3 + col}: face moved ${-dx}, ${-dy}`);
+        }
 
         // Anything past the cell's sides would bleed into the neighbouring
         // frame and flash at the mascot's edge whenever that frame showed.
         const cropL = Math.max(0, -left);
         const cropR = Math.max(0, left + w - cellW);
+        const cropT = Math.max(0, -top);
         const cropB = Math.max(0, top + ph - cellH);
-        if (cropL || cropR || cropB) {
+        if (cropL || cropR || cropT || cropB) {
           piece = await sharp(piece)
-            .extract({ left: cropL, top: 0, width: w - cropL - cropR, height: ph - cropB })
+            .extract({ left: cropL, top: cropT, width: w - cropL - cropR, height: ph - cropT - cropB })
             .png()
             .toBuffer();
           left += cropL;
+          top += cropT;
         }
         composites.push({ input: piece, left: col * cellW + left, top: row * cellH + top });
       }
