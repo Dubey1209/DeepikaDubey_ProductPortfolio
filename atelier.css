@@ -1454,12 +1454,12 @@ html.atelier .atelier-mascot.is-m-stretch :is(.atelier-mascot-layer, .atelier-ma
    scaling the picture continuously kept it permanently resampled and soft. */
 html.atelier .atelier-mascot-look,
 html.atelier .atelier-mascot-layer.is-look {
-  background-image: url('mascots/deepika-directions.webp?v=20261104');
+  background-image: url('mascots/deepika-directions.webp?v=20261105');
 }
 
 html.atelier .atelier-mascot-react,
 html.atelier .atelier-mascot-layer.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261104');
+  background-image: url('mascots/deepika-reactions.webp?v=20261105');
 }
 
 html.atelier .atelier-mascot-react {
@@ -1474,8 +1474,8 @@ html.atelier .atelier-mascot-react {
    underneath; an oval reached the jaw and showed a second chin. */
 html.atelier .atelier-mascot-face {
   opacity: 0;
-  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261104');
-  mask-image: url('mascots/deepika-face-mask.png?v=20261104');
+  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261105');
+  mask-image: url('mascots/deepika-face-mask.png?v=20261105');
   -webkit-mask-size: 300% 300%;
   mask-size: 300% 300%;
   -webkit-mask-repeat: no-repeat;
@@ -4446,6 +4446,12 @@ html.atelier .lock-notification--error {
     width: 42px;
     height: 42px;
   }
+
+  html.atelier.is-book-bar-in .scroll-top-btn {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
 }
 
 @media (max-width: 800px) {
@@ -5165,14 +5171,14 @@ html.atelier .sb-cameo-art {
   top: 11%;
   width: 120%;
   aspect-ratio: 680 / 800;
-  background-image: url('mascots/deepika-directions.webp?v=20261104');
+  background-image: url('mascots/deepika-directions.webp?v=20261105');
   background-repeat: no-repeat;
   background-size: 300% 300%;
   background-position: 50% 50%;
 }
 
 html.atelier .sb-cameo-art.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261104');
+  background-image: url('mascots/deepika-reactions.webp?v=20261105');
 }
 
 html.atelier .sb-cameo-art.is-face {
@@ -5245,6 +5251,41 @@ html.atelier .story-book {
 
   html.atelier .sb-cameo-window::before {
     animation: none;
+  }
+}
+
+@media (pointer: coarse) {
+  html.atelier .atelier-footer li {
+    margin: 0;
+  }
+
+  html.atelier .atelier-footer li a {
+    display: inline-block;
+    padding: 0.55rem 0;
+  }
+
+  html.atelier .projects-section .project-readmore,
+  html.atelier .atelier-cert-cta,
+  html.atelier .theme-toggle-btn,
+  html.atelier .logo,
+  html.atelier .atelier-footer-logo,
+  html.atelier .story-back {
+    position: relative;
+  }
+
+  html.atelier .projects-section .project-readmore::after,
+  html.atelier .atelier-cert-cta::after,
+  html.atelier .theme-toggle-btn::after,
+  html.atelier .logo::after,
+  html.atelier .atelier-footer-logo::after,
+  html.atelier .story-back::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: max(100%, 44px);
+    height: max(100%, 44px);
+    translate: -50% -50%;
   }
 }
 

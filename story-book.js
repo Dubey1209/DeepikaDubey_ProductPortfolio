@@ -25,7 +25,7 @@
       pageW = Math.max(300, Math.min(pageW, Math.round(h * 0.84)));
       return { width: pageW, height: h, spread: true, stageW: pageW * 2 };
     }
-    var pad = vw < 700 ? 28 : 40;
+    var pad = vw < 700 ? 44 : 40;
     var w = Math.round(h * 0.72);
     if (w > avail - pad) {
       w = Math.max(240, avail - pad);
@@ -448,6 +448,13 @@
 
   applyShell();
   sheets.forEach(function (el) { stage.appendChild(el); });
+
+  // On phones the floating scroll-top button sits right on the Next button.
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function (entries) {
+      document.documentElement.classList.toggle('is-book-bar-in', entries[0].isIntersecting);
+    }).observe(book.querySelector('.work-book-bar'));
+  }
 
   // The cover portrait is alive: she looks toward the pointer, blinks now
   // and then, smiles when the book first comes into view and winks when the

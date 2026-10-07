@@ -1961,18 +1961,23 @@ body.page-loaded .home-left > :nth-child(5) { transition-delay: 320ms; }
     width: 85%;
     max-width: 300px;
     height: 100vh;
+    height: 100dvh;
     background: #fff;
     flex-direction: column;
     padding: 5rem 1.5rem 2rem;
     box-shadow: -5px 0 20px rgba(0, 0, 0, 0.15);
-    transition: right 0.3s ease-in-out;
+    visibility: hidden;
+    transition: right 0.3s ease-in-out, visibility 0s linear 0.3s;
     z-index: 1000;
     overflow-y: auto;
+    overscroll-behavior: contain;
     gap: 0;
   }
   
   .nav-links.open {
     right: 0;
+    visibility: visible;
+    transition: right 0.3s ease-in-out, visibility 0s;
   }
   
   

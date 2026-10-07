@@ -137,17 +137,24 @@
       transition: opacity 0.18s ease;
     }
 
-    @media (max-width: 760px) {
+    /* Side by side needs ~1100px: narrower, her thought cloud ran off the
+       right edge, so the page stacks with her on top. */
+    @media (max-width: 1100px) {
       main {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 34rem);
+        justify-content: center;
         gap: 2.2rem;
       }
 
       .lost {
         order: -1;
+        width: fit-content;
+        justify-self: start;
         padding-top: 3.8rem;
       }
+    }
 
+    @media (max-width: 760px) {
       .window {
         width: 8.4rem;
       }
@@ -210,6 +217,18 @@
     a:focus-visible {
       color: var(--accent);
       border-color: currentColor;
+    }
+
+    @media (pointer: coarse) {
+      .links a {
+        position: relative;
+      }
+
+      .links a::after {
+        content: '';
+        position: absolute;
+        inset: -0.75rem -0.4rem;
+      }
     }
   </style>
 </head>
