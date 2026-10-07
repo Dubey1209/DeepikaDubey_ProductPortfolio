@@ -85,7 +85,9 @@ class PortfolioLock {
   }
 
   playUnlock(name) {
-    const thanks = `Thanks, ${name}. It's open.`;
+    // Where the mascot is on the page she welcomes them by name, so the toast
+    // would only say it twice.
+    const thanks = document.querySelector('.atelier-mascot') ? '' : `Thanks, ${name}. It's open.`;
 
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       this.unlockInstant(name);
@@ -140,6 +142,7 @@ class PortfolioLock {
 
   notify(message, type) {
     document.querySelector('.lock-notification')?.remove();
+    if (!message) return;
     const el = document.createElement('div');
     el.className = `lock-notification lock-notification--${type}`;
     el.textContent = message;
