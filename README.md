@@ -77,7 +77,7 @@ GSAP 3.12.7, ScrollTrigger 3.12.7, Lenis 1.1.20, page-flip 2.0.7, and
 ## Cache busting
 
 Every stylesheet and script is referenced with a **single shared** `?v=` token
-(currently `20261016`; the mascot sheet URLs in `atelier.css` carry it too).
+(currently `20261017`; the mascot sheet URLs in `atelier.css` carry it too).
 When you change any CSS, JS or mascot sheet, bump that token —
 in both `index.html` and `my-story.html`.
 
@@ -149,7 +149,9 @@ user: you", then starry: "retention: 100%. hi, friend!"). A mouse resting on her
 for 2.2s gets a passing thought ("what problem are we really solving?"), at most
 every 20s. Each poke also gives her a small flinch away from the finger.
 
-There are about 150 thoughts, in `SPOTS`, `TEASE` and `MUSINGS`. A line is a
+There are about 265 thoughts, in `SPOTS`, `TEASE` and `MUSINGS`, many drawn
+from the About copy ("if it doesn't earn a place, it doesn't ship", built →
+measured → shipped, the user in the room, MVPs over slides). A line is a
 string, shown with its spot's face, or `[face, string]` when it needs another
 one. Each list is dealt like a shuffled deck: every line once before any comes
 round again, and the deck is kept in `localStorage` (`mascot-said`), so a
