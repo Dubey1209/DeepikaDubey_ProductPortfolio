@@ -458,11 +458,37 @@
     var look = fig.querySelector('.is-look');
     var face = fig.querySelector('.is-face');
     var cell = 4;
+    // Two gaze layers cross-fade, the new one over the old; switching one
+    // layer's position jumped her head from frame to frame.
+    var spare = look.cloneNode(false);
+    spare.style.opacity = '0';
+    look.parentNode.insertBefore(spare, face);
+    var swapTimer = 0;
+    function lookAt(n) {
+      var incoming = spare;
+      var outgoing = look;
+      window.clearTimeout(swapTimer);
+      incoming.style.transition = 'none';
+      incoming.style.opacity = '0';
+      incoming.style.backgroundPosition = cellAt(n);
+      look.parentNode.insertBefore(incoming, face);
+      void incoming.offsetWidth;
+      incoming.style.transition = 'opacity 0.18s ease';
+      incoming.style.opacity = '1';
+      swapTimer = window.setTimeout(function () {
+        outgoing.style.transition = 'none';
+        outgoing.style.opacity = '0';
+      }, 200);
+      look = incoming;
+      spare = outgoing;
+    }
     var faceTimer = 0;
     var faceOn = false;
 
     function showFace(n, ms) {
       window.clearTimeout(faceTimer);
+      // A blink has to close fully: the usual soft fade would only dim the eyes.
+      face.style.transitionDuration = n === 0 ? '0.05s' : '';
       face.style.backgroundPosition = cellAt(n);
       fig.classList.add('is-face-on');
       faceOn = true;
@@ -489,7 +515,7 @@
       var next = row * 3 + col;
       if (next === cell) return;
       cell = next;
-      look.style.backgroundPosition = cellAt(next);
+      lookAt(next);
     }, { passive: true });
 
     fig.addEventListener('pointerenter', function () {

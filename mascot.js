@@ -219,8 +219,10 @@
       body.show('react', index, 300);
       return;
     }
-    // The faces look straight out, so she turns to the front first.
-    var turning = body.key !== 'look:' + CENTRE;
+    // The faces look straight out, so she turns to the front first. Coming
+    // out of a whole-figure pose (thinking) is not a turn: the face comes in
+    // with the body, or her plain face flashed between the two expressions.
+    var turning = body.key.indexOf('look:') === 0 && body.key !== 'look:' + CENTRE;
     body.show('look', CENTRE, 240);
     if (turning) {
       faceDelay = setTimeout(function () {
@@ -435,9 +437,25 @@
     }
     // The sway never stops, so keep the picture on the pixel grid and only
     // rotate it for a real turn; otherwise she would be resampled and soft.
+    // The tilt eases out of a dead zone instead of switching on at its edge,
+    // which showed as a small snap of the head at the start of every turn.
     var grid = window.devicePixelRatio || 1;
-    setLean(Math.round(px * grid) / grid, Math.round(py * grid) / grid, Math.abs(tilt) < 0.3 ? 0 : tilt);
+    var lean = Math.abs(tilt) < TILT_DEAD ? 0 : tilt - Math.sign(tilt) * TILT_DEAD;
+    snapX = snapTo(px, snapX, grid);
+    snapY = snapTo(py, snapY, grid);
+    setLean(snapX, snapY, lean);
     requestAnimationFrame(stepSpring);
+  }
+
+  // Rounding to the grid with a little hysteresis: plain rounding flicked
+  // between two pixels whenever the offset hovered near a half, which read as
+  // a one-pixel shiver.
+  var TILT_DEAD = 0.3;
+  var snapX = 0;
+  var snapY = 0;
+  function snapTo(raw, last, grid) {
+    if (Math.abs(raw - last) < 0.7 / grid) return last;
+    return Math.round(raw * grid) / grid;
   }
 
   // ---- speech bubble --------------------------------------------------------
@@ -536,8 +554,26 @@
     });
   }
 
+  // A new line while one is showing: the old cloud shrinks away for a moment
+  // and the new one pops in, rather than the words and the cloud's shape
+  // jumping in a single frame.
+  var swapTimer = 0;
   function say(text, hold) {
     clearTimeout(bubbleTimer);
+    clearTimeout(swapTimer);
+    if (bubble.classList.contains('is-in') && !reducedMotion) {
+      bubble.classList.add('is-swap');
+      swapTimer = setTimeout(function () {
+        bubble.classList.remove('is-swap');
+        fillBubble(text, hold);
+      }, 150);
+      return;
+    }
+    bubble.classList.remove('is-swap');
+    fillBubble(text, hold);
+  }
+
+  function fillBubble(text, hold) {
     bubbleText.textContent = '';
     var words = text.split(' ');
     words.forEach(function (word, i) {
@@ -1016,15 +1052,26 @@
   ];
 
   var momentTimers = [];
-  var MOVES = ['dance', 'hop', 'sneeze', 'tilt', 'dizzy', 'doze', 'bounce', 'lean', 'shake', 'squish', 'shiver', 'jump', 'nod', 'stretch'];
-
+  // A move already under way is allowed to finish: swapping it for another
+  // mid-hop snapped her from the top of the jump straight back to the floor.
+  var moveUntil = 0;
+  var moveTimer = 0;
   function moveBody(name) {
-    if (reducedMotion || !name) return;
-    MOVES.forEach(function (m) { el.classList.remove('is-m-' + m); });
+    if (reducedMotion || !name || now() < moveUntil) return;
+    Object.keys(MOVE_MS).forEach(function (m) { el.classList.remove('is-m-' + m); });
     void el.offsetWidth;
     el.classList.add('is-m-' + name);
-    momentTimers.push(setTimeout(function () { el.classList.remove('is-m-' + name); }, 2600));
+    var ms = MOVE_MS[name] || 1500;
+    moveUntil = now() + ms;
+    clearTimeout(moveTimer);
+    moveTimer = setTimeout(function () { el.classList.remove('is-m-' + name); }, ms + 50);
   }
+
+  // Durations of the .is-m-* animations in atelier.css.
+  var MOVE_MS = {
+    hop: 1000, jump: 750, bounce: 1300, dance: 2300, tilt: 2300, lean: 2100, shake: 800,
+    nod: 1100, squish: 1100, shiver: 900, dizzy: 1800, doze: 2500, sneeze: 1500, stretch: 2400,
+  };
 
   function pickMoment() {
     var used = said.moment || [];
@@ -1366,9 +1413,11 @@
     commitLook();
   }
 
+  var blushTimer = 0;
   function blushFor(ms) {
     el.classList.add('is-blushing');
-    setTimeout(function () { el.classList.remove('is-blushing'); }, ms);
+    clearTimeout(blushTimer);
+    blushTimer = setTimeout(function () { el.classList.remove('is-blushing'); }, ms);
   }
 
   var GLANCES = [3, 5, 0, 2, 1, 6, 8];
@@ -1739,6 +1788,7 @@
         // it, rather than her flicking back to her normal face in between.
         react(beat.face, last ? hold : hold + 600);
         say(beat.text, hold);
+        clearTimeout(blushTimer);
         el.classList.toggle('is-blushing', !!beat.blush);
         if (beat.fx) burst(beat.fx);
       }, at);

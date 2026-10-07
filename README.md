@@ -77,7 +77,7 @@ GSAP 3.12.7, ScrollTrigger 3.12.7, Lenis 1.1.20, page-flip 2.0.7, and
 ## Cache busting
 
 Every stylesheet and script is referenced with a **single shared** `?v=` token
-(currently `20261102`; the mascot sheet URLs in `atelier.css` carry it too).
+(currently `20261103`; the mascot sheet URLs in `atelier.css` carry it too).
 When you change any CSS, JS or mascot sheet, bump that token —
 in both `index.html` and `my-story.html`.
 
@@ -139,7 +139,16 @@ move on the picture layers (`.is-m-hop`, `-nod`, `-dance`, `-doze`,
 of sweat, a lightbulb: `MARKS` and `.atelier-mascot-mark`) and a line. They
 are dealt like the lines, every one before any repeats, remembered across
 visits; a few quiet ones (humming, dozing off, a sneeze) also turn up in
-the at-rest loop. A drawn waving hand was tried and removed: it never
+the at-rest loop. Smoothness fixes from a QA pass: the lean is snapped to the pixel grid
+with hysteresis (plain rounding flicked between two pixels near a half),
+the tilt eases out of its dead zone instead of switching on at 0.3°, a body
+move already running is allowed to finish (swapping mid-hop snapped her to
+the floor), a new line while the bubble is up shrinks the old cloud away
+and pops the new one in (`is-swap`), overlapping blushes no longer cut each
+other off, and coming out of the thinking pose no longer flashes her plain
+face. The story cover sticker and the 404 page cross-fade between frames
+(two layers) instead of jumping the sheet position, and their blinks use a
+quick fade so the eyes still close fully. A drawn waving hand was tried and removed: it never
 looked like part of her. The star-eyes cell (6) of the reactions sheet is not
 used anywhere (its sparkles came out oversized and blurry); `STARRY` in
 `mascot.js` is an alias for the grin, and the story book and 404 page use

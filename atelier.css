@@ -1454,12 +1454,12 @@ html.atelier .atelier-mascot.is-m-stretch :is(.atelier-mascot-layer, .atelier-ma
    scaling the picture continuously kept it permanently resampled and soft. */
 html.atelier .atelier-mascot-look,
 html.atelier .atelier-mascot-layer.is-look {
-  background-image: url('mascots/deepika-directions.webp?v=20261102');
+  background-image: url('mascots/deepika-directions.webp?v=20261103');
 }
 
 html.atelier .atelier-mascot-react,
 html.atelier .atelier-mascot-layer.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261102');
+  background-image: url('mascots/deepika-reactions.webp?v=20261103');
 }
 
 html.atelier .atelier-mascot-react {
@@ -1474,8 +1474,8 @@ html.atelier .atelier-mascot-react {
    underneath; an oval reached the jaw and showed a second chin. */
 html.atelier .atelier-mascot-face {
   opacity: 0;
-  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261102');
-  mask-image: url('mascots/deepika-face-mask.png?v=20261102');
+  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261103');
+  mask-image: url('mascots/deepika-face-mask.png?v=20261103');
   -webkit-mask-size: 300% 300%;
   mask-size: 300% 300%;
   -webkit-mask-repeat: no-repeat;
@@ -1526,6 +1526,14 @@ html.atelier .atelier-mascot-bubble.is-out {
   transition:
     opacity 0.6s ease,
     transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html.atelier .atelier-mascot-bubble.is-in.is-swap {
+  opacity: 0;
+  transform: translate(-4px, 6px) scale(0.9) rotate(-2deg);
+  transition:
+    opacity 0.14s ease,
+    transform 0.14s ease;
 }
 
 html.atelier .atelier-mascot-cloud {
@@ -5157,18 +5165,19 @@ html.atelier .sb-cameo-art {
   top: 11%;
   width: 120%;
   aspect-ratio: 680 / 800;
-  background-image: url('mascots/deepika-directions.webp?v=20261102');
+  background-image: url('mascots/deepika-directions.webp?v=20261103');
   background-repeat: no-repeat;
   background-size: 300% 300%;
   background-position: 50% 50%;
 }
 
 html.atelier .sb-cameo-art.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261102');
+  background-image: url('mascots/deepika-reactions.webp?v=20261103');
 }
 
 html.atelier .sb-cameo-art.is-face {
   opacity: 0;
+  transition: opacity 0.16s ease;
 }
 
 html.atelier .sb-cameo.is-face-on .sb-cameo-art.is-face {

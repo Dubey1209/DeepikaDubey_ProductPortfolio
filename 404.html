@@ -230,17 +230,42 @@
     </div>
     <div class="lost" aria-hidden="true">
       <p class="cloud"><span class="cloud-text">hmm… where did it go?</span></p>
-      <div class="window"><div class="pane"><i class="art"></i></div></div>
+      <div class="window"><div class="pane"><i class="art"></i><i class="art" style="opacity:0"></i></div></div>
     </div>
   </main>
   <script>
     (function () {
-      var art = document.querySelector('.art');
+      var arts = document.querySelectorAll('.art');
+      var pane = document.querySelector('.pane');
+      var front = arts[0];
+      var back = arts[1];
       var text = document.querySelector('.cloud-text');
       var idle = { face: '50% 100%', say: text.textContent };
       var swap = 0;
+      var settle = 0;
+      // The new face fades in over the old one, which is hidden once covered;
+      // swapping one picture's position made her face jump.
+      function showFace(face) {
+        if (front.style.backgroundPosition === face) return;
+        clearTimeout(settle);
+        back.style.transition = 'none';
+        back.style.opacity = '0';
+        back.style.backgroundPosition = face;
+        pane.appendChild(back);
+        void back.offsetWidth;
+        back.style.transition = 'opacity 0.2s ease';
+        back.style.opacity = '1';
+        var old = front;
+        settle = setTimeout(function () {
+          old.style.transition = 'none';
+          old.style.opacity = '0';
+        }, 220);
+        front = back;
+        back = old;
+      }
+      front.style.backgroundPosition = idle.face;
       function show(face, say) {
-        art.style.backgroundPosition = face;
+        showFace(face);
         clearTimeout(swap);
         text.style.opacity = '0';
         swap = setTimeout(function () {
