@@ -87,7 +87,7 @@ async function main() {
   }
 
   const server = await startServer(PORT);
-  const browser = await chromium.launch();
+  const browser = await chromium.launch({ args: ['--disable-font-subpixel-positioning'] });
   const baseUrl = `http://127.0.0.1:${PORT}`;
 
   const failures = [];

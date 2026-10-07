@@ -322,13 +322,28 @@ const NOISY_SELECTORS = [
  * silent pass; if one ever starts flapping the right fix is to pin it in
  * `settleAtTop`, not to stop looking at it.
  */
-const VOLATILE_CLASSES = ['lenis-scrolling', 'lenis-stopped'];
+const VOLATILE_CLASSES = ['lenis-scrolling', 'lenis-stopped', 'is-look', 'is-react', 'is-breezy'];
+
+/**
+ * Properties a script changes on a timer, per element, and so are not read.
+ *
+ * The About mascot blinks and catches a breeze at random intervals, whether or
+ * not anyone is pointing at it. Each blink swaps which of its two layers is on
+ * top and which sheet each one shows (the `is-look` / `is-react` classes above,
+ * plus the properties below), and a breeze toggles `is-breezy` and its filter.
+ * Where a capture lands in that cycle is chance. Everything else about these
+ * elements -- size, position, mask, transition -- is still compared.
+ */
+const TIMER_OWNED = {
+  '.atelier-mascot-layer': ['opacity', 'z-index', 'background-image', 'background-position', 'transform'],
+  '.atelier-mascot': ['filter'],
+};
 
 async function capture(page, scenario, baseUrl) {
   await preparePage(page, scenario, baseUrl, { freezeTransitions: false });
 
   return page.evaluate(
-    ({ props, pseudoProps, geometryProps, jsOwnedProps, noisySelectors, volatileClasses }) => {
+    ({ props, pseudoProps, geometryProps, jsOwnedProps, noisySelectors, volatileClasses, timerOwned }) => {
       /**
        * A path that identifies the same element across two runs.
        *
@@ -368,21 +383,28 @@ async function capture(page, scenario, baseUrl) {
        * Which properties to leave unread on this element. See NOISY_PROPS.
        */
       const skipFor = (el) => {
+        const timed = Object.entries(timerOwned).flatMap(([sel, list]) => (el.matches(sel) ? list : []));
+
         const inHeroCluster = noisySelectors.some((sel) => el.closest(sel));
-        if (inHeroCluster) return geometryProps;
+        if (inHeroCluster) return [...geometryProps, ...timed];
 
         // Anything JavaScript is driving via an inline style. CSS cannot reach
         // it, so it is out of scope for a CSS refactor either way.
         const inline = jsOwnedProps.filter((prop) => el.style.getPropertyValue(prop) !== '');
-        return inline.length ? inline : null;
+        const skip = [...inline, ...timed];
+        return skip.length ? skip : null;
       };
+
+      // Resolved url() values carry the harness server's origin, which would
+      // make a snapshot saved on one port fail on any other.
+      const origin = location.origin;
 
       const read = (el, pseudo, list, skip) => {
         const cs = getComputedStyle(el, pseudo);
         const out = {};
         for (const prop of list) {
           if (skip && skip.includes(prop)) continue;
-          out[prop] = cs.getPropertyValue(prop);
+          out[prop] = cs.getPropertyValue(prop).split(origin).join('');
         }
         return out;
       };
@@ -453,6 +475,7 @@ async function capture(page, scenario, baseUrl) {
       jsOwnedProps: JS_OWNED_PROPS,
       noisySelectors: NOISY_SELECTORS,
       volatileClasses: VOLATILE_CLASSES,
+      timerOwned: TIMER_OWNED,
     }
   );
 }

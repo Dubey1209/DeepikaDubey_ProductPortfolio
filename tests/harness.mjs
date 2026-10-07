@@ -38,12 +38,17 @@ export const THEMES = ['light', 'dark'];
  *                     on where the pointer last was and on a random blink
  *                     timer. Only the drawings are hidden; the card around them
  *                     is still compared.
+ * - .fx-cursor        the custom cursor motion.js draws at the pointer. Where
+ *                     it sits is wherever the click landed, and that depends
+ *                     on how far the page had scrolled when it did; the work
+ *                     modal scenario failed on nothing but its "View" ball.
  */
 export const VOLATILE = [
   '.home-rotate',
   '.scroll-progress',
   '.lock-notification',
   '.atelier-mascot-layer',
+  '.fx-cursor',
 ];
 
 export const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
