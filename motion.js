@@ -199,6 +199,7 @@
 
     var cinemaOn = bindScrollCinema();
     if (!cinemaOn) bindFadeFallback();
+    bindDraw();
 
     var cgpa = document.querySelector('.atelier-edu-stat strong');
     if (cgpa && cgpa.textContent.trim() === '8.3' && !cgpa.dataset.fxCount) {
@@ -232,6 +233,21 @@
         }
       }
     }
+  }
+
+  function bindDraw() {
+    var marks = document.querySelectorAll('.atelier-about-mark');
+    if (!marks.length || html.dataset.fxDraw || !('IntersectionObserver' in window)) return;
+    html.dataset.fxDraw = '1';
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('is-drawn');
+        io.unobserve(entry.target);
+      });
+    }, { rootMargin: '0px 0px -15% 0px', threshold: 1 });
+    marks.forEach(function (el) { io.observe(el); });
+    html.classList.add('has-draw');
   }
 
   function bindFadeFallback() {
@@ -366,8 +382,12 @@
       return { y: 36, filter: 'blur(10px)' };
     }, { duration: 1.3 });
 
+    fly(document.querySelectorAll('.atelier-about-flow li'), function () {
+      return { y: 22, scale: 0.86 };
+    }, { stagger: 0.12, duration: 0.95, ease: 'back.out(1.8)' });
+
     fly(document.querySelectorAll('.atelier-about-pull'), function () {
-      return { x: -28, y: 20, filter: 'blur(8px)' };
+      return { y: 26, filter: 'blur(8px)' };
     }, { duration: 1.35 });
 
     fly(document.querySelectorAll('.atelier-about-notes li'), function (el, i) {

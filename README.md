@@ -77,7 +77,7 @@ GSAP 3.12.7, ScrollTrigger 3.12.7, Lenis 1.1.20, page-flip 2.0.7, and
 ## Cache busting
 
 Every stylesheet and script is referenced with a **single shared** `?v=` token
-(currently `20261020`; the mascot sheet URLs in `atelier.css` carry it too).
+(currently `20261021`; the mascot sheet URLs in `atelier.css` carry it too).
 When you change any CSS, JS or mascot sheet, bump that token —
 in both `index.html` and `my-story.html`.
 
@@ -126,9 +126,20 @@ her thought cloud opens to her left (`--cloud-tail: right` in the hero), so it
 never runs off the page; on phones it sits above her head as before. Once per
 visit, after the hero's entrance and the lock screen, she says hello
 (`GREETINGS`; the test harness marks her as having greeted so captures do not
-depend on the timer). About is now a single centred column, its three notes
-numbered 01–03 like the chapters of My Story. In the hero she is ~9% larger
-(372×438; 240×282 on phones).
+depend on the timer). In the hero she is ~9% larger (372×438; 240×282 on
+phones).
+
+About is a centred column with no photo. The working loop is a row of chips
+(built → measured → shipped → "should it exist?"), the pull quote gets a
+hand-drawn underline under "earn a place" (drawn by `bindDraw()` in
+`motion.js` when it scrolls into view; drawn from the start without the
+observer or under reduced motion), and the three notes are tilted sticker
+cards, numbered 01–03 like the chapters of My Story, each with a line icon,
+and a "shipped ✓" stamp on the third. Tilt and hover lift use the
+`rotate`/`translate` properties because the scroll reveals own `transform`.
+The legacy case-studies glow (`::before` in `base.css`, `top: -50%`) reached
+up over these cards and swallowed their hover, so its pseudo-elements are
+`pointer-events: none`.
 
 She is also a tour guide while the hero is on screen (`GUIDE` in `mascot.js`):
 resting the mouse on a nav link, the theme switch, the resume button or "Who
