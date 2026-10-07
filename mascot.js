@@ -573,9 +573,71 @@
     fillBubble(text, hold);
   }
 
+  // Small words ride with the word after them, and a short last word with the
+  // one before, so a line never ends on "a" or "my" and never leaves one
+  // word alone at the bottom. Glued words share a no-break space.
+  var GLUE = ['a', 'an', 'the', 'i', 'i’m', 'i’ll', 'my', 'your', 'to', 'of', 'in', 'on', 'at', 'for', 'and', 'or', 'but', 'so', 'no', 'is', 'it’s', 'that’s', 'you’re'];
+  // Glued runs stay under this many characters, so one never outgrows the
+  // narrow phone bubble.
+  var GLUE_MAX = 22;
+
+  // Joins word onto the last run; if the run would get too long, only the
+  // run's last word goes with it.
+  function glueOn(out, word) {
+    var prev = out[out.length - 1];
+    if (prev.length + 1 + word.length <= GLUE_MAX) {
+      out[out.length - 1] = prev + '\u00a0' + word;
+      return true;
+    }
+    // A small word carried off with the tail would otherwise be left dangling.
+    var parts = prev.split('\u00a0');
+    var tail = [parts.pop()];
+    while (parts.length && GLUE.indexOf(parts[parts.length - 1].toLowerCase()) >= 0) tail.unshift(parts.pop());
+    var run = tail.concat(word).join('\u00a0');
+    if (!parts.length || run.length > GLUE_MAX) return false;
+    out[out.length - 1] = parts.join('\u00a0');
+    out.push(run);
+    return true;
+  }
+
+  function phrases(text) {
+    var out = [];
+    var words = text.split(' ');
+    words.forEach(function (word, i) {
+      var prev = out[out.length - 1];
+      var last = prev ? prev.split('\u00a0').pop().toLowerCase() : '';
+      var glue = prev && GLUE.indexOf(last) >= 0;
+      // The last word keeps company with the one before it.
+      var lastWord = prev && i === words.length - 1 && words.length > 2;
+      if (!(glue || lastWord) || !glueOn(out, word)) out.push(word);
+    });
+    return out;
+  }
+
+  // Balanced lines are often narrower than the bubble's max width, which left
+  // the cloud loose round them: shrink it to the widest line.
+  function hugText() {
+    bubble.style.width = '';
+    var spans = bubbleText.children;
+    var rows = {};
+    Array.prototype.forEach.call(spans, function (s) {
+      var row = rows[s.offsetTop] || (rows[s.offsetTop] = { l: Infinity, r: -Infinity });
+      row.l = Math.min(row.l, s.offsetLeft);
+      row.r = Math.max(row.r, s.offsetLeft + s.offsetWidth);
+    });
+    var keys = Object.keys(rows);
+    var widest = keys.reduce(function (w, k) { return Math.max(w, rows[k].r - rows[k].l); }, 0);
+    var cs = getComputedStyle(cloud);
+    var pad = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+    bubble.style.width = Math.ceil(widest + pad + 2) + 'px';
+    var after = {};
+    Array.prototype.forEach.call(spans, function (s) { after[s.offsetTop] = true; });
+    if (Object.keys(after).length !== keys.length) bubble.style.width = '';
+  }
+
   function fillBubble(text, hold) {
     bubbleText.textContent = '';
-    var words = text.split(' ');
+    var words = phrases(text);
     words.forEach(function (word, i) {
       var span = document.createElement('span');
       span.className = 'atelier-mascot-word is-pre';
@@ -584,6 +646,7 @@
       bubbleText.appendChild(span);
       if (i < words.length - 1) bubbleText.appendChild(document.createTextNode(' '));
     });
+    hugText();
     drawCloud(text);
     bubble.classList.remove('is-out');
     bubble.classList.add('is-in');
@@ -773,7 +836,7 @@
       lines: [
         'oh, you noticed my earrings!',
         'I love accessories, tiny details matter',
-        'earrings: the micro-interactions of fashion',
+        'earrings: fashion’s micro-interactions',
         [GRIN, 'yes, I’m listening. always am.'],
         [GRIN, 'all ears for user feedback'],
         'these earrings are my favourite feature',
@@ -840,14 +903,14 @@
       face: GIGGLE,
       lines: [
         'hehe, that tickles!',
-        [GRIN, 'careful, it’s my launch-day sweater'],
+        [GRIN, 'careful, it’s my launch sweater'],
         [GRIN, 'cozy sweater, shipped on time'],
         [WINK, 'stripes: consistent, like a design system'],
         [GRIN, 'this sweater has great UX. very cosy'],
         'hehe, soft and warm, like good onboarding',
         [WINK, 'comfy clothes, sharp decisions'],
         [WINK, 'every stripe was user-tested'],
-        [SHY, 'cosiness is a non-negotiable requirement'],
+        [SHY, 'cosiness is non-negotiable'],
         [SHY, 'hehe, sweater hug accepted'],
         [GRIN, 'striped, snug and production ready'],
         [GRIN, 'warmest feature in my wardrobe'],

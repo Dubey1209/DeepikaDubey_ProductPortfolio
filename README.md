@@ -77,7 +77,7 @@ GSAP 3.12.7, ScrollTrigger 3.12.7, Lenis 1.1.20, page-flip 2.0.7, and
 ## Cache busting
 
 Every stylesheet and script is referenced with a **single shared** `?v=` token
-(currently `20261103`; the mascot sheet URLs in `atelier.css` carry it too).
+(currently `20261104`; the mascot sheet URLs in `atelier.css` carry it too).
 When you change any CSS, JS or mascot sheet, bump that token —
 in both `index.html` and `my-story.html`.
 
@@ -139,7 +139,15 @@ move on the picture layers (`.is-m-hop`, `-nod`, `-dance`, `-doze`,
 of sweat, a lightbulb: `MARKS` and `.atelier-mascot-mark`) and a line. They
 are dealt like the lines, every one before any repeats, remembered across
 visits; a few quiet ones (humming, dozing off, a sneeze) also turn up in
-the at-rest loop. Smoothness fixes from a QA pass: the lean is snapped to the pixel grid
+the at-rest loop. Bubble line breaks: `phrases()` in `mascot.js` glues small words (a, the, my,
+I'm…) to the word after them and the last word to the one before, with a
+no-break space and runs capped at 22 characters, so a line never ends on
+"a" and the last line is never one short word; `hugText()` then shrinks the
+bubble to its widest balanced line so the cloud fits the words. Checked
+against every line in the file at desktop, 390px and 340px widths: one long
+word ("micro-interactions") still sits on its own line, nothing overflows
+the cloud or the screen. The phone bubble is 12.75rem wide at most.
+Smoothness fixes from a QA pass: the lean is snapped to the pixel grid
 with hysteresis (plain rounding flicked between two pixels near a half),
 the tilt eases out of its dead zone instead of switching on at 0.3°, a body
 move already running is allowed to finish (swapping mid-hop snapped her to
