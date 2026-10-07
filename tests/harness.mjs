@@ -34,8 +34,17 @@ export const THEMES = ['light', 'dark'];
  *                     at capture time is arbitrary.
  * - .scroll-progress  injected by motion.js and driven by scroll offset.
  * - .lock-notification transient toast on a timer.
+ * - .atelier-mascot-layer the About mascot's drawings: which frame shows depends
+ *                     on where the pointer last was and on a random blink
+ *                     timer. Only the drawings are hidden; the card around them
+ *                     is still compared.
  */
-export const VOLATILE = ['.home-rotate', '.scroll-progress', '.lock-notification'];
+export const VOLATILE = [
+  '.home-rotate',
+  '.scroll-progress',
+  '.lock-notification',
+  '.atelier-mascot-layer',
+];
 
 export const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 

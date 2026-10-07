@@ -61,7 +61,13 @@ All scripts are `defer`red. Third-party libraries come from the jsDelivr CDN.
 | `theme-toggle.js` | Toggles `.dark-theme` on `<body>`, persisted to `localStorage`. An inline script at the top of `<body>` applies the saved theme early to avoid a flash. |
 | `motion.js` | GSAP + ScrollTrigger + Lenis scroll animations. |
 | `contact-form.js` | Contact form via EmailJS. The SDK is lazy-loaded on first focus of the form rather than on page load. |
+| `mascot.js` | `index.html` only. The cartoon in the About card: looks towards the cursor, reacts when clicked, blinks, dozes after 20s idle. See [About mascot](#about-mascot). |
 | `story-book.js` | Flip-book behaviour on `my-story.html`, using page-flip. |
+
+The visual and computed-style harnesses hide the mascot's drawings (they are in
+`VOLATILE` in `tests/harness.mjs`), since the frame showing depends on where
+the pointer was and on a random blink timer. The card around them is still
+compared.
 
 ### External dependencies (CDN, runtime)
 
@@ -71,12 +77,12 @@ GSAP 3.12.7, ScrollTrigger 3.12.7, Lenis 1.1.20, page-flip 2.0.7, and
 ## Cache busting
 
 Every stylesheet and script is referenced with a **single shared** `?v=` token
-(currently `20260830-2`). When you change any CSS or JS file, bump that token —
+(currently `20261007`). When you change any CSS or JS file, bump that token —
 in both `index.html` and `my-story.html`.
 
-The `-2` suffix is there because the Phase 3 merge shipped on the same day as
-Phase 1: `atelier.css` changed content at a URL returning visitors already had
-cached, so the token had to move even though the date had not.
+If two changes ship on the same day, add a suffix (`-2`): the Phase 3 merge
+did, because `atelier.css` changed content at a URL returning visitors already
+had cached, so the token had to move even though the date had not.
 
 It is one shared value on purpose. Per-asset tokens were used previously and
 drifted out of sync (`motion.css` reached `fx45` while `motion.js` sat at
@@ -108,6 +114,56 @@ Two deliberate choices here:
 The certificate images intentionally have no `width`/`height` attributes: they
 are `width: 100%; height: 100%; object-fit: cover` inside an absolutely
 positioned sheet, so the attributes would have no effect on layout.
+
+## About mascot
+
+The About card shows a cartoon of Deepika instead of a photo. It follows the
+idea of [page-mascot](https://koboyo.com/page-mascot), which is a React
+component; this is a plain-JS version (`mascot.js`) so the site keeps no React
+and no build step.
+
+It is two 3×3 sprite sheets in `mascots/`:
+
+- `deepika-directions.webp` — the head turned towards nine directions (rows up
+  / level / down, columns left / centre / right). The frame follows the
+  pointer, aimed at the face.
+- `deepika-reactions.webp` — blink, wink, grin, gasp, giggle, shy, starry,
+  thinking, sleepy. A click (or Enter/Space when focused) shows a random one
+  for about a second; blinks happen on their own every 3–6s; after 20s without
+  pointer movement she dozes until the pointer moves. Blinking and dozing are
+  off under `prefers-reduced-motion`.
+
+There is no card: the sheets have a transparent background and the avatar sits
+straight on the page. The nine frames are steps, so `mascot.js` also sets
+`--mascot-x` / `--mascot-y` (-1…1, towards the pointer, scaled by distance) and
+CSS turns them into a small eased lean and shift. In dark theme a soft glow
+keeps the dark hair from merging into the page. Without JavaScript, CSS shows
+the centre frame.
+
+The drawings were generated from a photo, then assembled by
+`tools/build-mascot.mjs` from the raw sheets in `tools/mascot-src/`:
+
+```bash
+node tools/build-mascot.mjs --check   # measure all 18 frames, write nothing
+node tools/build-mascot.mjs           # write mascots/*.webp
+```
+
+The image model does not place figures on an exact grid, so the script finds
+each figure by its pixels, aligns them by the top of the hair and the centre of
+the body, cuts every frame at the same sweater height, and refuses to write if
+any figure's width differs from the rest by more than 6% — that would be the
+character visibly growing or shrinking as frames switch. Aligning by the
+sweater's bottom edge instead looked natural but made the head pop ~19px up on
+every blink, because the model draws more sweater in some rows than others.
+
+The model will not draw a head turned to the left, so the left column is the
+right column mirrored. The script also removes the cream background (edge flood
+fill, then un-mixing the outline's anti-aliased rim so no cream halo is left)
+and paints over the white highlight the model draws along the hair edge.
+
+To redraw the character, replace the two raw sheets and re-run the script;
+`mascot.js` and the CSS do not change. `AboutPhoto.*` is no longer shown on the
+site but is kept as the source photo.
 
 ## Third-party service configuration
 

@@ -760,6 +760,77 @@ html.atelier .atelier-about-frame:hover .atelier-about-photo {
   transform: rotate(0.5deg) scale(1.06);
 }
 
+/* The mascot stands on the page by itself: transparent sheets, no card, no
+   tilt, no shadow. It takes the photo's footprint so the layout is unchanged. */
+html.atelier .atelier-mascot {
+  position: relative;
+  display: block;
+  width: 100%;
+  max-width: 340px;
+  height: 400px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  border-radius: 1.4rem;
+}
+
+html.atelier .atelier-mascot:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 4px;
+}
+
+/* mascot.js sets --mascot-x/-y (-1..1) towards the pointer, so between the
+   nine drawn frames the whole figure leans and shifts continuously. Rotation
+   pivots at the base of the bust, like a person turning from the shoulders.
+   The bottom edge fades so the cut-off sweater does not end in a hard line. */
+html.atelier .atelier-mascot-layer {
+  position: absolute;
+  inset: 0;
+  background-repeat: no-repeat;
+  background-size: 300% 300%;
+  background-position: 50% 50%;
+  pointer-events: none;
+  transform-origin: 50% 100%;
+  transform: translate(calc(var(--mascot-x, 0) * 7px), calc(var(--mascot-y, 0) * 4px))
+    rotate(calc(var(--mascot-x, 0) * 3deg));
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  -webkit-mask-image: linear-gradient(to bottom, #000 82%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 82%, transparent 100%);
+}
+
+/* Near-black hair against the near-black dark page loses its silhouette. */
+html.atelier body.dark-theme .atelier-mascot-layer {
+  filter: drop-shadow(0 0 18px rgba(243, 238, 228, 0.14));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.atelier .atelier-mascot-layer {
+    transform: none;
+    transition: none;
+  }
+}
+
+@media (max-width: 760px) {
+  html.atelier .atelier-mascot {
+    max-width: 220px;
+    height: 270px;
+    margin: 0 auto;
+  }
+}
+
+html.atelier .atelier-mascot-look {
+  background-image: url('mascots/deepika-directions.webp');
+}
+
+html.atelier .atelier-mascot-react {
+  background-image: url('mascots/deepika-reactions.webp');
+  visibility: hidden;
+}
+
+html.atelier .atelier-mascot.is-reacting .atelier-mascot-react {
+  visibility: visible;
+}
+
 html.atelier .atelier-about-frame figcaption {
   margin-top: 1rem;
   padding-left: 0.4rem;
