@@ -771,9 +771,11 @@ html.atelier .atelier-mascot:focus-visible {
   outline-offset: 4px;
 }
 
-/* mascot.js sets --mascot-x/-y (-1..1) towards the pointer, so between the
-   nine drawn frames the whole figure leans and shifts continuously. Rotation
-   pivots at the base of the bust, like a person turning from the shoulders.
+/* mascot.js drives a spring towards the pointer and writes the result to
+   --mascot-tx/-ty/-tilt every frame, so there is deliberately no transition
+   here: one would restart on every write and stutter. The tilt pivots at the
+   base of the bust, like a person turning from the shoulders, and is only
+   non-zero while she is moving, so the picture is never left rotated.
    The bottom edge fades so the cut-off sweater does not end in a hard line.
    The fade is eased rather than linear: a straight ramp starts and stops
    abruptly, and both ends showed as faint horizontal bands across the knit. */
@@ -785,9 +787,7 @@ html.atelier .atelier-mascot-layer {
   background-position: 50% 50%;
   pointer-events: none;
   transform-origin: 50% 100%;
-  transform: translate(calc(var(--mascot-x, 0) * 7px), calc(var(--mascot-y, 0) * 4px))
-    rotate(calc(var(--mascot-x, 0) * 3deg));
-  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translate(var(--mascot-tx, 0px), var(--mascot-ty, 0px)) rotate(var(--mascot-tilt, 0deg));
   -webkit-mask-image: linear-gradient(
     to bottom,
     #000 68%,
@@ -818,7 +818,6 @@ html.atelier body.dark-theme .atelier-mascot-layer {
 @media (prefers-reduced-motion: reduce) {
   html.atelier .atelier-mascot-layer {
     transform: none;
-    transition: none;
   }
 }
 
@@ -830,37 +829,23 @@ html.atelier body.dark-theme .atelier-mascot-layer {
   }
 }
 
-html.atelier .atelier-mascot-look {
-  background-image: url('mascots/deepika-directions.webp?v=20261011');
-}
-
-/* Frames cross-fade instead of cutting. The look layer fades out under a
-   reaction rather than staying behind it: both layers fade at the bottom, and
-   two different sweaters showed through each other there as ghost stripes. */
+/* Without JavaScript the first layer shows the centre direction frame and the
+   second stays hidden. mascot.js then treats both as interchangeable layers
+   and swaps the sheet on each with .is-look / .is-react, cross-fading between
+   them; it owns their opacity from then on. There is no breathing animation:
+   scaling the picture continuously kept it permanently resampled and soft. */
 html.atelier .atelier-mascot-look,
-html.atelier .atelier-mascot-react {
-  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.11s ease-out;
+html.atelier .atelier-mascot-layer.is-look {
+  background-image: url('mascots/deepika-directions.webp?v=20261012');
+}
+
+html.atelier .atelier-mascot-react,
+html.atelier .atelier-mascot-layer.is-react {
+  background-image: url('mascots/deepika-reactions.webp?v=20261012');
 }
 
 html.atelier .atelier-mascot-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261011');
   opacity: 0;
-}
-
-html.atelier .atelier-mascot.is-reacting .atelier-mascot-react {
-  opacity: 1;
-}
-
-html.atelier .atelier-mascot.is-reacting .atelier-mascot-look {
-  opacity: 0;
-}
-
-/* Breathing: a slow lift of the shoulders, height only. Reactions add no body
-   motion at all: a squash-and-stretch bounce on every click read as the whole
-   character shrinking and growing, so a reaction changes only the face. */
-html.atelier .atelier-mascot {
-  transform-origin: 50% 100%;
-  animation: mascot-breathe 4.8s ease-in-out infinite;
 }
 
 /* The SVG filter mascot.js injects; it displaces only the side hair. */
@@ -868,14 +853,64 @@ html.atelier .atelier-mascot.is-breezy {
   filter: url(#mascot-breeze);
 }
 
-@keyframes mascot-breathe {
-  0%, 100% { scale: 1 1; }
-  50% { scale: 1 1.006; }
+/* What she says when poked repeatedly: a small note that rises in softly
+   beside her head and drifts away, never a pop-up. */
+html.atelier .atelier-mascot-bubble {
+  position: absolute;
+  z-index: 3;
+  top: 7%;
+  left: 66%;
+  padding: 0.5rem 0.85rem;
+  border: 1.5px solid var(--ink);
+  border-radius: 1rem 1rem 1rem 0.3rem;
+  background: var(--card);
+  color: var(--ink);
+  box-shadow: 3px 4px 0 var(--ink);
+  font-family: var(--sans);
+  font-size: 0.86rem;
+  font-weight: 500;
+  line-height: 1.3;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-4px, 8px) scale(0.92);
+  transform-origin: 0% 100%;
+  transition:
+    opacity 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.42s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+html.atelier .atelier-mascot-bubble.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+html.atelier .atelier-mascot-bubble.is-out {
+  opacity: 0;
+  transform: translate(2px, -6px) scale(0.98);
+  transition:
+    opacity 0.45s ease,
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (max-width: 760px) {
+  html.atelier .atelier-mascot-bubble {
+    top: -4%;
+    left: auto;
+    right: -0.5rem;
+    width: max-content;
+    max-width: 11.5rem;
+    white-space: normal;
+    border-radius: 1rem 1rem 0.3rem 1rem;
+    transform-origin: 100% 100%;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html.atelier .atelier-mascot {
-    animation: none !important;
+  html.atelier .atelier-mascot-bubble,
+  html.atelier .atelier-mascot-bubble.is-out {
+    transition: opacity 0.2s linear;
+    transform: none;
   }
 }
 

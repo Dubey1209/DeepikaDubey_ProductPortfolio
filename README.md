@@ -131,9 +131,14 @@ It is two 3×3 sprite sheets in `mascots/`:
 - `deepika-reactions.webp` — blink, wink, grin, gasp, giggle, shy, starry,
   thinking, sleepy (unused). Each is tied to something the visitor does (grin
   when the pointer arrives, shy when it rests on her face, giggle when it
-  scrubs over her, a random one per click, thinking after four quick clicks,
-  sometimes starry when a link is hovered). The table at the top of
-  `mascot.js` is the full list.
+  scrubs over her, a friendly face per click, sometimes starry when a link is
+  hovered). The table at the top of `mascot.js` is the full list.
+
+Poke her repeatedly (clicks under 1.4s apart) and from the third poke she says
+something in a small speech bubble beside her head, escalating gently through
+four steps ("ouch!" with a gasp, then shy, then a giggle, then thinking: "is
+this a usability test?"). Each step has three lines and never repeats the last
+one, so it does not read as canned.
 
 Every reaction frame faces straight out. So the reactions she starts herself
 (blinks, starry) only happen while she is already looking straight out, and
@@ -142,19 +147,37 @@ and "sleepy" after 20s, and both look down, so a visitor who left the cursor
 somewhere saw her stop looking at it. Left alone, she keeps looking wherever
 the cursor was left, and re-aims when the page scrolls under it.
 
-Frames cross-fade rather than cut. Reactions change only the face: an earlier
-squash-and-stretch bounce on each click read as the whole character shrinking
-and growing, and was removed. She breathes (a 0.6% lift of the shoulders), and
-every 8–17s a breeze moves her side hair: an SVG filter displaces the picture
-by drifting noise, masked so the face and body stay still. All of the
+Reactions change only the face: an earlier squash-and-stretch bounce on each
+click read as the whole character shrinking and growing, and was removed. Every
+8–17s a breeze moves her side hair: an SVG filter displaces the picture by
+drifting noise, masked so the face and body stay still. All of the
 self-started motion is off under `prefers-reduced-motion`.
 
+How the motion is kept smooth:
+
+- **Every frame change is a cross-fade over the old frame.** The two layers are
+  interchangeable and can show either sheet; the new frame fades in on top
+  while the old one stays fully opaque underneath, so the figure never dims
+  mid-change. (Fading one out while the other fades in dipped to about 75%.)
+- **Frame boundaries have hysteresis.** A side frame is entered past 0.42 of
+  the way round and kept until the cursor comes back past 0.3, so a cursor
+  resting on a boundary does not flick between two frames.
+- **The lean is a spring, not a CSS transition.** A transition restarts on every
+  `pointermove` and stutters; the spring keeps its velocity and settles with a
+  hint of follow-through. `mascot.js` writes `--mascot-tx/-ty/-tilt` each frame.
+
+How it is kept sharp:
+
+- She tilts only while moving (from the spring's velocity), and at rest the
+  offset is snapped to the device pixel grid. The earlier version stayed
+  rotated towards the cursor and breathed with a continuous `scale`, both of
+  which left the picture permanently resampled and soft.
+- The sheets are built at 2x the display size, so a 2x screen draws them pixel
+  for pixel.
+
 There is no card: the sheets have a transparent background and the avatar sits
-straight on the page. The nine frames are steps, so `mascot.js` also sets
-`--mascot-x` / `--mascot-y` (-1…1, towards the pointer, scaled by distance) and
-CSS turns them into a small eased lean and shift. In dark theme a soft glow
-keeps the dark hair from merging into the page. Without JavaScript, CSS shows
-the centre frame.
+straight on the page. In dark theme a soft glow keeps the dark hair from
+merging into the page. Without JavaScript, CSS shows the centre frame.
 
 The drawings were generated from a photo, then assembled by
 `tools/build-mascot.mjs` from the raw sheets in `tools/mascot-src/`:
@@ -187,6 +210,13 @@ Two cut-out details that each showed on the dark theme:
 - The thin highlight the model draws along the outside of the hair is painted
   hair colour down to a luminance of 45. Cuts at white and at mid-grey each
   left a dotted grey trace that the sharpening step then brightened.
+
+The silhouette is not upscaled as an alpha channel. The cut-out is decided per
+source pixel, so at ~2.5x an upscaled alpha is a staircase along the hair, and
+sharpening made it jagged; blurring and re-contrasting the alpha only softened
+the steps. Instead the script builds a signed distance field of the cut-out,
+upscales that, and cuts it at its midpoint with a one-pixel ramp, the way fonts
+are rendered from distance fields. Only the colour channels are sharpened.
 
 The model will not draw a head turned to the left, so the left column is the
 right column mirrored. The script also removes the cream background (edge flood

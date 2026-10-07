@@ -76,7 +76,9 @@ const INK = [24, 18, 16];
 // shown with `background-size: 300% 300%` without stretching.
 const CELL_W = 340;
 const CELL_H = 400;
-const RESOLUTION = 1.5;
+// 2x the display size, so a 2x screen draws the sheet pixel for pixel. At 1.5x
+// the browser had to upscale on those screens, and the mascot looked soft.
+const RESOLUTION = 2;
 
 // How far a figure's size may differ from the median before it counts as a jump.
 const TOLERANCE = 0.06;
@@ -441,6 +443,67 @@ function cutOut(img, bg) {
   return rgba;
 }
 
+/**
+ * The silhouette as a signed distance field, one byte per source pixel:
+ * 128 is the edge, and each source pixel inside (outside) adds (subtracts)
+ * SDF_STEP. Upscaling this and cutting it at 128 gives a smooth outline at
+ * any size; upscaling the alpha itself reproduces the source pixel grid as a
+ * staircase along the hair, which no blur-and-recontrast fully removed.
+ */
+const SDF_STEP = 16;
+
+function signedDistance(rgba, width, height) {
+  const n = width * height;
+  const inside = new Uint8Array(n);
+  for (let p = 0; p < n; p += 1) inside[p] = rgba[p * 4 + 3] >= 128 ? 1 : 0;
+
+  // Two-pass chamfer distance to the nearest pixel of the other kind.
+  const dist = (want) => {
+    const d = new Float32Array(n).fill(1e6);
+    for (let p = 0; p < n; p += 1) if (inside[p] !== want) d[p] = 0;
+    const A = 1;
+    const B = Math.SQRT2;
+    for (let y = 0; y < height; y += 1) {
+      for (let x = 0; x < width; x += 1) {
+        const p = y * width + x;
+        if (!d[p]) continue;
+        let v = d[p];
+        if (x > 0) v = Math.min(v, d[p - 1] + A);
+        if (y > 0) {
+          v = Math.min(v, d[p - width] + A);
+          if (x > 0) v = Math.min(v, d[p - width - 1] + B);
+          if (x < width - 1) v = Math.min(v, d[p - width + 1] + B);
+        }
+        d[p] = v;
+      }
+    }
+    for (let y = height - 1; y >= 0; y -= 1) {
+      for (let x = width - 1; x >= 0; x -= 1) {
+        const p = y * width + x;
+        if (!d[p]) continue;
+        let v = d[p];
+        if (x < width - 1) v = Math.min(v, d[p + 1] + A);
+        if (y < height - 1) {
+          v = Math.min(v, d[p + width] + A);
+          if (x < width - 1) v = Math.min(v, d[p + width + 1] + B);
+          if (x > 0) v = Math.min(v, d[p + width - 1] + B);
+        }
+        d[p] = v;
+      }
+    }
+    return d;
+  };
+
+  const toOutside = dist(1);
+  const toInside = dist(0);
+  const sdf = Buffer.alloc(n);
+  for (let p = 0; p < n; p += 1) {
+    const s = inside[p] ? toOutside[p] - 0.5 : -(toInside[p] - 0.5);
+    sdf[p] = Math.max(0, Math.min(255, Math.round(128 + s * SDF_STEP)));
+  }
+  return sdf;
+}
+
 const median = (values) => [...values].sort((a, b) => a - b)[values.length >> 1];
 const hex = (rgb) => `#${rgb.map((v) => v.toString(16).padStart(2, '0')).join('')}`;
 
@@ -516,6 +579,15 @@ async function main() {
 
   for (const s of sheets) {
     const rgba = cutOut(s.img, s.bg);
+    // Lightly blurred so single-pixel JPEG bumps along the cut become gentle
+    // curves rather than nicks.
+    const sdf = await sharp(signedDistance(rgba, s.img.width, s.img.height), {
+      raw: { width: s.img.width, height: s.img.height, channels: 1 },
+    })
+      .blur(0.7)
+      .extractChannel(0)
+      .raw()
+      .toBuffer();
     const composites = [];
     const sheetScale = scale * s.faceScale;
     // A sheet scaled up shows less sweater, so the hair top stays where every
@@ -529,15 +601,43 @@ async function main() {
         const w = Math.round(c.width * sheetScale);
         const ph = Math.round(srcH * sheetScale);
 
-        let pipeline = sharp(rgba, { raw: { width: s.img.width, height: s.img.height, channels: 4 } })
+        let resized = sharp(rgba, { raw: { width: s.img.width, height: s.img.height, channels: 4 } })
           .extract({ left: c.left, top: c.top, width: c.width, height: srcH })
-          .resize(w, ph, { kernel: 'lanczos3' })
-          // Upscaling the ~330px source softens the ink lines; a light
-          // unsharp mask brings the edges back without ringing on flat fills.
-          .sharpen({ sigma: 0.8, m1: 0.6, m2: 1.4 });
-        if (flip) pipeline = pipeline.flop();
-        let piece = await pipeline.png().toBuffer();
+          .resize(w, ph, { kernel: 'lanczos3' });
+        if (flip) resized = resized.flop();
+        const big = await resized.raw().toBuffer();
 
+        // Colour and silhouette are finished separately.
+        //
+        // Upscaling the ~330px source ~2.5x softens the ink lines; an unsharp
+        // mask brings them back. Stronger than this (m2 2.4) drew pale halos
+        // beside the nose and mouth lines.
+        //
+        // The silhouette comes from the distance field instead of the alpha:
+        // the cut-out is decided per source pixel, so an upscaled alpha is a
+        // staircase of 2.5px steps, and sharpening made it visibly jagged.
+        // Cutting the upscaled field at its midpoint, with a one-pixel ramp,
+        // gives an outline that is smooth and still crisp.
+        const rgb = await sharp(big, { raw: { width: w, height: ph, channels: 4 } })
+          .removeAlpha()
+          .sharpen({ sigma: 1.0, m1: 0.9, m2: 2.0 })
+          .raw()
+          .toBuffer();
+        const ramp = (sheetScale * 255) / SDF_STEP;
+        let field = sharp(sdf, { raw: { width: s.img.width, height: s.img.height, channels: 1 } })
+          .extract({ left: c.left, top: c.top, width: c.width, height: srcH })
+          .resize(w, ph, { kernel: 'cubic' });
+        if (flip) field = field.flop();
+        // extractChannel: sharp writes a one-channel raw image out as three.
+        const alpha = await field
+          .linear(ramp, 127.5 - 128 * ramp)
+          .extractChannel(0)
+          .raw()
+          .toBuffer();
+        let piece = await sharp(rgb, { raw: { width: w, height: ph, channels: 3 } })
+          .joinChannel(alpha, { raw: { width: w, height: ph, channels: 1 } })
+          .png()
+          .toBuffer();
         // Hair top at the same height in every cell, the cut sweater flush
         // with the cell bottom, the body's centre on the cell's centre.
         const anchor = flip ? c.right - c.anchorX : c.anchorX - c.left;
@@ -566,7 +666,7 @@ async function main() {
       .composite(composites)
       // Above 1x, compression artefacts are smaller than a screen pixel, so a
       // lower quality than a 1x sheet would need still looks clean.
-      .webp({ quality: 62, alphaQuality: 80, effort: 6 })
+      .webp({ quality: 74, alphaQuality: 80, effort: 6 })
       .toFile(join(ROOT, s.out));
 
     const { size } = statSync(join(ROOT, s.out));
