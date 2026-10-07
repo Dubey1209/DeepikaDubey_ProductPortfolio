@@ -77,7 +77,7 @@ GSAP 3.12.7, ScrollTrigger 3.12.7, Lenis 1.1.20, page-flip 2.0.7, and
 ## Cache busting
 
 Every stylesheet and script is referenced with a **single shared** `?v=` token
-(currently `20261025`; the mascot sheet URLs in `atelier.css` carry it too).
+(currently `20261026`; the mascot sheet URLs in `atelier.css` carry it too).
 When you change any CSS, JS or mascot sheet, bump that token —
 in both `index.html` and `my-story.html`.
 
@@ -139,6 +139,21 @@ so she looked sad whenever the pointer was below her. `smileDown` in
 with the skin around it and gives each downward frame the smile of the level
 frame above, carried as a difference from its own skin so it takes the new
 frame's tone, at 72% for the foreshortened face.
+
+She appears on the other pages too, from the same two sheets, in an arched
+portrait window (`.sb-cameo` in `atelier.css`) rather than the full
+`mascot.js` rig. On the story-book cover she replaces the photo: she looks
+toward the pointer (gaze cells), blinks, smiles when the book first comes
+into view and winks when the pointer reaches her, beside a pencilled "psst,
+that's me". The last page has her starry-eyed. `404.html` has her thinking,
+and she answers whichever link you hover (grin, starry, wink); its image
+path is absolute like its links, because GitHub Pages serves it at any depth.
+
+The story book is dressed as a book: drop caps open each chapter
+(`.wb-drop`, added by `story-book.js`), a satin ribbon hangs below the
+spread, and the title has an inked underline under "long" with a pencilled
+aside. `splitChars()` in `motion.js` splits text nodes in place for
+unlined titles, so markup like that underline survives the letter reveal.
 
 About is a centred column with no photo. The working loop is a row of chips
 (built → measured → shipped → "should it exist?") whose arrows nudge forward

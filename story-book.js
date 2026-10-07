@@ -68,6 +68,24 @@
     return parts ? parts.map(function (p) { return p.trim(); }).filter(Boolean) : [text];
   }
 
+  // The mascot from the home page, cut down to an arched window. Cells count
+  // across her 3×3 sheets; `react` takes the face from the expressions sheet
+  // instead of the gaze sheet.
+  function cellAt(n) {
+    return (n % 3) * 50 + '% ' + Math.floor(n / 3) * 50 + '%';
+  }
+
+  function cameo(cls, cell, react) {
+    return '<span class="sb-cameo ' + cls + '" aria-hidden="true">' +
+      '<span class="sb-cameo-window">' +
+        '<i class="sb-cameo-art is-look' + (react ? ' is-react' : '') + '" style="background-position:' + cellAt(cell) + '"></i>' +
+        '<i class="sb-cameo-art is-face is-react"></i>' +
+      '</span>' +
+    '</span>';
+  }
+
+  var ARROW = '<svg viewBox="0 0 40 30" aria-hidden="true"><path pathLength="1" d="M37 4C27 2 15 6 9 17c-1 2-2 5-2 8m0 0-4-6m4 6 5-4"/></svg>';
+
   function sheet(html, attrs) {
     attrs = attrs || {};
     var el = document.createElement('article');
@@ -223,7 +241,10 @@
         '<p class="sb-cover-kicker">The long version</p>' +
         '<h3 class="sb-cover-title"><span>Wanna know me</span><span>beyond resume?</span></h3>' +
         '<i class="sb-cover-mark" aria-hidden="true"></i>' +
-        '<figure class="sb-cover-photo"><img src="ProfilePhoto.webp" alt="Deepika" width="96" height="120" decoding="async"></figure>' +
+        '<div class="sb-cover-portrait">' +
+          cameo('is-cover', 4, false) +
+          '<p class="sb-cover-note" aria-hidden="true"><span>psst,</span><span>that’s me</span>' + ARROW + '</p>' +
+        '</div>' +
       '</div>' +
     '</div>',
     { cover: true }
@@ -290,7 +311,12 @@
     ));
     pageMeta.push({ kind: 'opener', ch: chIndex });
 
-    packed[chIndex].forEach(function (body) {
+    packed[chIndex].forEach(function (body, pageIndex) {
+      var open = '<p class="wb-line">';
+      var first = body.charAt(open.length);
+      if (pageIndex === 0 && body.indexOf(open) === 0 && /[A-Za-z]/.test(first)) {
+        body = '<p class="wb-line"><span class="wb-drop">' + first + '</span>' + body.slice(open.length + 1);
+      }
       sheets.push(sheet(
         '<div class="wb-write">' +
           '<header class="wb-running"><span>Chapter ' + ch.roman + '</span><span>' + esc(ch.title) + '</span></header>' +
@@ -304,8 +330,8 @@
 
   sheets.push(sheet(
     '<div class="wb-write sb-open">' +
+      cameo('is-end', 6, true) +
       '<p class="sb-open-kicker">The end</p>' +
-      '<p class="sb-open-roman">Fin</p>' +
       '<h3 class="sb-open-title">Watch me. I\'m just getting started.</h3>' +
       '<i class="sb-open-mark" aria-hidden="true"></i>' +
       '<button type="button" class="wb-cta" data-chapter="cover">Back to the cover</button>' +
@@ -325,6 +351,7 @@
 
   mount.innerHTML =
     '<div class="work-book story-book" id="story-book">' +
+      '<i class="sb-ribbon" aria-hidden="true"></i>' +
       '<div class="work-book-stage" id="story-book-stage"></div>' +
       '<div class="work-book-bar">' +
         '<button type="button" class="work-book-nav" data-book="prev" aria-label="Previous page">Prev</button>' +
@@ -347,6 +374,63 @@
 
   applyShell();
   sheets.forEach(function (el) { stage.appendChild(el); });
+
+  // The cover portrait is alive: she looks toward the pointer, blinks now
+  // and then, smiles when the book first comes into view and winks when the
+  // pointer reaches her. Gaze cells: row 0 looks up, column 0 to the left.
+  (function bindCameo() {
+    var fig = stage.querySelector('.sb-cameo.is-cover');
+    if (!fig) return;
+    var look = fig.querySelector('.is-look');
+    var face = fig.querySelector('.is-face');
+    var cell = 4;
+    var faceTimer = 0;
+    var faceOn = false;
+
+    function showFace(n, ms) {
+      window.clearTimeout(faceTimer);
+      face.style.backgroundPosition = cellAt(n);
+      fig.classList.add('is-face-on');
+      faceOn = true;
+      faceTimer = window.setTimeout(function () {
+        fig.classList.remove('is-face-on');
+        faceOn = false;
+      }, ms);
+    }
+
+    (function blinkSoon() {
+      window.setTimeout(function () {
+        if (cell === 4 && !faceOn && !document.hidden) showFace(0, 150);
+        blinkSoon();
+      }, 2600 + Math.random() * 3400);
+    })();
+
+    document.addEventListener('pointermove', function (e) {
+      var r = fig.getBoundingClientRect();
+      if (!r.width || r.bottom < 0 || r.top > window.innerHeight) return;
+      var dx = e.clientX - (r.left + r.width / 2);
+      var dy = e.clientY - (r.top + r.height * 0.42);
+      var col = dx < -r.width * 0.8 ? 0 : dx > r.width * 0.8 ? 2 : 1;
+      var row = dy < -r.height * 0.75 ? 0 : dy > r.height * 0.75 ? 2 : 1;
+      var next = row * 3 + col;
+      if (next === cell) return;
+      cell = next;
+      look.style.backgroundPosition = cellAt(next);
+    }, { passive: true });
+
+    fig.addEventListener('pointerenter', function () {
+      showFace(1, 1100);
+    });
+
+    if ('IntersectionObserver' in window) {
+      var seen = new IntersectionObserver(function (entries) {
+        if (!entries[0].isIntersecting) return;
+        seen.disconnect();
+        window.setTimeout(function () { showFace(2, 1600); }, 700);
+      }, { threshold: 0.6 });
+      seen.observe(fig);
+    }
+  })();
 
   function paintStatus() {
     if (!flip) return;
@@ -435,7 +519,7 @@
     if (!flip || turning) return;
     var i = flip.getCurrentPageIndex();
     var n = flip.getPageCount();
-    if (dir === 'next' && i >= n - 1) return;
+    if (dir === 'next' && (i >= n - 1 || isLastPage())) return;
     if (dir === 'prev' && i <= 0) return;
     stopAuto();
     if (reduce) {

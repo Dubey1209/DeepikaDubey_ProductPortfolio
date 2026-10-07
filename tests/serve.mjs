@@ -27,7 +27,9 @@ export function startServer(port = 4173) {
   const server = createServer(async (req, res) => {
     try {
       const url = new URL(req.url, `http://localhost:${port}`);
-      let pathname = decodeURIComponent(url.pathname);
+      // GitHub Pages serves the site under the repository name; 404.html
+      // uses absolute paths with that prefix.
+      let pathname = decodeURIComponent(url.pathname).replace(/^\/DeepikaDubey_ProductPortfolio(?=\/)/, '');
       if (pathname.endsWith('/')) pathname += 'index.html';
 
       // Contain path traversal: resolve then verify the result is inside ROOT.

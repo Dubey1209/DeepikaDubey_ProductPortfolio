@@ -28,9 +28,38 @@
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
 
+  // Splits text in place, so markup inside the title (an inked underline,
+  // say) survives; only the home title's lines are rebuilt from text.
+  function splitNodes(node) {
+    Array.prototype.slice.call(node.childNodes).forEach(function (child) {
+      if (child.nodeType === 1) {
+        if (child.namespaceURI === 'http://www.w3.org/1999/xhtml') splitNodes(child);
+        return;
+      }
+      if (child.nodeType !== 3) return;
+      child.textContent.split('').forEach(function (ch) {
+        if (ch === ' ') {
+          node.insertBefore(document.createTextNode(' '), child);
+          return;
+        }
+        var outer = document.createElement('span');
+        var inner = document.createElement('span');
+        outer.className = 'fx-ch';
+        inner.textContent = ch;
+        outer.appendChild(inner);
+        node.insertBefore(outer, child);
+      });
+      node.removeChild(child);
+    });
+  }
+
   function splitChars(el, lined) {
     if (!el || el.dataset.fxSplit) return;
     el.dataset.fxSplit = '1';
+    if (!lined) {
+      splitNodes(el);
+      return;
+    }
     var htmlBits = el.innerHTML.split(/<br\s*\/?>/i);
     el.innerHTML = htmlBits.map(function (line, i) {
       var wrap = document.createElement('div');
