@@ -425,24 +425,106 @@
   // Words drift in one after another, softly, the way a thought forms, and
   // the note floats away when she is done.
 
+  var SVG_NS = 'http://www.w3.org/2000/svg';
+  function svgNode(tag, cls) {
+    var node = document.createElementNS(SVG_NS, tag);
+    if (cls) node.setAttribute('class', cls);
+    return node;
+  }
+
   var bubble = document.createElement('span');
   bubble.className = 'atelier-mascot-bubble';
   bubble.setAttribute('aria-hidden', 'true');
+  var cloud = document.createElement('span');
+  cloud.className = 'atelier-mascot-cloud';
+  var cloudSvg = svgNode('svg', 'atelier-mascot-cloud-art');
+  var cloudShade = svgNode('path', 'atelier-mascot-cloud-shade');
+  var cloudLine = svgNode('path', 'atelier-mascot-cloud-line');
+  var puffs = [svgNode('g', 'atelier-mascot-puff is-near'), svgNode('g', 'atelier-mascot-puff is-far')];
+  puffs.forEach(function (puff) {
+    puff.appendChild(svgNode('circle', 'atelier-mascot-cloud-shade'));
+    puff.appendChild(svgNode('circle', 'atelier-mascot-cloud-line'));
+    cloudSvg.appendChild(puff);
+  });
+  cloudSvg.appendChild(cloudShade);
+  cloudSvg.appendChild(cloudLine);
+  var bubbleText = document.createElement('span');
+  bubbleText.className = 'atelier-mascot-bubble-text';
+  cloud.appendChild(cloudSvg);
+  cloud.appendChild(bubbleText);
+  bubble.appendChild(cloud);
   el.appendChild(bubble);
   var bubbleTimer = 0;
 
+  // A cloud drawn around the line's box: points spaced evenly round a rounded
+  // rectangle (a superellipse), joined by arcs that bulge outward. The bumps
+  // vary a little, seeded by the text so the same line keeps the same cloud.
+  function cloudPath(w, h, text) {
+    var seed = 7;
+    for (var c = 0; c < text.length; c += 1) seed = (seed * 31 + text.charCodeAt(c)) % 233280;
+    function rand() {
+      seed = (seed * 9301 + 49297) % 233280;
+      return seed / 233280;
+    }
+    var a = w / 2, b = h / 2, n = 3.2, steps = 240;
+    var pts = [], lens = [0];
+    for (var i = 0; i <= steps; i += 1) {
+      var t = (i / steps) * Math.PI * 2 + 2.2;
+      var cos = Math.cos(t), sin = Math.sin(t);
+      pts.push([
+        a + a * (cos < 0 ? -1 : 1) * Math.pow(Math.abs(cos), 2 / n),
+        b + b * (sin < 0 ? -1 : 1) * Math.pow(Math.abs(sin), 2 / n),
+      ]);
+      if (i) lens.push(lens[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
+    }
+    var total = lens[steps];
+    var count = Math.max(7, Math.round(total / 36));
+    var step = total / count;
+    var marks = [];
+    for (var k = 0, j = 0; k < count; k += 1) {
+      var at = k * step + (k ? (rand() - 0.5) * step * 0.3 : 0);
+      while (j < steps && lens[j + 1] < at) j += 1;
+      var f = (at - lens[j]) / (lens[j + 1] - lens[j] || 1);
+      marks.push([pts[j][0] + (pts[j + 1][0] - pts[j][0]) * f, pts[j][1] + (pts[j + 1][1] - pts[j][1]) * f]);
+    }
+    var d = 'M' + marks[0][0].toFixed(1) + ' ' + marks[0][1].toFixed(1);
+    for (var m = 1; m <= count; m += 1) {
+      var p = marks[m % count], q = marks[m - 1];
+      var r = Math.hypot(p[0] - q[0], p[1] - q[1]) * (0.53 + rand() * 0.12);
+      d += 'A' + r.toFixed(1) + ' ' + r.toFixed(1) + ' 0 0 1 ' + p[0].toFixed(1) + ' ' + p[1].toFixed(1);
+    }
+    return d + 'Z';
+  }
+
+  function drawCloud(text) {
+    var w = cloud.offsetWidth, h = cloud.offsetHeight;
+    var d = cloudPath(w, h, text);
+    cloudShade.setAttribute('d', d);
+    cloudLine.setAttribute('d', d);
+    // Two small puffs trail down-left, towards her head, like a thought.
+    var spots = [[w * 0.17, h + 15, 5.5], [w * 0.17 - 11, h + 28, 3.4]];
+    puffs.forEach(function (puff, i) {
+      Array.prototype.forEach.call(puff.childNodes, function (circle) {
+        circle.setAttribute('cx', spots[i][0].toFixed(1));
+        circle.setAttribute('cy', spots[i][1].toFixed(1));
+        circle.setAttribute('r', String(spots[i][2]));
+      });
+    });
+  }
+
   function say(text, hold) {
     clearTimeout(bubbleTimer);
-    bubble.textContent = '';
+    bubbleText.textContent = '';
     var words = text.split(' ');
     words.forEach(function (word, i) {
       var span = document.createElement('span');
       span.className = 'atelier-mascot-word is-pre';
       span.style.setProperty('--i', String(i));
       span.textContent = word;
-      bubble.appendChild(span);
-      if (i < words.length - 1) bubble.appendChild(document.createTextNode(' '));
+      bubbleText.appendChild(span);
+      if (i < words.length - 1) bubbleText.appendChild(document.createTextNode(' '));
     });
+    drawCloud(text);
     bubble.classList.remove('is-out');
     bubble.classList.add('is-in');
     // Read layout so the words start from their hidden state, then release them.

@@ -880,20 +880,16 @@ html.atelier .atelier-mascot.is-breezy {
   filter: url(#mascot-breeze);
 }
 
-/* What she says when poked repeatedly: a small note that grows out from
-   beside her cheek with a gentle overshoot, its words drifting in one by one,
-   and floats up and away when she is done. Never a pop-up. */
+/* What she says when poked repeatedly: a thought cloud that grows out from
+   above her head with a gentle overshoot, its trail of puffs popping first,
+   its words drifting in one by one, and floats up and away when she is done.
+   mascot.js draws the cloud's outline around each line. Never a pop-up. */
 html.atelier .atelier-mascot-bubble {
   position: absolute;
   z-index: 6;
-  top: 9%;
-  left: 68%;
-  padding: 0.55rem 0.9rem 0.6rem;
-  border: 1.5px solid var(--ink);
-  border-radius: 1.1rem 1.1rem 1.1rem 0.25rem;
-  background: var(--card);
+  top: 6%;
+  left: 66%;
   color: var(--ink);
-  box-shadow: 3px 4px 0 var(--ink);
   font-family: var(--sans);
   font-size: 0.88rem;
   font-weight: 500;
@@ -922,6 +918,62 @@ html.atelier .atelier-mascot-bubble.is-out {
     transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+html.atelier .atelier-mascot-cloud {
+  position: relative;
+  display: block;
+  padding: 0.7rem 1.25rem 0.75rem;
+}
+
+html.atelier .atelier-mascot-bubble.is-in .atelier-mascot-cloud {
+  animation: atelier-mascot-float 3.4s ease-in-out 0.7s infinite;
+}
+
+@keyframes atelier-mascot-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+html.atelier .atelier-mascot-cloud-art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+html.atelier .atelier-mascot-cloud-shade {
+  fill: var(--ink);
+  opacity: 0.9;
+  transform: translate(2.5px, 3.5px);
+}
+
+html.atelier .atelier-mascot-cloud-line {
+  fill: var(--card);
+  stroke: var(--ink);
+  stroke-width: 1.5px;
+  stroke-linejoin: round;
+}
+
+html.atelier .atelier-mascot-bubble-text {
+  position: relative;
+}
+
+/* The puff nearest her pops first, then the next, then the cloud settles. */
+html.atelier .atelier-mascot-puff {
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scale(0);
+  transition: transform 0.45s cubic-bezier(0.34, 1.7, 0.5, 1);
+}
+
+html.atelier .atelier-mascot-bubble.is-in .atelier-mascot-puff {
+  transform: none;
+}
+
+html.atelier .atelier-mascot-bubble.is-in .atelier-mascot-puff.is-near {
+  transition-delay: 0.08s;
+}
+
 html.atelier .atelier-mascot-word {
   display: inline-block;
   transition:
@@ -946,7 +998,6 @@ html.atelier .atelier-mascot-word.is-pre {
     width: max-content;
     max-width: 11.5rem;
     white-space: normal;
-    border-radius: 1rem 1rem 0.3rem 1rem;
     transform-origin: 100% 100%;
   }
 }
@@ -963,6 +1014,15 @@ html.atelier .atelier-mascot-word.is-pre {
     transform: none;
     filter: none;
     transition: opacity 0.2s linear;
+  }
+
+  html.atelier .atelier-mascot-bubble.is-in .atelier-mascot-cloud {
+    animation: none;
+  }
+
+  html.atelier .atelier-mascot-puff {
+    transform: none;
+    transition: none;
   }
 }
 

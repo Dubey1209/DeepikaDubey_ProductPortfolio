@@ -140,7 +140,10 @@ blush"), mouth, forehead, hair (gasp, "not the hair!"), chin and sweater
 (giggle, "hehe, that tickles!"). The spots are measured on the centre frame;
 see `spotAt` in `mascot.js`. The first poke gets only the face. From the second
 (pokes under 1.6s apart) she says a line that belongs to the face she is making,
-in a bubble whose words drift in one by one. From the fifth she starts teasing
+in a thought cloud whose words drift in one by one. The cloud's outline is
+drawn around each line (`cloudPath`: arcs bulging out between points spaced
+round a superellipse, seeded by the text), two puffs trail down to her head and
+pop in first, and the cloud floats gently while it stays. From the fifth she starts teasing
 back (thinking: "hmm… is this a usability test?", then shy, then starry: "fine,
 you win"). A spot runs through all its lines before repeating one. Each poke
 also gives her a small flinch away from the finger.
