@@ -1049,10 +1049,141 @@
 
   document.addEventListener('pointerover', function (e) {
     var hovered = e.target.closest && e.target.closest('a, button');
-    if (!hovered || el.contains(hovered)) return;
+    if (!hovered || el.contains(hovered) || guideKey(hovered)) return;
     if (now() - lastStarry < 8000 || Math.random() > 0.35) return;
     lastStarry = now();
     autoReact(STARRY, 900);
+  });
+
+  // ---- tour guide -----------------------------------------------------------
+  //
+  // While she is on screen, resting the mouse on a nav link, the theme switch
+  // or a hero button gets a remark about where it leads. She keeps looking at
+  // whatever is hovered (her gaze already follows the pointer), so only the
+  // thought appears; no face swap turns her back to the front.
+
+  var GUIDE = {
+    home: ['that’s home. you’re already here!', 'P{ }: product, with a little code', 'logo click = teleport to the top'],
+    about: ['the short version. I promise it’s short', 'psst… the real me is just below', 'about me? finally, a topic I know well'],
+    work: ['ooh, the good stuff. go go go!', 'case studies! problem first, pixels later', 'this is where I show my receipts', 'real problems, real metrics, real shipping'],
+    design: ['pretty pixels, but every one has a reason', 'design work! zoom in on the details', 'Figma files with feelings'],
+    tech: ['yes, I write code too. engineer brain!', 'warning: actual working code ahead', 'where I break things, then fix them'],
+    skills: ['skills: tested in production, not just listed', 'spoiler: saying no is one of them', 'fewer buzzwords, more shipping'],
+    certs: ['certificates! proof I did the homework', 'framed in my heart, and on this page', 'yes, I read the whole syllabus'],
+    education: ['where curiosity got a syllabus', 'engineering degree, product heart', 'the origin story, academically'],
+    experience: ['real work, real users, real deadlines', 'where theory met deadlines', 'the part recruiters scroll to first'],
+    writing: ['my brain, but in paragraphs', 'words! thoughts with good formatting', 'grab a coffee, I write with feeling'],
+    fun: ['ooh, the fun part. I’m in there!', 'fun facts: 100% true, 0% boring', 'click it. you know you want to'],
+    story: ['the long version… grab a snack', 'it starts with a very curious kid', 'my whole story? you’re sweet'],
+    contact: ['yes! say hi, I reply', 'hiring for product? I can think and ship', 'slide into my inbox, professionally'],
+    resume: ['one page. zero fluff. promise', 'my resume: the shippable version of me', 'download me, I’m lightweight'],
+    who: ['that’s me! keep scrolling', 'who am I? the answer is right below', 'spoiler: a PM who ships'],
+    toLight: ['lights on? okay, squint time', 'bright mode, for the brave', 'switching to daylight? good morning!'],
+    toDark: ['dark mode? my eyes say thank you', 'lights off? cosy mode incoming', 'night shift? I’m ready'],
+  };
+
+  var GUIDE_HREFS = {
+    '#home': 'home',
+    '#about': 'about',
+    '#case-studies': 'work',
+    '#design-projects': 'design',
+    '#technical-projects': 'tech',
+    '#skills': 'skills',
+    '#certifications': 'certs',
+    '#education': 'education',
+    '#experience': 'experience',
+    '#writing': 'writing',
+    '#fun-facts': 'fun',
+    'my-story.html': 'story',
+    '#contact': 'contact',
+  };
+
+  function guideKey(target) {
+    if (target.id === 'theme-toggle') return document.body.classList.contains('dark-theme') ? 'toLight' : 'toDark';
+    if (target.closest('.home-btns')) return 'resume';
+    if (target.classList.contains('home-who')) return 'who';
+    if (!target.closest('.navbar')) return '';
+    return GUIDE_HREFS[target.getAttribute('href')] || '';
+  }
+
+  var guideTimer = 0;
+  var guideTarget = null;
+  var guideSaid = {};
+
+  document.addEventListener('pointerover', function (e) {
+    if (e.pointerType !== 'mouse') return;
+    var target = e.target.closest && e.target.closest('a, button');
+    if (!target || target === guideTarget) return;
+    var key = guideKey(target);
+    clearTimeout(guideTimer);
+    guideTarget = key ? target : null;
+    if (!key) return;
+    // A short dwell, so sweeping across the nav does not set off every link.
+    guideTimer = setTimeout(function () {
+      if (!visible || reacting >= 0 || now() - (guideSaid[key] || 0) < 6000) return;
+      guideSaid[key] = now();
+      var line = pickLine('guide:' + key, { face: -1, lines: GUIDE[key] });
+      say(line.text, holdFor(line.text));
+    }, 280);
+  });
+
+  document.addEventListener('pointerout', function (e) {
+    if (guideTarget && !guideTarget.contains(e.relatedTarget)) {
+      clearTimeout(guideTimer);
+      guideTarget = null;
+    }
+  });
+
+  // The theme actually changing gets a face as well as a thought.
+  var THEME_SWITCH = {
+    dark: { face: SHY, lines: ['ooh, cosy mode', 'night shift: on', 'shh… the pixels are sleeping', [WINK, 'dark mode, but make it cute']] },
+    light: { face: GASP, lines: ['aaah, bright!', [GRIN, 'good morning, sunshine!'], 'my eyes! okay, okay, I’m fine', [GRIN, 'daylight mode: fresh and crisp']] },
+  };
+  var wasDark = document.body.classList.contains('dark-theme');
+
+  new MutationObserver(function () {
+    var dark = document.body.classList.contains('dark-theme');
+    if (dark === wasDark) return;
+    wasDark = dark;
+    if (!visible) return;
+    clearTimeout(guideTimer);
+    var line = pickLine(dark ? 'theme:dark' : 'theme:light', THEME_SWITCH[dark ? 'dark' : 'light']);
+    var hold = holdFor(line.text);
+    react(line.face, hold);
+    say(line.text, hold);
+  }).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+
+  // Copying text from the page, and coming back to the tab.
+  var COPIED = { face: STARRY, lines: ['copying my lines? I’m flattered', [WINK, 'ctrl+c? excellent taste'], [GRIN, 'ooh, quote me on that'], [WINK, 'credit the author, okay?']] };
+  var WELCOME_BACK = { face: GRIN, lines: ['oh, you’re back!', [SHY, 'missed you. kidding. a little'], [WINK, 'welcome back! I kept your seat warm'], 'hey! I knew you’d come back'] };
+
+  document.addEventListener('copy', function () {
+    if (!visible || reacting >= 0) return;
+    var line = pickLine('copy', COPIED);
+    var hold = holdFor(line.text);
+    react(line.face, hold);
+    say(line.text, hold);
+  });
+
+  var pageTitle = document.title;
+  var leftAt = 0;
+
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) {
+      leftAt = now();
+      pageTitle = document.title;
+      document.title = 'psst… Deepika is waiting';
+      return;
+    }
+    document.title = pageTitle;
+    if (!visible || now() - leftAt < 4000) return;
+    setTimeout(function () {
+      if (reacting >= 0) return;
+      var line = pickLine('back', WELCOME_BACK);
+      var hold = holdFor(line.text);
+      react(line.face, hold);
+      say(line.text, hold);
+    }, 500);
   });
 
   var aimQueued = false;

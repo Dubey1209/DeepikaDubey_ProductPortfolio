@@ -77,7 +77,7 @@ GSAP 3.12.7, ScrollTrigger 3.12.7, Lenis 1.1.20, page-flip 2.0.7, and
 ## Cache busting
 
 Every stylesheet and script is referenced with a **single shared** `?v=` token
-(currently `20261019`; the mascot sheet URLs in `atelier.css` carry it too).
+(currently `20261020`; the mascot sheet URLs in `atelier.css` carry it too).
 When you change any CSS, JS or mascot sheet, bump that token —
 in both `index.html` and `my-story.html`.
 
@@ -127,7 +127,19 @@ never runs off the page; on phones it sits above her head as before. Once per
 visit, after the hero's entrance and the lock screen, she says hello
 (`GREETINGS`; the test harness marks her as having greeted so captures do not
 depend on the timer). About is now a single centred column, its three notes
-numbered 01–03 like the chapters of My Story.
+numbered 01–03 like the chapters of My Story. In the hero she is ~9% larger
+(372×438; 240×282 on phones).
+
+She is also a tour guide while the hero is on screen (`GUIDE` in `mascot.js`):
+resting the mouse on a nav link, the theme switch, the resume button or "Who
+am I?" for 280ms gets a remark about where it leads ("skills: tested in
+production, not just listed", "dark mode? my eyes say thank you"), at most once
+per 6s per target. Her gaze already follows the pointer, so she looks up at
+the link while she says it; the face is left alone, since a reaction would
+turn her back to the front. Switching the theme gets a face too (shy for dark,
+a gasp for light). Copying text gets "copying my lines? I'm flattered". While
+the tab is in the background its title reads "psst… Deepika is waiting", and
+coming back after 4s or more gets a welcome back.
 
 It follows the idea of [page-mascot](https://koboyo.com/page-mascot), which is a React
 component; this is a plain-JS version (`mascot.js`) so the site keeps no React

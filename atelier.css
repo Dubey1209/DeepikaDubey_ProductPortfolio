@@ -568,12 +568,15 @@ html.atelier .home-right {
 /* The mascot is the hero's picture. Her thought cloud opens to her left,
    over the gap beside the copy, so it never runs off the right edge. */
 html.atelier .home-mascot {
-  width: 340px;
+  width: 372px;
   max-width: 100%;
 }
 
+/* A little larger than she was in About, at the sheet's 340:400 shape. */
 html.atelier .home-mascot .atelier-mascot {
   --cloud-tail: right;
+  max-width: 372px;
+  height: 438px;
 }
 
 html.atelier .home-mascot .atelier-mascot-bubble {
@@ -863,12 +866,12 @@ html.atelier body.dark-theme .atelier-mascot::before {
    scaling the picture continuously kept it permanently resampled and soft. */
 html.atelier .atelier-mascot-look,
 html.atelier .atelier-mascot-layer.is-look {
-  background-image: url('mascots/deepika-directions.webp?v=20261019');
+  background-image: url('mascots/deepika-directions.webp?v=20261020');
 }
 
 html.atelier .atelier-mascot-react,
 html.atelier .atelier-mascot-layer.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261019');
+  background-image: url('mascots/deepika-reactions.webp?v=20261020');
 }
 
 html.atelier .atelier-mascot-react {
@@ -883,8 +886,8 @@ html.atelier .atelier-mascot-react {
    underneath; an oval reached the jaw and showed a second chin. */
 html.atelier .atelier-mascot-face {
   opacity: 0;
-  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261019');
-  mask-image: url('mascots/deepika-face-mask.png?v=20261019');
+  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261020');
+  mask-image: url('mascots/deepika-face-mask.png?v=20261020');
   -webkit-mask-size: 300% 300%;
   mask-size: 300% 300%;
   -webkit-mask-repeat: no-repeat;
@@ -1020,8 +1023,14 @@ html.atelier .atelier-mascot-word.is-pre {
     transform-origin: 100% 100%;
   }
 
+  html.atelier .home-mascot {
+    width: 240px;
+  }
+
   html.atelier .home-mascot .atelier-mascot {
     --cloud-tail: left;
+    max-width: 240px;
+    height: 282px;
   }
 
   html.atelier .home-mascot .atelier-mascot-bubble {
