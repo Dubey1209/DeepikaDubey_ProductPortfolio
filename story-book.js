@@ -75,22 +75,29 @@
     return (n % 3) * 50 + '% ' + Math.floor(n / 3) * 50 + '%';
   }
 
-  function cameo(cls, cell, react) {
+  function cameo(cls, cell, react, face) {
     return '<span class="sb-cameo ' + cls + '" aria-hidden="true">' +
       '<span class="sb-cameo-window">' +
         '<i class="sb-cameo-art is-look' + (react ? ' is-react' : '') + '" style="background-position:' + cellAt(cell) + '"></i>' +
-        '<i class="sb-cameo-art is-face is-react"></i>' +
+        '<i class="sb-cameo-art is-face is-react"' + (face != null ? ' style="background-position:' + cellAt(face) + '"' : '') + '></i>' +
       '</span>' +
     '</span>';
   }
 
-  // Her sticker on each chapter's opening page, matched to its mood:
-  // [cell, from the expressions sheet]. Faces: 0 eyes closed, 1 wink, 2 grin,
-  // 3 gasp, 4 giggle, 5 shy, 6 starry, 7 thinking, 8 unimpressed.
+  // Her sticker on each chapter's opening page. She arrives with a neutral
+  // smile, then pulls the chapter's face; hovering or tapping her gets the
+  // second face. [face, second face, scribble]. Faces: 0 eyes closed, 1 wink,
+  // 2 grin, 3 gasp, 4 giggle, 5 shy, 6 starry, 7 thinking, 8 unimpressed.
   var MOODS = [
-    [3, true], [6, true], [2, true], [4, true], [1, true], [7, true], [2, true],
-    [5, true], [4, true], [1, false], [8, true], [0, true], [6, true], [1, true]
+    [3, 6, 'wait, what?!'], [6, 2, 'best. day.'], [2, 4, 'hehe'], [4, 1, 'lol, true'],
+    [1, 2, 'between us'], [7, 6, 'hmm… oh!'], [2, 6, 'yay!'], [5, 4, 'eep'],
+    [4, 2, 'haha'], [7, 1, 'plot twist'], [8, 4, 'really?'], [0, 2, 'deep breath'],
+    [6, 4, 'look at that'], [1, 6, 'more soon']
   ];
+
+  // One small found object per text page, so no two neighbours look alike.
+  var KEEPSAKES = ['sb-k-clip', 'sb-k-tape', 'sb-k-stamp', 'sb-k-fold'];
+  var CLIP = '<svg class="sb-keep sb-k-clip" viewBox="0 0 24 64" aria-hidden="true"><path d="M8 20V8a4 4 0 0 1 8 0v40a8 8 0 0 1-16 0V14"/></svg>';
   var TAPES = ['is-tape-a', 'is-tape-b', 'is-tape-c', 'is-tape-d'];
   var SQUIGGLE = '<svg class="sb-squiggle" viewBox="0 0 120 14" aria-hidden="true"><path pathLength="1" d="M3 8c8-6 14 6 22 0s14-6 22 0 14 6 22 0 14-6 22 0 14 6 26-1"/></svg>';
 
@@ -343,12 +350,15 @@
     }
 
     chapterStart[chIndex] = sheets.length;
-    var mood = MOODS[chIndex] || [2, true];
+    var mood = MOODS[chIndex] || [2, 4, 'hi'];
     sheets.push(sheet(
       '<div class="wb-write sb-open">' +
         '<span class="sb-open-num" aria-hidden="true">' + ch.num + '</span>' +
         '<p class="sb-open-kicker sb-tape ' + TAPES[chIndex % TAPES.length] + '">Chapter ' + ch.roman + '</p>' +
-        cameo('is-sticker is-mood' + (chIndex % 2 ? ' is-tilt-r' : ''), mood[0], mood[1]) +
+        '<span class="sb-mood-wrap" data-face="' + mood[0] + '" data-alt="' + mood[1] + '">' +
+          cameo('is-sticker is-mood' + (chIndex % 2 ? ' is-tilt-r' : ''), 4, false, mood[0]) +
+          '<span class="sb-mood-note' + (chIndex % 2 ? ' is-left' : '') + '" aria-hidden="true">' + esc(mood[2]) + '</span>' +
+        '</span>' +
         '<h3 class="sb-open-title">' + esc(ch.title) + '</h3>' +
         SQUIGGLE +
       '</div>' +
@@ -370,14 +380,19 @@
       // A chai ring on the odd page, the way a real journal gets used.
       var ring = printed % 9 === 4 ? ' has-ring' : '';
       var room = PAGE_LINES - 1 - linesIn(body) >= 3;
+      var keep = KEEPSAKES[printed % KEEPSAKES.length];
+      var keepHtml = keep === 'sb-k-clip' ? CLIP :
+        keep === 'sb-k-stamp' ? '<span class="sb-keep sb-k-stamp" aria-hidden="true"><b>' + ch.roman + '</b><i>chapter</i></span>' :
+        '<span class="sb-keep ' + keep + '" aria-hidden="true"></span>';
       sheets.push(sheet(
+        keepHtml +
         '<div class="wb-write">' +
           '<header class="wb-running"><span>Chapter ' + ch.roman + '</span><span>' + esc(ch.title) + '</span></header>' +
           body +
         '</div>' +
         (room && !ring ? doodle(printed) : '') +
         '<footer class="wb-folio">' + printed++ + '</footer>',
-        { cls: 'sb-text' + ring }
+        { cls: 'sb-text' + ring + (keep === 'sb-k-stamp' ? '' : ' has-keep-top') }
       ));
       pageMeta.push({ kind: 'chapter', ch: chIndex });
     });
@@ -386,7 +401,10 @@
   sheets.push(sheet(
     '<div class="wb-write sb-open">' +
       '<p class="sb-open-kicker sb-tape is-tape-a">The end</p>' +
-      cameo('is-sticker is-mood', 6, true) +
+      '<span class="sb-mood-wrap" data-face="6" data-alt="1">' +
+        cameo('is-sticker is-mood', 4, false, 6) +
+        '<span class="sb-mood-note" aria-hidden="true">thank you!</span>' +
+      '</span>' +
       '<h3 class="sb-open-title">Watch me. I\'m just getting started.</h3>' +
       SQUIGGLE +
       '<button type="button" class="wb-cta" data-chapter="cover">Back to the cover</button>' +
@@ -408,7 +426,6 @@
 
   mount.innerHTML =
     '<div class="work-book story-book" id="story-book">' +
-      '<i class="sb-ribbon" aria-hidden="true"></i>' +
       '<div class="work-book-stage" id="story-book-stage"></div>' +
       '<div class="work-book-bar">' +
         '<button type="button" class="work-book-nav" data-book="prev" aria-label="Previous page">Prev</button>' +
@@ -489,8 +506,54 @@
     }
   })();
 
+  function moodFace(wrap, which) {
+    var fig = wrap.querySelector('.sb-cameo');
+    var face = wrap.querySelector('.is-face');
+    if (!fig || !face) return;
+    face.style.backgroundPosition = cellAt(Number(wrap.getAttribute(which)));
+    fig.classList.add('is-face-on');
+  }
+
+  function wakeMoods() {
+    if (!flip) return;
+    var i = flip.getCurrentPageIndex();
+    sheets.forEach(function (el, idx) {
+      var wrap = el.querySelector('.sb-mood-wrap');
+      if (!wrap) return;
+      var shown = idx === i || (size.spread && idx === i + 1);
+      if (!shown) {
+        window.clearTimeout(wrap._t);
+        wrap.classList.remove('is-live');
+        var fig = wrap.querySelector('.sb-cameo');
+        if (fig) fig.classList.remove('is-face-on');
+        return;
+      }
+      if (wrap.classList.contains('is-live')) return;
+      wrap.classList.add('is-live');
+      wrap._t = window.setTimeout(function () { moodFace(wrap, 'data-face'); }, reduce ? 0 : 700);
+    });
+  }
+
+  book.addEventListener('pointerover', function (e) {
+    var wrap = e.target.closest && e.target.closest('.sb-mood-wrap.is-live');
+    if (wrap && !wrap.contains(e.relatedTarget)) {
+      window.clearTimeout(wrap._t);
+      moodFace(wrap, 'data-alt');
+      wrap.classList.add('is-boop');
+    }
+  });
+
+  book.addEventListener('pointerout', function (e) {
+    var wrap = e.target.closest && e.target.closest('.sb-mood-wrap.is-live');
+    if (wrap && !wrap.contains(e.relatedTarget)) {
+      moodFace(wrap, 'data-face');
+      wrap.classList.remove('is-boop');
+    }
+  });
+
   function paintStatus() {
     if (!flip) return;
+    wakeMoods();
     var meta = pageMeta[flip.getCurrentPageIndex()] || {};
     if (meta.kind === 'cover') status.textContent = 'Cover';
     else if (meta.kind === 'index') status.textContent = 'Contents';
@@ -641,8 +704,22 @@
     if (!Ctor) return false;
     if (flip) {
       try { startPage = flip.getCurrentPageIndex(); } catch (err) {}
+      // destroy() removes the stage element itself, which used to leave the
+      // book blank after a resize: move the pages to a fresh stage first.
+      var fresh = document.createElement('div');
+      fresh.className = 'work-book-stage';
+      fresh.id = 'story-book-stage';
+      stage.parentNode.insertBefore(fresh, stage);
+      sheets.forEach(function (el) {
+        el.removeAttribute('style');
+        el.classList.remove('stf__item', '--left', '--right', '--simple', '--hard', '--soft');
+        fresh.appendChild(el);
+      });
       try { flip.destroy(); } catch (err2) {}
+      if (stage.parentNode) stage.parentNode.removeChild(stage);
+      stage = fresh;
       flip = null;
+      applyShell();
     }
     turning = false;
     sheets.forEach(function (el) {
@@ -746,12 +823,17 @@
   }
 
   var resizeTimer = null;
+  var lastVW = window.innerWidth;
   window.addEventListener('resize', function () {
     window.clearTimeout(resizeTimer);
     resizeTimer = window.setTimeout(function () {
+      // Phones fire resize whenever the address bar slides in or out; only a
+      // real change of width (rotation, window resize) rebuilds the book.
+      if (window.innerWidth === lastVW) return;
+      lastVW = window.innerWidth;
       var next = fitSize();
       var modeChanged = next.spread !== size.spread;
-      var sizeChanged = Math.abs(next.width - size.width) > 12 || Math.abs(next.height - size.height) > 12;
+      var sizeChanged = Math.abs(next.width - size.width) > 12 || Math.abs(next.height - size.height) > 40;
       if (!modeChanged && !sizeChanged) return;
       var page = flip ? flip.getCurrentPageIndex() : 0;
       size = next;

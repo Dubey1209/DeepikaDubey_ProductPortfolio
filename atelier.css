@@ -1284,12 +1284,12 @@ html.atelier .atelier-mascot-burst.is-spark > span {
    scaling the picture continuously kept it permanently resampled and soft. */
 html.atelier .atelier-mascot-look,
 html.atelier .atelier-mascot-layer.is-look {
-  background-image: url('mascots/deepika-directions.webp?v=20261029');
+  background-image: url('mascots/deepika-directions.webp?v=20261030');
 }
 
 html.atelier .atelier-mascot-react,
 html.atelier .atelier-mascot-layer.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261029');
+  background-image: url('mascots/deepika-reactions.webp?v=20261030');
 }
 
 html.atelier .atelier-mascot-react {
@@ -1304,8 +1304,8 @@ html.atelier .atelier-mascot-react {
    underneath; an oval reached the jaw and showed a second chin. */
 html.atelier .atelier-mascot-face {
   opacity: 0;
-  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261029');
-  mask-image: url('mascots/deepika-face-mask.png?v=20261029');
+  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261030');
+  mask-image: url('mascots/deepika-face-mask.png?v=20261030');
   -webkit-mask-size: 300% 300%;
   mask-size: 300% 300%;
   -webkit-mask-repeat: no-repeat;
@@ -4987,14 +4987,14 @@ html.atelier .sb-cameo-art {
   top: 11%;
   width: 120%;
   aspect-ratio: 680 / 800;
-  background-image: url('mascots/deepika-directions.webp?v=20261029');
+  background-image: url('mascots/deepika-directions.webp?v=20261030');
   background-repeat: no-repeat;
   background-size: 300% 300%;
   background-position: 50% 50%;
 }
 
 html.atelier .sb-cameo-art.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261029');
+  background-image: url('mascots/deepika-reactions.webp?v=20261030');
 }
 
 html.atelier .sb-cameo-art.is-face {
@@ -5049,34 +5049,8 @@ html.atelier .wb-sheet .wb-drop {
   -webkit-text-fill-color: var(--spin) !important;
 }
 
-/* A satin ribbon marker, tucked under the pages and hanging below them. */
 html.atelier .story-book {
   position: relative;
-}
-
-html.atelier .sb-ribbon {
-  display: none;
-}
-
-html.atelier .story-book.is-spread .sb-ribbon {
-  position: absolute;
-  z-index: 1;
-  left: calc(50% + var(--sb-w, 680px) / 4);
-  top: calc(0.35rem + var(--sb-h, 460px) - 12px);
-  display: block;
-  width: 13px;
-  height: 52px;
-  background:
-    linear-gradient(90deg, rgba(0, 0, 0, 0.22), rgba(255, 255, 255, 0.2) 38%, rgba(0, 0, 0, 0.12) 70%, rgba(0, 0, 0, 0.26)),
-    color-mix(in srgb, var(--spin) 82%, #000);
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 82%, 0 100%);
-  transform-origin: 50% 0;
-  animation: ribbon-sway 5.5s ease-in-out infinite alternate;
-}
-
-@keyframes ribbon-sway {
-  from { rotate: -2.5deg; }
-  to { rotate: 3deg; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -5090,8 +5064,7 @@ html.atelier .story-book.is-spread .sb-ribbon {
     opacity: 1;
   }
 
-  html.atelier .sb-cameo-window::before,
-  html.atelier .story-book.is-spread .sb-ribbon {
+  html.atelier .sb-cameo-window::before {
     animation: none;
   }
 }
