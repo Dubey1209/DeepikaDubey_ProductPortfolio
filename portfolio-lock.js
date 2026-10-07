@@ -88,7 +88,7 @@ class PortfolioLock {
     const thanks = `Thanks, ${name}. It's open.`;
 
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      this.unlockInstant();
+      this.unlockInstant(name);
       this.notify(thanks, 'success');
       return Promise.resolve();
     }
@@ -98,7 +98,7 @@ class PortfolioLock {
     const shell = document.getElementById('site-shell');
 
     if (!lock || !card || !shell) {
-      this.unlockInstant();
+      this.unlockInstant(name);
       this.notify(thanks, 'success');
       return Promise.resolve();
     }
@@ -110,7 +110,7 @@ class PortfolioLock {
       setTimeout(() => {
         shell.style.display = 'block';
         shell.classList.add('is-revealing');
-        document.dispatchEvent(new CustomEvent('portfolio-unlocked'));
+        document.dispatchEvent(new CustomEvent('portfolio-unlocked', { detail: { name } }));
       }, 180);
 
       setTimeout(() => {
@@ -126,13 +126,15 @@ class PortfolioLock {
     });
   }
 
-  unlockInstant() {
+  // `name` only when the visitor has just typed it in; a returning session
+  // unlocks without one, and the mascot greets it the ordinary way.
+  unlockInstant(name) {
     document.body.classList.remove('portfolio-is-locked');
     const lock = document.getElementById('portfolio-lock');
     const shell = document.getElementById('site-shell');
     if (lock) lock.style.display = 'none';
     if (shell) shell.style.display = 'block';
-    document.dispatchEvent(new CustomEvent('portfolio-unlocked'));
+    document.dispatchEvent(new CustomEvent('portfolio-unlocked', { detail: { name: name || '' } }));
     window.scrollTo({ top: 0, behavior: 'auto' });
   }
 

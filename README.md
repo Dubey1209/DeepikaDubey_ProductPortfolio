@@ -77,7 +77,7 @@ GSAP 3.12.7, ScrollTrigger 3.12.7, Lenis 1.1.20, page-flip 2.0.7, and
 ## Cache busting
 
 Every stylesheet and script is referenced with a **single shared** `?v=` token
-(currently `20261024`; the mascot sheet URLs in `atelier.css` carry it too).
+(currently `20261025`; the mascot sheet URLs in `atelier.css` carry it too).
 When you change any CSS, JS or mascot sheet, bump that token —
 in both `index.html` and `my-story.html`.
 
@@ -126,7 +126,13 @@ her thought cloud opens to her left (`--cloud-tail: right` in the hero), so it
 never runs off the page; on phones it sits above her head as before. Once per
 visit, after the hero's entrance and the lock screen, she says hello
 (`GREETINGS`; the test harness marks her as having greeted so captures do not
-depend on the timer). In the hero she is ~9% larger (372×438; 240×282 on
+depend on the timer). A visitor who has just typed their name on the lock
+screen gets a welcome instead: `portfolio-lock.js` passes the name in the
+`portfolio-unlocked` event, and `welcome()` in `mascot.js` plays three beats
+using their first name: starry eyes with sparkles, a shy blush (a pink flush
+over her cheeks, `.atelier-mascot-blush`, while hearts rise from them), then a
+giggle and "welcome in". A returning session unlocks without a name and gets
+the ordinary hello. In the hero she is ~9% larger (372×438; 240×282 on
 phones). The bottom row of the direction sheet was drawn without her smile,
 so she looked sad whenever the pointer was below her. `smileDown` in
 `tools/build-mascot.mjs` fixes it in the build: it paints the flat mouth out

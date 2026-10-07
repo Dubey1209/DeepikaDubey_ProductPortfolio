@@ -1344,11 +1344,119 @@
   var GREETED_KEY = 'mascot-greeted';
   var greetTimer = 0;
 
+  function markGreeted() {
+    try {
+      sessionStorage.setItem(GREETED_KEY, '1');
+    } catch (err) {
+      // No storage: greet on every visit, which is harmless.
+    }
+  }
+
+  // ---- welcome --------------------------------------------------------------
+  //
+  // Someone who has just typed their name on the lock screen is met by name,
+  // in three beats: starry-eyed that they came (sparkles), shy and blushing
+  // (her cheeks warm, hearts drift up), then a giggle and a welcome in. Only
+  // then: a returning session in the same tab gets the ordinary hello.
+
+  var pendingWelcome = '';
+
+  function firstName(name) {
+    var first = String(name || '').trim().split(/\s+/)[0] || '';
+    if (first.length > 16) first = first.slice(0, 15) + '…';
+    return first.charAt(0).toUpperCase() + first.slice(1);
+  }
+
+  var blush = document.createElement('span');
+  blush.className = 'atelier-mascot-blush';
+  blush.setAttribute('aria-hidden', 'true');
+  el.appendChild(blush);
+
+  var HEART = '<svg viewBox="0 0 24 24"><path d="M12 20.6 4.3 12.9a4.8 4.8 0 0 1 6.8-6.8l.9.9.9-.9a4.8 4.8 0 0 1 6.8 6.8z"/></svg>';
+  var SPARK = '<svg viewBox="0 0 24 24"><path d="M12 2.5c.7 5 2.4 7 7.5 7.9v1.2c-5.1.9-6.8 2.9-7.5 7.9h-1c-.7-5-2.4-7-7.5-7.9v-1.2c5.1-.9 6.8-2.9 7.5-7.9z"/></svg>';
+
+  // Particles in the mascot's own box: hearts rise from her cheeks, sparkles
+  // pop around her head. Positions are fractions of the box (see spotAt).
+  function burst(kind) {
+    if (reducedMotion) return;
+    var wrap = document.createElement('span');
+    wrap.className = 'atelier-mascot-burst is-' + kind;
+    wrap.setAttribute('aria-hidden', 'true');
+    var count = kind === 'heart' ? 7 : 6;
+    for (var i = 0; i < count; i += 1) {
+      var p = document.createElement('span');
+      var side = i % 2 ? 1 : -1;
+      if (kind === 'heart') {
+        p.style.setProperty('--x', (53.5 + side * (9 + Math.random() * 9)) + '%');
+        p.style.setProperty('--y', (47 + Math.random() * 4) + '%');
+        p.style.setProperty('--dx', (side * (14 + Math.random() * 26)) + 'px');
+        p.style.setProperty('--rise', -(110 + Math.random() * 90) + 'px');
+        p.style.setProperty('--s', (0.7 + Math.random() * 0.6).toFixed(2));
+      } else {
+        var a = (i / count) * Math.PI * 2 + Math.random() * 0.5;
+        p.style.setProperty('--x', (53.5 + Math.cos(a) * 30) + '%');
+        p.style.setProperty('--y', (30 + Math.sin(a) * 20) + '%');
+        p.style.setProperty('--s', (0.6 + Math.random() * 0.7).toFixed(2));
+      }
+      p.style.setProperty('--d', (i * 0.12 + Math.random() * 0.1).toFixed(2) + 's');
+      p.style.setProperty('--r', (side * (8 + Math.random() * 18)).toFixed(0) + 'deg');
+      p.innerHTML = kind === 'heart' ? HEART : SPARK;
+      wrap.appendChild(p);
+    }
+    el.appendChild(wrap);
+    setTimeout(function () {
+      if (wrap.parentNode) wrap.parentNode.removeChild(wrap);
+    }, 3600);
+  }
+
+  function welcome(name) {
+    pendingWelcome = '';
+    var first = firstName(name);
+    var beats = [
+      { face: STARRY, text: first ? first + '! you actually came' : 'oh! you actually came', fx: 'spark' },
+      { face: SHY, text: 'aww, now I’m blushing…', fx: 'heart', blush: true },
+      { face: GIGGLE, text: first ? 'welcome in, ' + first + '. make yourself at home' : 'welcome in. make yourself at home' },
+    ];
+    var at = 0;
+    beats.forEach(function (beat, i) {
+      var hold = holdFor(beat.text);
+      var last = i === beats.length - 1;
+      setTimeout(function () {
+        // Each beat outlasts its own words so the next one takes over from
+        // it, rather than her flicking back to her normal face in between.
+        react(beat.face, last ? hold : hold + 600);
+        say(beat.text, hold);
+        el.classList.toggle('is-blushing', !!beat.blush);
+        if (beat.fx) burst(beat.fx);
+      }, at);
+      at += hold + 280;
+    });
+    setTimeout(function () {
+      el.classList.remove('is-blushing');
+    }, at);
+  }
+
+  document.addEventListener('portfolio-unlocked', function (e) {
+    var name = e && e.detail && e.detail.name;
+    if (!name) return;
+    markGreeted();
+    clearTimeout(greetTimer);
+    // After the lock screen has gone and the hero's entrance has played.
+    greetTimer = setTimeout(function () {
+      if (visible) welcome(name);
+      else pendingWelcome = name;
+    }, 1900);
+  });
+
   function greetSoon() {
+    if (pendingWelcome) {
+      welcome(pendingWelcome);
+      return;
+    }
     try {
       if (sessionStorage.getItem(GREETED_KEY)) return;
     } catch (err) {
-      // No storage: greet on every visit, which is harmless.
+      // See markGreeted.
     }
     if (document.body.classList.contains('portfolio-is-locked')) {
       document.addEventListener('portfolio-unlocked', greetSoon, { once: true });
@@ -1357,11 +1465,7 @@
     clearTimeout(greetTimer);
     greetTimer = setTimeout(function () {
       if (!visible || reacting >= 0 || now() - lastPokeAt < 4000) return;
-      try {
-        sessionStorage.setItem(GREETED_KEY, '1');
-      } catch (err) {
-        // See above.
-      }
+      markGreeted();
       var line = pickLine('greet', GREETINGS);
       var hold = holdFor(line.text);
       react(line.face, hold);

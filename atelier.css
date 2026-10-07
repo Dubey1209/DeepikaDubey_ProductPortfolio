@@ -1126,6 +1126,96 @@ html.atelier body.dark-theme .atelier-mascot::before {
   }
 }
 
+/* The welcome. A warm flush over her cheeks (positions are fractions of the
+   mascot box, like the face itself), moving with her as the layers do. */
+html.atelier .atelier-mascot-blush {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    radial-gradient(7% 3.8% at 40% 47.5%, rgba(255, 92, 122, 0.5), rgba(255, 92, 122, 0) 100%),
+    radial-gradient(7% 3.8% at 67% 47.5%, rgba(255, 92, 122, 0.5), rgba(255, 92, 122, 0) 100%);
+  mix-blend-mode: multiply;
+  transform-origin: 50% 100%;
+  transform: translate(var(--mascot-tx, 0px), var(--mascot-ty, 0px)) rotate(var(--mascot-tilt, 0deg));
+  transition: opacity 0.8s ease;
+}
+
+html.atelier .atelier-mascot.is-blushing .atelier-mascot-blush {
+  opacity: 1;
+  animation: mascot-blush 1.4s ease-in-out 0.8s infinite alternate;
+}
+
+@keyframes mascot-blush {
+  to { opacity: 0.65; }
+}
+
+html.atelier .atelier-mascot-burst {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+html.atelier .atelier-mascot-burst > span {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: 18px;
+  height: 18px;
+  margin: -9px 0 0 -9px;
+  opacity: 0;
+}
+
+html.atelier .atelier-mascot-burst svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+html.atelier .atelier-mascot-burst.is-heart svg {
+  fill: #ff5c7a;
+  filter: drop-shadow(0 2px 4px rgba(255, 92, 122, 0.35));
+}
+
+html.atelier .atelier-mascot-burst.is-spark svg {
+  fill: var(--spin);
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--spin) 55%, transparent));
+}
+
+html.atelier .atelier-mascot-burst.is-heart > span {
+  animation: mascot-heart 2.6s cubic-bezier(0.22, 0.61, 0.36, 1) var(--d) forwards;
+}
+
+html.atelier .atelier-mascot-burst.is-spark > span {
+  animation: mascot-spark 1.3s cubic-bezier(0.34, 1.56, 0.64, 1) var(--d) forwards;
+}
+
+@keyframes mascot-heart {
+  0% { opacity: 0; transform: translate(0, 0) scale(0.2) rotate(0deg); }
+  15% { opacity: 1; transform: translate(calc(var(--dx) * 0.2), -14px) scale(var(--s)) rotate(var(--r)); }
+  55% { transform: translate(calc(var(--dx) * 0.7), calc(var(--rise) * 0.6)) scale(var(--s)) rotate(calc(var(--r) * -1)); }
+  100% { opacity: 0; transform: translate(var(--dx), var(--rise)) scale(calc(var(--s) * 0.8)) rotate(var(--r)); }
+}
+
+@keyframes mascot-spark {
+  0% { opacity: 0; transform: scale(0) rotate(0deg); }
+  40% { opacity: 1; transform: scale(var(--s)) rotate(var(--r)); }
+  100% { opacity: 0; transform: scale(0.2) rotate(calc(var(--r) * 4)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.atelier .atelier-mascot-blush {
+    transform: none;
+  }
+
+  html.atelier .atelier-mascot.is-blushing .atelier-mascot-blush {
+    animation: none;
+  }
+}
+
 @media (max-width: 760px) {
   html.atelier .atelier-mascot {
     max-width: 220px;
@@ -1141,12 +1231,12 @@ html.atelier body.dark-theme .atelier-mascot::before {
    scaling the picture continuously kept it permanently resampled and soft. */
 html.atelier .atelier-mascot-look,
 html.atelier .atelier-mascot-layer.is-look {
-  background-image: url('mascots/deepika-directions.webp?v=20261024');
+  background-image: url('mascots/deepika-directions.webp?v=20261025');
 }
 
 html.atelier .atelier-mascot-react,
 html.atelier .atelier-mascot-layer.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261024');
+  background-image: url('mascots/deepika-reactions.webp?v=20261025');
 }
 
 html.atelier .atelier-mascot-react {
@@ -1161,8 +1251,8 @@ html.atelier .atelier-mascot-react {
    underneath; an oval reached the jaw and showed a second chin. */
 html.atelier .atelier-mascot-face {
   opacity: 0;
-  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261024');
-  mask-image: url('mascots/deepika-face-mask.png?v=20261024');
+  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261025');
+  mask-image: url('mascots/deepika-face-mask.png?v=20261025');
   -webkit-mask-size: 300% 300%;
   mask-size: 300% 300%;
   -webkit-mask-repeat: no-repeat;
