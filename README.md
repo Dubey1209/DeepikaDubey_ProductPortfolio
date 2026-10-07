@@ -77,7 +77,7 @@ GSAP 3.12.7, ScrollTrigger 3.12.7, Lenis 1.1.20, page-flip 2.0.7, and
 ## Cache busting
 
 Every stylesheet and script is referenced with a **single shared** `?v=` token
-(currently `20261008`; the mascot sheet URLs in `atelier.css` carry it too).
+(currently `20261009`; the mascot sheet URLs in `atelier.css` carry it too).
 When you change any CSS, JS or mascot sheet, bump that token —
 in both `index.html` and `my-story.html`.
 
@@ -136,7 +136,8 @@ It is two 3×3 sprite sheets in `mascots/`:
   after 7s, sleepy after 20s, a startled gasp on waking). The table at the top
   of `mascot.js` is the full list.
 
-She also breathes, hops on a poke, wiggles when tickled, and every 8–17s a
+Frames cross-fade rather than cut. She also breathes, bobs on a poke (a small
+squash-and-stretch dip, lift and settle, not a jump), wiggles when tickled, and every 8–17s a
 breeze moves her side hair: an SVG filter displaces the picture by drifting
 noise, masked so the face and body stay still. All of the self-started motion
 is off under `prefers-reduced-motion`.

@@ -12,10 +12,10 @@
 //               6 starry  7 thinking  8 sleepy
 //
 // What triggers each reaction:
-//   pointer arrives on her      grin + hop (at most every 15s)
+//   pointer arrives on her      grin + perk (at most every 15s)
 //   pointer rests on her face   shy
 //   pointer scrubs over her     giggle + wiggle (tickled)
-//   click / Enter / Space       wink, grin, gasp, giggle, starry or shy + hop
+//   click / Enter / Space       wink, grin, gasp, giggle, starry or shy + bounce
 //   four quick clicks           thinking ("what are you doing?")
 //   any link or button hovered  sometimes starry
 //   7s without the pointer      thinking or wink, once
@@ -167,8 +167,8 @@
 
   function wake() {
     if (isReacting() && current === SLEEPY) {
-      showReaction(GASP, 700);
-      body('is-hopping', 500);
+      showReaction(GASP, 800);
+      body('is-perking', 600);
     }
     scheduleIdle();
   }
@@ -177,12 +177,13 @@
     clearTimeout(blinkTimer);
     if (reducedMotion) return;
     blinkTimer = setTimeout(function () {
-      autoReaction(BLINK, 140);
+      // Long enough to outlast the layers' cross-fade, so the eyes fully close.
+      autoReaction(BLINK, 180);
       // Now and then a double blink, which reads as more alive than a metronome.
       if (Math.random() < 0.25) {
         setTimeout(function () {
-          autoReaction(BLINK, 120);
-        }, 300);
+          autoReaction(BLINK, 160);
+        }, 400);
       }
       scheduleBlink();
     }, 2600 + Math.random() * 3400);
@@ -309,9 +310,9 @@
       pick = POKES[Math.floor(Math.random() * POKES.length)];
     } while (pick === lastPoke);
     lastPoke = pick;
-    showReaction(pick, 1100);
-    if (pick === GIGGLE) body('is-wiggling', 900);
-    else body('is-hopping', 500);
+    showReaction(pick, 1400);
+    if (pick === GIGGLE) body('is-wiggling', 1000);
+    else body('is-bouncing', 720);
   }
 
   var lastGreet = 0;
@@ -319,8 +320,8 @@
   el.addEventListener('pointerenter', function () {
     if (now() - lastGreet < 15000 || isReacting()) return;
     lastGreet = now();
-    showReaction(GRIN, 900);
-    body('is-hopping', 500);
+    showReaction(GRIN, 1100);
+    body('is-perking', 600);
   });
 
   // Tickle: the pointer reversing direction quickly several times over her.
@@ -340,7 +341,7 @@
     if (reversals.length >= 5) {
       reversals = [];
       showReaction(GIGGLE, 1300);
-      body('is-wiggling', 900);
+      body('is-wiggling', 1000);
     }
   });
 

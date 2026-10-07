@@ -819,32 +819,50 @@ html.atelier body.dark-theme .atelier-mascot-layer {
 }
 
 html.atelier .atelier-mascot-look {
-  background-image: url('mascots/deepika-directions.webp?v=20261008');
+  background-image: url('mascots/deepika-directions.webp?v=20261009');
+}
+
+/* Frames cross-fade instead of cutting. The look layer fades out under a
+   reaction rather than staying behind it: both layers fade at the bottom, and
+   two different sweaters showed through each other there as ghost stripes. */
+html.atelier .atelier-mascot-look,
+html.atelier .atelier-mascot-react {
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.11s ease-out;
 }
 
 html.atelier .atelier-mascot-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261008');
-  visibility: hidden;
+  background-image: url('mascots/deepika-reactions.webp?v=20261009');
+  opacity: 0;
 }
 
 html.atelier .atelier-mascot.is-reacting .atelier-mascot-react {
-  visibility: visible;
+  opacity: 1;
 }
 
-/* Body language on the wrapper. Breathing, hops and wiggles animate the
-   separate scale / translate / rotate properties so they can overlap without
-   overriding each other or the layers' pointer lean. */
+html.atelier .atelier-mascot.is-reacting .atelier-mascot-look {
+  opacity: 0;
+}
+
+/* Body language. Breathing animates the wrapper's `scale`; bounces and
+   wiggles animate the layers' own scale / translate / rotate, which compose
+   with the pointer lean in `transform` instead of replacing it. Each bounce
+   follows squash and stretch: a small dip, a lift, a soft landing that
+   settles, so it reads as a person bobbing rather than a sprite jumping. */
 html.atelier .atelier-mascot {
   transform-origin: 50% 100%;
   animation: mascot-breathe 4.2s ease-in-out infinite;
 }
 
-html.atelier .atelier-mascot.is-hopping {
-  animation: mascot-breathe 4.2s ease-in-out infinite, mascot-hop 0.5s cubic-bezier(0.3, 1.6, 0.5, 1);
+html.atelier .atelier-mascot.is-bouncing .atelier-mascot-layer {
+  animation: mascot-bounce 0.72s linear;
 }
 
-html.atelier .atelier-mascot.is-wiggling {
-  animation: mascot-breathe 4.2s ease-in-out infinite, mascot-wiggle 0.9s ease-in-out;
+html.atelier .atelier-mascot.is-perking .atelier-mascot-layer {
+  animation: mascot-perk 0.6s linear;
+}
+
+html.atelier .atelier-mascot.is-wiggling .atelier-mascot-layer {
+  animation: mascot-wiggle 1s ease-in-out;
 }
 
 /* The SVG filter mascot.js injects; it displaces only the side hair. */
@@ -857,25 +875,34 @@ html.atelier .atelier-mascot.is-breezy {
   50% { scale: 1.006 1.014; }
 }
 
-@keyframes mascot-hop {
-  0%, 100% { translate: 0 0; }
-  35% { translate: 0 -12px; }
-  70% { translate: 0 2px; }
+@keyframes mascot-bounce {
+  0% { translate: 0 0; scale: 1 1; animation-timing-function: cubic-bezier(0.33, 0, 0.67, 1); }
+  16% { translate: 0 1px; scale: 1.022 0.975; animation-timing-function: cubic-bezier(0.2, 0.6, 0.35, 1); }
+  44% { translate: 0 -7px; scale: 0.988 1.02; animation-timing-function: cubic-bezier(0.55, 0, 0.75, 0.6); }
+  68% { translate: 0 0; scale: 1.012 0.988; animation-timing-function: cubic-bezier(0.25, 0.6, 0.4, 1); }
+  84% { translate: 0 -1.5px; scale: 0.997 1.004; animation-timing-function: ease-in-out; }
+  100% { translate: 0 0; scale: 1 1; }
+}
+
+@keyframes mascot-perk {
+  0% { translate: 0 0; scale: 1 1; animation-timing-function: cubic-bezier(0.2, 0.6, 0.35, 1); }
+  40% { translate: 0 -3px; scale: 0.994 1.012; animation-timing-function: ease-in-out; }
+  100% { translate: 0 0; scale: 1 1; }
 }
 
 @keyframes mascot-wiggle {
   0%, 100% { rotate: 0deg; }
-  20% { rotate: -3deg; }
-  40% { rotate: 3deg; }
-  60% { rotate: -2deg; }
-  80% { rotate: 1.5deg; }
+  15% { rotate: -1.8deg; }
+  32% { rotate: 1.6deg; }
+  50% { rotate: -1.1deg; }
+  68% { rotate: 0.7deg; }
+  84% { rotate: -0.3deg; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   html.atelier .atelier-mascot,
-  html.atelier .atelier-mascot.is-hopping,
-  html.atelier .atelier-mascot.is-wiggling {
-    animation: none;
+  html.atelier .atelier-mascot .atelier-mascot-layer {
+    animation: none !important;
   }
 }
 

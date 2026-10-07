@@ -24,6 +24,7 @@
 import sharp from 'sharp';
 import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
+import { statSync } from 'node:fs';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const CHECK_ONLY = process.argv.includes('--check');
@@ -58,6 +59,10 @@ const BG_TOLERANCE = 30;
 const RIM_RINGS = 2;
 // How far inside the silhouette the hair's white edge highlight sits.
 const EDGE_REACH = 8;
+// Background pockets left inside curled strands: how far from the outside
+// they may be, and how large, before they are treated as part of the drawing.
+const POCKET_REACH = 24;
+const POCKET_MAX = 2500;
 const HAIR = [34, 26, 22];
 const INK = [24, 18, 16];
 
@@ -65,6 +70,7 @@ const INK = [24, 18, 16];
 // shown with `background-size: 300% 300%` without stretching.
 const CELL_W = 340;
 const CELL_H = 400;
+const RESOLUTION = 1.5;
 
 // How far a figure's size may differ from the median before it counts as a jump.
 const TOLERANCE = 0.06;
@@ -199,6 +205,82 @@ function measureCell(img, bg, col, row, band) {
   return { col, row, top, bottom, left, right, width: right - left + 1, height: bottom - top + 1, anchorX };
 }
 
+/**
+ * Marks enclosed pockets of background inside the hair as background.
+ *
+ * Where a loose strand curls away from the hair, the model leaves cream
+ * between the strand and the hair. The edge flood fill cannot reach it, so it
+ * stayed opaque and showed on the page as pale, broken blotches along the
+ * hair's outline. A pocket counts only when it is near the silhouette, small,
+ * and walled mostly by near-black hair: eye whites are far inside, and the
+ * cream sweater stripes are walled by brown knit, not black.
+ */
+function removePockets(img, bg, isBg, dist, pixelLum) {
+  const { width, height } = img;
+  const n = width * height;
+
+  const reach = new Uint8Array(n).fill(255);
+  let frontier = [];
+  for (let p = 0; p < n; p += 1) {
+    if (isBg[p]) {
+      reach[p] = 0;
+      frontier.push(p);
+    }
+  }
+  for (let step = 1; step <= POCKET_REACH && frontier.length; step += 1) {
+    const next = [];
+    for (const p of frontier) {
+      const x = p % width;
+      for (const q of [x > 0 ? p - 1 : -1, x < width - 1 ? p + 1 : -1, p - width, p + width]) {
+        if (q >= 0 && q < n && reach[q] === 255) {
+          reach[q] = step;
+          next.push(q);
+        }
+      }
+    }
+    frontier = next;
+  }
+
+  const candidate = (p) => !isBg[p] && dist(p) <= BG_TOLERANCE + 12;
+  const seen = new Uint8Array(n);
+  let removed = 0;
+  for (let s = 0; s < n; s += 1) {
+    if (seen[s] || !candidate(s)) continue;
+    const pixels = [];
+    const stack = [s];
+    seen[s] = 1;
+    let near = false;
+    let wall = 0;
+    let dark = 0;
+    while (stack.length) {
+      const p = stack.pop();
+      pixels.push(p);
+      if (reach[p] !== 255) near = true;
+      const x = p % width;
+      for (const q of [x > 0 ? p - 1 : -1, x < width - 1 ? p + 1 : -1, p - width, p + width]) {
+        if (q < 0 || q >= n) continue;
+        if (candidate(q)) {
+          if (!seen[q]) {
+            seen[q] = 1;
+            stack.push(q);
+          }
+        } else if (!isBg[q]) {
+          wall += 1;
+          // Walls are anti-aliased, so look one pixel further for the ink.
+          const beyond = q + (q - p);
+          const ink = Math.min(pixelLum(q), beyond >= 0 && beyond < n ? pixelLum(beyond) : 255);
+          if (ink < 60) dark += 1;
+        }
+      }
+    }
+    if (near && pixels.length <= POCKET_MAX && wall && dark / wall >= 0.6) {
+      for (const p of pixels) isBg[p] = 1;
+      removed += 1;
+    }
+  }
+  return removed;
+}
+
 /** RGBA copy of the sheet with the edge-connected background made transparent. */
 function cutOut(img, bg) {
   const { width, height, data } = img;
@@ -234,6 +316,9 @@ function cutOut(img, bg) {
     if (p >= width) seed(p - width);
     if (p < width * (height - 1)) seed(p + width);
   }
+
+  const pockets = removePockets(img, bg, isBg, dist, pixelLum);
+  console.log(`  removed ${pockets} enclosed background pocket(s)`);
 
   // The model draws a thin white highlight along the outside of the hair,
   // between two black outlines. On the cream it was drawn on, it is invisible;
@@ -374,7 +459,12 @@ async function main() {
   // jump by turning it into a different one.
   const commonH = Math.min(...all.map((c) => c.height));
   const maxW = Math.max(...all.map((c) => c.width));
-  const scale = Math.min((CELL_H * 0.94) / commonH, (CELL_W * 0.98) / maxW);
+  const fit = Math.min((CELL_H * 0.94) / commonH, (CELL_W * 0.98) / maxW);
+  // Written at twice the display size: on high-density screens the browser
+  // would otherwise upscale a 1x sheet itself, softening every outline.
+  const scale = fit * RESOLUTION;
+  const cellW = CELL_W * RESOLUTION;
+  const cellH = CELL_H * RESOLUTION;
   const h = Math.round(commonH * scale);
 
   for (const s of sheets) {
@@ -389,29 +479,33 @@ async function main() {
 
         let pipeline = sharp(rgba, { raw: { width: s.img.width, height: s.img.height, channels: 4 } })
           .extract({ left: c.left, top: c.top, width: c.width, height: commonH })
-          .resize(w, h, { kernel: 'lanczos3' });
+          .resize(w, h, { kernel: 'lanczos3' })
+          // Upscaling the ~330px source softens the ink lines; a light
+          // unsharp mask brings the edges back without ringing on flat fills.
+          .sharpen({ sigma: 0.8, m1: 0.6, m2: 1.4 });
         if (flip) pipeline = pipeline.flop();
         const piece = await pipeline.png().toBuffer();
 
         // Hair top at the same height in every cell, the cut sweater flush
         // with the cell bottom, the body's centre on the cell's centre.
         const anchor = flip ? c.right - c.anchorX : c.anchorX - c.left;
-        const left = Math.round(CELL_W / 2 - anchor * scale) + col * CELL_W;
-        const top = (row + 1) * CELL_H - h;
-        composites.push({ input: piece, left: Math.max(col * CELL_W, left), top });
+        const left = Math.round(cellW / 2 - anchor * scale) + col * cellW;
+        const top = (row + 1) * cellH - h;
+        composites.push({ input: piece, left: Math.max(col * cellW, left), top });
       }
     }
 
     await sharp({
-      create: { width: CELL_W * 3, height: CELL_H * 3, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } },
+      create: { width: cellW * 3, height: cellH * 3, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } },
     })
       .composite(composites)
-      // Flat ink-and-fill art hides compression well: 78 is visually the same
-      // as 88 here at two-thirds of the size (~200KB for both sheets).
-      .webp({ quality: 78 })
+      // Above 1x, compression artefacts are smaller than a screen pixel, so a
+      // lower quality than a 1x sheet would need still looks clean.
+      .webp({ quality: 62, alphaQuality: 80, effort: 6 })
       .toFile(join(ROOT, s.out));
 
-    console.log(`Wrote ${s.out}  (${CELL_W * 3} x ${CELL_H * 3}, scale ${scale.toFixed(3)})`);
+    const { size } = statSync(join(ROOT, s.out));
+    console.log(`Wrote ${s.out}  (${cellW * 3} x ${cellH * 3}, scale ${scale.toFixed(3)}, ${Math.round(size / 1024)}KB)`);
   }
 }
 
