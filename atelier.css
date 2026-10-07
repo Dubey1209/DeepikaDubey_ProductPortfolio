@@ -776,9 +776,10 @@ html.atelier .atelier-mascot:focus-visible {
    here: one would restart on every write and stutter. The tilt pivots at the
    base of the bust, like a person turning from the shoulders, and is only
    non-zero while she is moving, so the picture is never left rotated.
-   The bottom edge fades so the cut-off sweater does not end in a hard line.
-   The fade is eased rather than linear: a straight ramp starts and stops
-   abruptly, and both ends showed as faint horizontal bands across the knit. */
+   The bottom edge softens over its last few pixels only, so the cut-off
+   sweater ends clean but not razor-sharp. Any longer fade washed the cream
+   stripes into the page, which read as a hazy glow under her on the light
+   theme. */
 html.atelier .atelier-mascot-layer {
   position: absolute;
   inset: 0;
@@ -792,26 +793,8 @@ html.atelier .atelier-mascot-layer {
      picture was redrawn a different way at the start and end of every fade
      and visibly shimmered. */
   will-change: opacity, transform;
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    #000 68%,
-    rgba(0, 0, 0, 0.94) 74%,
-    rgba(0, 0, 0, 0.8) 80%,
-    rgba(0, 0, 0, 0.58) 86%,
-    rgba(0, 0, 0, 0.32) 92%,
-    rgba(0, 0, 0, 0.1) 97%,
-    transparent 100%
-  );
-  mask-image: linear-gradient(
-    to bottom,
-    #000 68%,
-    rgba(0, 0, 0, 0.94) 74%,
-    rgba(0, 0, 0, 0.8) 80%,
-    rgba(0, 0, 0, 0.58) 86%,
-    rgba(0, 0, 0, 0.32) 92%,
-    rgba(0, 0, 0, 0.1) 97%,
-    transparent 100%
-  );
+  -webkit-mask-image: linear-gradient(to bottom, #000 97%, rgba(0, 0, 0, 0.55) 98.6%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 97%, rgba(0, 0, 0, 0.55) 98.6%, transparent 100%);
 }
 
 /* Near-black hair against the near-black dark page loses its silhouette, so a
@@ -847,12 +830,12 @@ html.atelier body.dark-theme .atelier-mascot::before {
    scaling the picture continuously kept it permanently resampled and soft. */
 html.atelier .atelier-mascot-look,
 html.atelier .atelier-mascot-layer.is-look {
-  background-image: url('mascots/deepika-directions.webp?v=20261014');
+  background-image: url('mascots/deepika-directions.webp?v=20261015');
 }
 
 html.atelier .atelier-mascot-react,
 html.atelier .atelier-mascot-layer.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261014');
+  background-image: url('mascots/deepika-reactions.webp?v=20261015');
 }
 
 html.atelier .atelier-mascot-react {
@@ -867,8 +850,8 @@ html.atelier .atelier-mascot-react {
    underneath; an oval reached the jaw and showed a second chin. */
 html.atelier .atelier-mascot-face {
   opacity: 0;
-  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261014');
-  mask-image: url('mascots/deepika-face-mask.png?v=20261014');
+  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261015');
+  mask-image: url('mascots/deepika-face-mask.png?v=20261015');
   -webkit-mask-size: 300% 300%;
   mask-size: 300% 300%;
   -webkit-mask-repeat: no-repeat;
@@ -895,7 +878,10 @@ html.atelier .atelier-mascot-bubble {
   font-weight: 500;
   line-height: 1.35;
   letter-spacing: 0.005em;
-  white-space: nowrap;
+  text-align: center;
+  text-wrap: balance;
+  width: max-content;
+  max-width: 14rem;
   pointer-events: none;
   opacity: 0;
   transform: translate(-10px, 12px) scale(0.8) rotate(-4deg);

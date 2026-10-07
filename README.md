@@ -77,7 +77,7 @@ GSAP 3.12.7, ScrollTrigger 3.12.7, Lenis 1.1.20, page-flip 2.0.7, and
 ## Cache busting
 
 Every stylesheet and script is referenced with a **single shared** `?v=` token
-(currently `20261014`; the mascot sheet URLs in `atelier.css` carry it too).
+(currently `20261015`; the mascot sheet URLs in `atelier.css` carry it too).
 When you change any CSS, JS or mascot sheet, bump that token —
 in both `index.html` and `my-story.html`.
 
@@ -134,19 +134,24 @@ It is two 3×3 sprite sheets in `mascots/`:
   scrubs over her, a friendly face per click, sometimes starry when a link is
   hovered). The table at the top of `mascot.js` is the full list.
 
-Where she is poked decides how she reacts: nose (gasp, "boop! …that was my
-nose"), eyes (eyes shut, "ow, my eye!"), cheeks (shy, "aww, you're making me
-blush"), mouth, forehead, hair (gasp, "not the hair!"), chin and sweater
-(giggle, "hehe, that tickles!"). The spots are measured on the centre frame;
-see `spotAt` in `mascot.js`. The first poke gets only the face. From the second
-(pokes under 1.6s apart) she says a line that belongs to the face she is making,
-in a thought cloud whose words drift in one by one. The cloud's outline is
+Where she is poked decides how she reacts, and every poke gets a thought that
+belongs to the face she is making, a little cute and a little product manager:
+nose (gasp, "boop! a nose is not a button"), eyes (eyes shut, "blinking…
+please hold"), cheeks (shy, "blushing is a feature, not a bug"), mouth,
+forehead (wink, "boop! new idea unlocked"), hair (gasp, "not the hair! it's in
+production"), chin and sweater (giggle, "hehe, you found an edge case"). The
+spots are measured on the centre frame; see `spotAt` in `mascot.js`. From the
+fifth quick poke (under 1.6s apart) she teases back (thinking: "hmm… is this a
+usability test?", then shy: "okay, engagement is way up", then starry:
+"retention: 100%. hi, friend!"). A mouse resting on her for 2.2s gets a passing
+thought ("currently prioritising snacks"), at most every 20s. A spot runs
+through all its lines before repeating one. Each poke also gives her a small
+flinch away from the finger.
+
+Thoughts appear in a cloud whose words drift in one by one. Its outline is
 drawn around each line (`cloudPath`: arcs bulging out between points spaced
 round a superellipse, seeded by the text), two puffs trail down to her head and
-pop in first, and the cloud floats gently while it stays. From the fifth she starts teasing
-back (thinking: "hmm… is this a usability test?", then shy, then starry: "fine,
-you win"). A spot runs through all its lines before repeating one. Each poke
-also gives her a small flinch away from the finger.
+pop in first, and the cloud floats gently while it stays.
 
 Every reaction frame faces straight out. So the reactions she starts herself
 (blinks, starry) only happen while she is already looking straight out, and
@@ -251,6 +256,15 @@ sharpening made it jagged; blurring and re-contrasting the alpha only softened
 the steps. Instead the script builds a signed distance field of the cut-out,
 upscales that, and cuts it at its midpoint with a one-pixel ramp, the way fonts
 are rendered from distance fields. Only the colour channels are sharpened.
+The field is blurred (sigma 2.2 source pixels) before upscaling, so the bumps
+of the model's sketchy outer line become one smooth curve; at 0.7 the hair kept
+a serrated edge that looked pixelated on the light page. Before that, the
+silhouette is closed by 3 source pixels: slivers of background between curls
+were left as holes and bites along the hair, and are filled with hair colour.
+
+The bottom of the sweater softens over only its last 3%. A fade over the bottom
+third washed the cream stripes into the page and read as a hazy glow under her
+on the light theme.
 
 The model will not draw a head turned to the left, so the left column is the
 right column mirrored. The script also removes the cream background (edge flood

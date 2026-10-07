@@ -83,6 +83,9 @@ const EDGE_REACH = 8;
 // they may be, and how large, before they are treated as part of the drawing.
 const POCKET_REACH = 24;
 const POCKET_MAX = 2500;
+// Background narrower than twice this (source pixels) inside the silhouette is
+// filled; see cutOut.
+const GAP_CLOSE = 3;
 const HAIR = [34, 26, 22];
 const INK = [24, 18, 16];
 
@@ -454,6 +457,21 @@ function cutOut(img, bg) {
     }
     rgba.set([r, g, b, 255], p * 4);
   }
+
+  // Slivers of background between curls, a few pixels wide, read as holes
+  // and bites along the hair once smoothed. Closing the silhouette fills
+  // them; every edge they sit on is ink or hair, so they take the hair colour.
+  const figure = new Uint8Array(width * height);
+  for (let p = 0; p < width * height; p += 1) figure[p] = rgba[p * 4 + 3] >= 128 ? 1 : 0;
+  const closed = morph(morph(figure, width, height, GAP_CLOSE, true), width, height, GAP_CLOSE, false);
+  let filled = 0;
+  for (let p = 0; p < width * height; p += 1) {
+    if (closed[p] && !figure[p]) {
+      rgba.set([HAIR[0], HAIR[1], HAIR[2], 255], p * 4);
+      filled += 1;
+    }
+  }
+  console.log(`  filled ${filled} pixel(s) of slivers between curls`);
   return rgba;
 }
 
@@ -845,12 +863,13 @@ async function main() {
 
   for (const s of sheets) {
     const rgba = cutOut(s.img, s.bg);
-    // Lightly blurred so single-pixel JPEG bumps along the cut become gentle
-    // curves rather than nicks.
+    // Blurred so the bumps of the model's sketchy outer line become one smooth
+    // curve. At 0.7 they survived as a serrated edge every few pixels down the
+    // hair, which looked pixelated on the light page.
     const sdf = await sharp(signedDistance(rgba, s.img.width, s.img.height), {
       raw: { width: s.img.width, height: s.img.height, channels: 1 },
     })
-      .blur(0.7)
+      .blur(2.2)
       .extractChannel(0)
       .raw()
       .toBuffer();

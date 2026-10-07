@@ -540,26 +540,38 @@
 
   // ---- being poked ----------------------------------------------------------
   //
-  // Where she is touched decides how she reacts, and each line belongs to the
-  // face she is making while she says it. The first poke gets only the face;
-  // after that she talks, and if it keeps going she starts teasing back.
+  // Where she is touched decides how she reacts, and each thought belongs to
+  // the face she is making while she has it: a little cute, a little product
+  // manager. If the poking keeps going she starts teasing back.
 
   var SPOTS = {
-    nose: { face: GASP, lines: ['boop! …that was my nose', 'eep, my nose!', 'hey, not the nose!'] },
-    eye: { face: BLINK, lines: ['ow, my eye!', 'careful, I need those', 'can’t see you now…'] },
-    cheek: { face: SHY, lines: ['aww, you’re making me blush', 'oh… stop it', 'hehe, my cheek'] },
-    mouth: { face: GIGGLE, lines: ['pfft, hehe', 'mmf! hi!', 'hehe, I was about to say something'] },
-    forehead: { face: WINK, lines: ['boop received', 'knock knock, yes I’m home', 'tap tap, hi!'] },
-    hair: { face: GASP, lines: ['not the hair!', 'I just fixed that!', 'hey, my hair!'] },
-    chin: { face: GIGGLE, lines: ['hehe, ticklish there', 'that tickles!', 'hehe, stop it'] },
-    sweater: { face: GIGGLE, lines: ['hehe, that tickles!', 'careful, comfy sweater', 'hehe, I’m ticklish'] },
-    hello: { face: GRIN, lines: ['hi! you found me', 'hello there!', 'hehe, hi!'] },
+    nose: { face: GASP, lines: ['boop! a nose is not a button', 'eep! zero affordance there', 'hey! that’s not a CTA'] },
+    eye: { face: BLINK, lines: ['ow! I need those for user research', 'blinking… please hold', 'can’t see the roadmap now'] },
+    cheek: {
+      face: SHY,
+      lines: ['aww, you’re making me blush', 'stop it… my NPS just went up', 'blushing is a feature, not a bug'],
+    },
+    mouth: { face: GIGGLE, lines: ['mmf! hehe, I was mid-pitch', 'pfft! okay, you have my attention', 'hehe, that’s my demo voice'] },
+    forehead: { face: WINK, lines: ['boop! new idea unlocked', 'knock knock… a feature request?', 'tap tap, my brain says hi'] },
+    hair: { face: GASP, lines: ['not the hair! it’s in production', 'hey! that took three iterations', 'careful, it’s a stable release'] },
+    chin: { face: GIGGLE, lines: ['hehe, ticklish there!', 'hehe, you found an edge case', 'that tickles! logging it as a bug'] },
+    sweater: { face: GIGGLE, lines: ['hehe, that tickles!', 'careful, it’s my launch-day sweater', 'cozy sweater, shipped on time'] },
+    hello: { face: GRIN, lines: ['hi! you found the easter egg', 'hello, keyboard friend!', 'hehe, hi there!'] },
   };
 
   var TEASE = [
-    { face: THINKING, lines: ['hmm… is this a usability test?', 'you really like poking, huh?'] },
-    { face: SHY, lines: ['okay, I think you like me', 'you’re kind of sweet, you know'] },
-    { face: STARRY, lines: ['fine, you win. hi, friend!', 'okay okay, hello to you too!'] },
+    { face: THINKING, lines: ['hmm… is this a usability test?', 'so many clicks… A/B testing me?'] },
+    { face: SHY, lines: ['okay, engagement is way up', 'you really like me, huh?'] },
+    { face: STARRY, lines: ['fine, you win. let’s build something!', 'retention: 100%. hi, friend!'] },
+  ];
+
+  // What she thinks about when the pointer rests on her without poking.
+  var MUSINGS = [
+    'psst… you can poke me',
+    'hmm… what would the user do?',
+    'currently prioritising snacks',
+    'thinking in user stories…',
+    'is this the MVP or the dream?',
   ];
 
   // Measured on the centre frame, as fractions of the box: eyes at y .36–.44,
@@ -611,10 +623,6 @@
       nudge(e.clientX < rect.left + rect.width / 2 ? 0.7 : -0.7, -0.35);
     }
 
-    if (streak === 1) {
-      react(step.face, 1300);
-      return;
-    }
     var line = pickLine(step.lines);
     var hold = Math.min(3200, 1500 + line.length * 40);
     react(step.face, hold);
@@ -628,6 +636,33 @@
     if (now() - lastGreet < 15000 || reacting >= 0) return;
     lastGreet = now();
     react(GRIN, 1100);
+  });
+
+  // A pointer resting on her for a moment gets a passing thought, at most
+  // every 20s, and never while she is already reacting.
+  var museTimer = 0;
+  var lastMuse = 0;
+
+  function waitToMuse() {
+    clearTimeout(museTimer);
+    museTimer = setTimeout(function () {
+      if (reacting >= 0 || now() - lastMuse < 20000 || now() - lastPokeAt < 4000) return;
+      lastMuse = now();
+      var line = pickLine(MUSINGS);
+      var hold = Math.min(3200, 1500 + line.length * 40);
+      react(THINKING, hold);
+      say(line, hold);
+    }, 2200);
+  }
+
+  el.addEventListener('pointermove', function (e) {
+    if (e.pointerType === 'mouse') waitToMuse();
+  });
+  el.addEventListener('pointerdown', function () {
+    clearTimeout(museTimer);
+  });
+  el.addEventListener('pointerleave', function () {
+    clearTimeout(museTimer);
   });
 
   // Tickle: the pointer reversing direction quickly several times over her.
