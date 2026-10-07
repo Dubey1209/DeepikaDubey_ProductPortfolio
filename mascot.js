@@ -542,48 +542,263 @@
   //
   // Where she is touched decides how she reacts, and each thought belongs to
   // the face she is making while she has it: a little cute, a little product
-  // manager. If the poking keeps going she starts teasing back.
+  // manager, and now and then something true about her. A line is a string,
+  // shown with the spot's face, or [face, string]. If the poking keeps going
+  // she starts teasing back.
 
   var SPOTS = {
-    nose: { face: GASP, lines: ['boop! a nose is not a button', 'eep! zero affordance there', 'hey! that’s not a CTA'] },
-    eye: { face: BLINK, lines: ['ow! I need those for user research', 'blinking… please hold', 'can’t see the roadmap now'] },
+    nose: {
+      face: GASP,
+      lines: [
+        'ouch! my nose is a bit sharp, careful',
+        'ow! sharp nose, soft heart',
+        'boop! a nose is not a button',
+        'eep! zero affordance there',
+        'hey! that’s not a CTA',
+        'ouch… filing this as a P0',
+        'my nose: pointy by design',
+        'boop detected. nose rebooting…',
+        'hey, sharp noses are sensitive too',
+        'ouch! that’s a sharp edge case',
+        [GIGGLE, 'hehe, nose bumped. sneeze deploying…'],
+        'careful, that’s a premium feature',
+        'ow! noted: nose is a no-touch zone',
+        [WINK, 'sharp nose, sharper roadmap'],
+      ],
+    },
+    eye: {
+      face: BLINK,
+      lines: [
+        'ow! I need those for user research',
+        'blinking… please hold',
+        'can’t see the roadmap now',
+        'eyes closed, vision still clear',
+        'ow! that’s my attention to detail',
+        'hey! I was reading the data',
+        'blink… okay, still here',
+        'eye-tracking study: failed',
+        'careful! these spot bugs for a living',
+        'ouch, my eyes were on the user',
+        'shh, I’m visualising the end state',
+        'can’t look… too many open tabs',
+      ],
+    },
     cheek: {
       face: SHY,
-      lines: ['aww, you’re making me blush', 'stop it… my NPS just went up', 'blushing is a feature, not a bug'],
+      lines: [
+        'aww, you’re making me blush',
+        'stop it… my NPS just went up',
+        'blushing is a feature, not a bug',
+        'hehe, these cheeks are on the roadmap',
+        'cheeks: 100% pink, 0% filler',
+        'oh… you’re sweet, you know that?',
+        'blush rate up 200%. thanks to you',
+        'shy mode: enabled',
+        'aww, delight is a metric too',
+        'stop… I’ll turn into a strawberry',
+        'cheek poke: highest-rated interaction',
+        'hehe, my cheeks have a fan club now',
+      ],
     },
-    mouth: { face: GIGGLE, lines: ['mmf! hehe, I was mid-pitch', 'pfft! okay, you have my attention', 'hehe, that’s my demo voice'] },
-    forehead: { face: WINK, lines: ['boop! new idea unlocked', 'knock knock… a feature request?', 'tap tap, my brain says hi'] },
-    hair: { face: GASP, lines: ['not the hair! it’s in production', 'hey! that took three iterations', 'careful, it’s a stable release'] },
-    chin: { face: GIGGLE, lines: ['hehe, ticklish there!', 'hehe, you found an edge case', 'that tickles! logging it as a bug'] },
-    sweater: { face: GIGGLE, lines: ['hehe, that tickles!', 'careful, it’s my launch-day sweater', 'cozy sweater, shipped on time'] },
-    hello: { face: GRIN, lines: ['hi! you found the easter egg', 'hello, keyboard friend!', 'hehe, hi there!'] },
+    mouth: {
+      face: GIGGLE,
+      lines: [
+        'mmf! hehe, I was mid-pitch',
+        'pfft! okay, you have my attention',
+        'hehe, that’s my demo voice',
+        [WINK, 'lips sealed… it’s an unreleased feature'],
+        [WINK, 'shh! roadmap secrets live here'],
+        'mmf! you just muted the PM',
+        [GRIN, 'this smile ships daily'],
+        'my lips say yes, the backlog says no',
+        'mmph! I had a hot take loading',
+        'okay okay, I’ll keep it short… ish',
+        [GRIN, 'every great idea starts with a smile'],
+        [GRIN, 'smile: lightweight, fast, no bugs'],
+      ],
+    },
+    forehead: {
+      face: WINK,
+      lines: [
+        'boop! new idea unlocked',
+        'knock knock… a feature request?',
+        'tap tap, my brain says hi',
+        [THINKING, 'loading big ideas… 87%'],
+        'that’s where the frameworks live',
+        'brain cache cleared. hi again!',
+        [STARRY, 'boop! that was the eureka button'],
+        'careful, the roadmap is in there',
+        [THINKING, 'hmm, you just started a brainstorm'],
+        'thoughts: prioritised. mostly.',
+        'tap! idea queued for the next sprint',
+        'yes, I’m thinking. always.',
+      ],
+    },
+    hair: {
+      face: GRIN,
+      lines: [
+        'psst… I love oiling my hair',
+        'hair oiling is my favourite self-care ritual',
+        'I love my long hair, be gentle!',
+        'fun fact: my hair is wavy by default',
+        [THINKING, 'some days I want straight hair… the waves win'],
+        [WINK, 'wavy hair, straight thinking'],
+        [GASP, 'not the hair! it’s in production'],
+        [GASP, 'hey! that took three iterations'],
+        [GASP, 'careful, it’s a stable release'],
+        'long hair, long roadmap, both well kept',
+        'my waves have their own personality',
+        [WINK, 'oiled, combed, shipped'],
+        [WINK, 'straight hair is my side project'],
+        'these waves don’t follow a template',
+        [GASP, 'low-maintenance hair? never heard of it'],
+        'every wave is a happy accident',
+      ],
+    },
+    ear: {
+      face: STARRY,
+      lines: [
+        'oh, you noticed my earrings!',
+        'I love accessories, tiny details matter',
+        'earrings: the micro-interactions of fashion',
+        [GRIN, 'yes, I’m listening. always am.'],
+        [GRIN, 'all ears for user feedback'],
+        'these earrings are my favourite feature',
+        'small details, big delight',
+        'accessories make any outfit ship-ready',
+        [WINK, 'shh, I hear a feature request'],
+        'a little sparkle never hurt anyone',
+        [GRIN, 'ear tap! active listening: on'],
+        'accessorising is my love language',
+      ],
+    },
+    chin: {
+      face: GIGGLE,
+      lines: [
+        'hehe, ticklish there!',
+        'hehe, you found an edge case',
+        'that tickles! logging it as a bug',
+        [WINK, 'chin up, ship on'],
+        [THINKING, 'hmm, that’s my thinking spot'],
+        [GRIN, 'chin poke! confidence +10'],
+        'hehe, stop, I can’t keep a straight face',
+        'tickle test: passed. very ticklish.',
+        'hehe, that’s not in the spec',
+      ],
+    },
+    neck: {
+      face: GIGGLE,
+      lines: [
+        'eek! my neck is super ticklish',
+        [GRIN, 'turtleneck season, forever'],
+        [SHY, 'aww, that’s my cosiest spot'],
+        'tickled! turtlenecks offer no protection',
+        'hehe, you found my secret ticklish zone',
+        [SHY, 'eep! warm and cosy in here'],
+        [GRIN, 'turtlenecks are my comfort UI'],
+        'hehe, that sent a giggle up my neck',
+        [WINK, 'snug as a well-scoped project'],
+        'hehe, careful, you’ll make me squeal',
+      ],
+    },
+    sweater: {
+      face: GIGGLE,
+      lines: [
+        'hehe, that tickles!',
+        [GRIN, 'careful, it’s my launch-day sweater'],
+        [GRIN, 'cozy sweater, shipped on time'],
+        [WINK, 'stripes: consistent, like a design system'],
+        [GRIN, 'this sweater has great UX. very cosy'],
+        'hehe, soft and warm, like good onboarding',
+        [WINK, 'comfy clothes, sharp decisions'],
+        [WINK, 'every stripe was user-tested'],
+        [SHY, 'cosiness is a non-negotiable requirement'],
+        [SHY, 'hehe, sweater hug accepted'],
+        [GRIN, 'striped, snug and production ready'],
+        [GRIN, 'warmest feature in my wardrobe'],
+      ],
+    },
+    hello: {
+      face: GRIN,
+      lines: [
+        'hi! you found the easter egg',
+        'hello, keyboard friend!',
+        'hehe, hi there!',
+        [STARRY, 'accessibility win! hello!'],
+        'tab, tab, enter… hi!',
+        [STARRY, 'a keyboard user! my favourite'],
+        'hi! thanks for exploring',
+      ],
+    },
   };
 
   var TEASE = [
-    { face: THINKING, lines: ['hmm… is this a usability test?', 'so many clicks… A/B testing me?'] },
-    { face: SHY, lines: ['okay, engagement is way up', 'you really like me, huh?'] },
-    { face: STARRY, lines: ['fine, you win. let’s build something!', 'retention: 100%. hi, friend!'] },
+    {
+      face: THINKING,
+      lines: [
+        'hmm… is this a usability test?',
+        'so many clicks… A/B testing me?',
+        'hmm, is this rage-clicking?',
+        'are you measuring my response time?',
+        'hmm, that’s a lot of engagement…',
+      ],
+    },
+    {
+      face: SHY,
+      lines: [
+        'okay, engagement is way up',
+        'you really like me, huh?',
+        'stop, I’m getting attached',
+        'daily active user: you',
+      ],
+    },
+    {
+      face: STARRY,
+      lines: [
+        'fine, you win. let’s build something!',
+        'retention: 100%. hi, friend!',
+        'you’re my favourite power user!',
+        'okay, you’re officially a superfan',
+      ],
+    },
   ];
 
   // What she thinks about when the pointer rests on her without poking.
-  var MUSINGS = [
-    'psst… you can poke me',
-    'hmm… what would the user do?',
-    'currently prioritising snacks',
-    'thinking in user stories…',
-    'is this the MVP or the dream?',
-  ];
+  var MUSINGS = {
+    face: THINKING,
+    lines: [
+      'psst… you can poke me',
+      'hmm… what would the user do?',
+      'currently prioritising snacks',
+      'thinking in user stories…',
+      'is this the MVP or the dream?',
+      'what problem are we really solving?',
+      'hmm… should I oil my hair tonight?',
+      'wavy or straight today… wavy wins',
+      'one more user interview, then a break',
+      'writing a PRD in my head…',
+      'who is this for, and why now?',
+      'less, but better',
+      'hmm, what would delight them?',
+    ],
+  };
 
   // Measured on the centre frame, as fractions of the box: eyes at y .36–.44,
-  // the nose tip at (.555, .47), the mouth at y .51, the face centred on .535.
+  // the nose tip at (.555, .47), the mouth at y .51, the face centred on .535,
+  // the ears and earrings at x .20–.315 and .72–.79 between y .36 and .53,
+  // the turtleneck at x .40–.66 from y .58 to .70.
   function spotAt(e) {
     if (!e || typeof e.clientX !== 'number' || (e.clientX === 0 && e.clientY === 0)) return 'hello';
     var rect = el.getBoundingClientRect();
     var x = (e.clientX - rect.left) / rect.width;
     var y = (e.clientY - rect.top) / rect.height;
     var fx = x - 0.535;
-    if (y > 0.62) return 'sweater';
-    if (y > 0.545) return x > 0.36 && x < 0.72 ? 'chin' : 'sweater';
+    if (y > 0.545) {
+      if (y < 0.58 && x > 0.36 && x < 0.72) return 'chin';
+      if (y < 0.7 && x > 0.4 && x < 0.66) return 'neck';
+      return 'sweater';
+    }
+    if (y > 0.36 && y < 0.53 && ((x > 0.2 && x < 0.315) || (x > 0.72 && x < 0.79))) return 'ear';
     if (y < 0.25 || Math.abs(fx) > 0.2) return 'hair';
     if (y < 0.345) return 'forehead';
     if (y < 0.445) return Math.abs(fx) < 0.05 ? 'nose' : 'eye';
@@ -591,19 +806,47 @@
     return Math.abs(fx) < 0.09 ? 'mouth' : 'cheek';
   }
 
-  // The last few lines said, so a spot runs through all of its lines before
-  // any comes round again.
-  var recent = [];
+  // Each list is dealt like a shuffled deck: every line once before any comes
+  // round again, and the deck is remembered across visits, so she does not
+  // repeat herself to someone who comes back.
+  var SAID_KEY = 'mascot-said';
+  var said = {};
+  try {
+    said = JSON.parse(localStorage.getItem(SAID_KEY)) || {};
+  } catch (err) {
+    said = {};
+  }
+  var lastLine = '';
 
-  function pickLine(lines) {
-    var options = lines.filter(function (line) {
-      return recent.indexOf(line) < 0;
+  function pickLine(key, step) {
+    var text = function (line) {
+      return typeof line === 'string' ? line : line[1];
+    };
+    var used = said[key] || [];
+    var options = step.lines.filter(function (line) {
+      return used.indexOf(text(line)) < 0 && text(line) !== lastLine;
     });
-    if (!options.length) options = lines;
+    if (!options.length) {
+      used = [];
+      options = step.lines.filter(function (line) {
+        return text(line) !== lastLine;
+      });
+    }
     var line = options[Math.floor(Math.random() * options.length)];
-    recent.push(line);
-    if (recent.length > 2) recent.shift();
-    return line;
+    lastLine = text(line);
+    used.push(lastLine);
+    said[key] = used;
+    try {
+      localStorage.setItem(SAID_KEY, JSON.stringify(said));
+    } catch (err) {
+      // Private mode: she just forgets between visits.
+    }
+    return { face: typeof line === 'string' ? step.face : line[0], text: lastLine };
+  }
+
+  // Long enough to read at an easy pace, never so long she seems stuck.
+  function holdFor(text) {
+    return Math.min(4200, 1600 + text.length * 45);
   }
 
   var streak = 0;
@@ -615,7 +858,9 @@
     lastPokeAt = t;
 
     var spot = spotAt(e);
-    var step = streak >= 5 ? TEASE[Math.min(streak - 5, TEASE.length - 1)] : SPOTS[spot];
+    var teaseStep = Math.min(streak - 5, TEASE.length - 1);
+    var key = streak >= 5 ? 'tease' + teaseStep : spot;
+    var step = streak >= 5 ? TEASE[teaseStep] : SPOTS[spot];
 
     // A small flinch away from the finger.
     if (e && typeof e.clientX === 'number') {
@@ -623,10 +868,10 @@
       nudge(e.clientX < rect.left + rect.width / 2 ? 0.7 : -0.7, -0.35);
     }
 
-    var line = pickLine(step.lines);
-    var hold = Math.min(3200, 1500 + line.length * 40);
-    react(step.face, hold);
-    say(line, hold);
+    var line = pickLine(key, step);
+    var hold = holdFor(line.text);
+    react(line.face, hold);
+    say(line.text, hold);
     if (streak >= 5 + TEASE.length - 1) streak = 0;
   }
 
@@ -648,10 +893,10 @@
     museTimer = setTimeout(function () {
       if (reacting >= 0 || now() - lastMuse < 20000 || now() - lastPokeAt < 4000) return;
       lastMuse = now();
-      var line = pickLine(MUSINGS);
-      var hold = Math.min(3200, 1500 + line.length * 40);
-      react(THINKING, hold);
-      say(line, hold);
+      var line = pickLine('muse', MUSINGS);
+      var hold = holdFor(line.text);
+      react(line.face, hold);
+      say(line.text, hold);
     }, 2200);
   }
 

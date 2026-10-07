@@ -77,7 +77,7 @@ GSAP 3.12.7, ScrollTrigger 3.12.7, Lenis 1.1.20, page-flip 2.0.7, and
 ## Cache busting
 
 Every stylesheet and script is referenced with a **single shared** `?v=` token
-(currently `20261015`; the mascot sheet URLs in `atelier.css` carry it too).
+(currently `20261016`; the mascot sheet URLs in `atelier.css` carry it too).
 When you change any CSS, JS or mascot sheet, bump that token —
 in both `index.html` and `my-story.html`.
 
@@ -135,18 +135,25 @@ It is two 3×3 sprite sheets in `mascots/`:
   hovered). The table at the top of `mascot.js` is the full list.
 
 Where she is poked decides how she reacts, and every poke gets a thought that
-belongs to the face she is making, a little cute and a little product manager:
-nose (gasp, "boop! a nose is not a button"), eyes (eyes shut, "blinking…
-please hold"), cheeks (shy, "blushing is a feature, not a bug"), mouth,
-forehead (wink, "boop! new idea unlocked"), hair (gasp, "not the hair! it's in
-production"), chin and sweater (giggle, "hehe, you found an edge case"). The
-spots are measured on the centre frame; see `spotAt` in `mascot.js`. From the
-fifth quick poke (under 1.6s apart) she teases back (thinking: "hmm… is this a
-usability test?", then shy: "okay, engagement is way up", then starry:
-"retention: 100%. hi, friend!"). A mouse resting on her for 2.2s gets a passing
-thought ("currently prioritising snacks"), at most every 20s. A spot runs
-through all its lines before repeating one. Each poke also gives her a small
-flinch away from the finger.
+belongs to the face she is making: a little cute, a little product manager, and
+now and then something true about her. Nose ("ouch! my nose is a bit sharp,
+careful"), eyes ("blinking… please hold"), cheeks ("blushing is a feature, not
+a bug"), lips ("lips sealed… it's an unreleased feature"), forehead ("boop! new
+idea unlocked"), hair (her hobbies: "psst… I love oiling my hair", "fun fact: my
+hair is wavy by default"), ears and earrings ("I love accessories, tiny details
+matter"), chin, neck ("eek! my neck is super ticklish") and sweater ("stripes:
+consistent, like a design system"). The spots are measured on the centre frame;
+see `spotAt` in `mascot.js`. From the fifth quick poke (under 1.6s apart) she
+teases back (thinking: "hmm… is this a usability test?", then shy: "daily active
+user: you", then starry: "retention: 100%. hi, friend!"). A mouse resting on her
+for 2.2s gets a passing thought ("what problem are we really solving?"), at most
+every 20s. Each poke also gives her a small flinch away from the finger.
+
+There are about 150 thoughts, in `SPOTS`, `TEASE` and `MUSINGS`. A line is a
+string, shown with its spot's face, or `[face, string]` when it needs another
+one. Each list is dealt like a shuffled deck: every line once before any comes
+round again, and the deck is kept in `localStorage` (`mascot-said`), so a
+returning visitor does not hear the same ones again.
 
 Thoughts appear in a cloud whose words drift in one by one. Its outline is
 drawn around each line (`cloudPath`: arcs bulging out between points spaced
