@@ -1231,12 +1231,12 @@ html.atelier .atelier-mascot-burst.is-spark > span {
    scaling the picture continuously kept it permanently resampled and soft. */
 html.atelier .atelier-mascot-look,
 html.atelier .atelier-mascot-layer.is-look {
-  background-image: url('mascots/deepika-directions.webp?v=20261027');
+  background-image: url('mascots/deepika-directions.webp?v=20261028');
 }
 
 html.atelier .atelier-mascot-react,
 html.atelier .atelier-mascot-layer.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261027');
+  background-image: url('mascots/deepika-reactions.webp?v=20261028');
 }
 
 html.atelier .atelier-mascot-react {
@@ -1251,8 +1251,8 @@ html.atelier .atelier-mascot-react {
    underneath; an oval reached the jaw and showed a second chin. */
 html.atelier .atelier-mascot-face {
   opacity: 0;
-  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261027');
-  mask-image: url('mascots/deepika-face-mask.png?v=20261027');
+  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261028');
+  mask-image: url('mascots/deepika-face-mask.png?v=20261028');
   -webkit-mask-size: 300% 300%;
   mask-size: 300% 300%;
   -webkit-mask-repeat: no-repeat;
@@ -4934,14 +4934,14 @@ html.atelier .sb-cameo-art {
   top: 11%;
   width: 120%;
   aspect-ratio: 680 / 800;
-  background-image: url('mascots/deepika-directions.webp?v=20261027');
+  background-image: url('mascots/deepika-directions.webp?v=20261028');
   background-repeat: no-repeat;
   background-size: 300% 300%;
   background-position: 50% 50%;
 }
 
 html.atelier .sb-cameo-art.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261027');
+  background-image: url('mascots/deepika-reactions.webp?v=20261028');
 }
 
 html.atelier .sb-cameo-art.is-face {
@@ -4982,18 +4982,6 @@ html.atelier .sb-cover-note svg {
   stroke-width: 1.4;
   stroke-linecap: round;
   stroke-linejoin: round;
-}
-
-/* The last page: the same window, smaller, and she is starry-eyed. */
-html.atelier .sb-cameo.is-end {
-  --cameo-w: 4.4rem;
-  --cameo-sky: color-mix(in srgb, var(--spin) 12%, var(--paper));
-  margin-bottom: 0.5rem;
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--spin) 8%, transparent);
-}
-
-html.atelier body.dark-theme .sb-cameo.is-end {
-  --cameo-sky: color-mix(in srgb, var(--spin) 14%, #1a1713);
 }
 
 /* Drop caps open each chapter. */

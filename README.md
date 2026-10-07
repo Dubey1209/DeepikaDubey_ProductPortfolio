@@ -77,7 +77,7 @@ GSAP 3.12.7, ScrollTrigger 3.12.7, Lenis 1.1.20, page-flip 2.0.7, and
 ## Cache busting
 
 Every stylesheet and script is referenced with a **single shared** `?v=` token
-(currently `20261027`; the mascot sheet URLs in `atelier.css` carry it too).
+(currently `20261028`; the mascot sheet URLs in `atelier.css` carry it too).
 When you change any CSS, JS or mascot sheet, bump that token —
 in both `index.html` and `my-story.html`.
 
@@ -153,10 +153,20 @@ that's me". The last page has her starry-eyed. `404.html` has her thinking,
 and she answers whichever link you hover (grin, starry, wink); its image
 path is absolute like its links, because GitHub Pages serves it at any depth.
 
-The story book is dressed as a book: drop caps open each chapter
-(`.wb-drop`, added by `story-book.js`), a satin ribbon hangs below the
-spread, and the title has an inked underline under "long" with a pencilled
-aside. `splitChars()` in `motion.js` splits text nodes in place for
+The story book is dressed as a kept journal (the rules are at the end of
+`motion.css`, scoped to `.story-book` because the work modal shares the base
+book styles). The cover is green cloth with a pasted paper label, an elastic
+band, a "vol. I" in foil and her die-cut sticker (a white edge from stacked
+drop-shadows) that still follows the pointer, blinks and winks. Each
+chapter opens with a washi-tape label, a sticker of her matched to the
+chapter's mood (`MOODS` in `story-book.js`), a large outlined chapter number
+and a squiggle. Text pages have a double margin rule, an italic running
+head, drop caps (`.wb-drop`), a ✦ at the end of each chapter, a pencil
+doodle where a short page leaves room, and now and then a chai ring.
+Quotes are highlighted, Act II opens on the one dark page, the contents
+says "start here", and the book closes on a polka-dot endpaper. A satin
+ribbon hangs below the spread, and the title has an inked underline under
+"long" with a pencilled aside. `splitChars()` in `motion.js` splits text nodes in place for
 unlined titles, so markup like that underline survives the letter reveal.
 
 About is a centred column with no photo. The working loop is a row of chips

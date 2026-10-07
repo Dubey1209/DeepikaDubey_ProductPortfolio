@@ -1568,3 +1568,467 @@ html.atelier body.dark-theme .sb-open-title {
   flex: 0 0 1.35rem;
   font-size: 0.88rem;
 }
+
+/* ---- The story as a kept journal -------------------------------------------
+   A cloth-bound cover with a pasted paper label, an elastic band and her
+   sticker; washi tape and a mood sticker on every chapter's first page; a
+   highlighter on the quotes, a chai ring here and there, marbled endpapers.
+   Scoped to the story book: the work modal shares the base book styles. */
+
+html.atelier .story-book {
+  --cloth: #24443b;
+  --label: #f4ecdc;
+  --label-ink: #231d17;
+  --label-red: #b4532a;
+  --foil: #e6c98a;
+}
+
+html.atelier body.dark-theme .story-book {
+  --cloth: #1b342d;
+}
+
+/* Cover */
+html.atelier .story-book .wb-sheet.sb-cover {
+  background-color: var(--cloth) !important;
+}
+
+html.atelier .story-book .sb-cover .sb-cover-inner {
+  justify-content: center;
+  gap: 0;
+  height: 100%;
+  margin: 0;
+  padding: 1.6rem 1.2rem 1.4rem;
+  border: 0;
+  outline: 0;
+  box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.28);
+}
+
+html.atelier .story-book .sb-band {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 8%;
+  width: 10px;
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.3), transparent 30%, rgba(255, 255, 255, 0.22) 50%, transparent 70%, rgba(0, 0, 0, 0.3)),
+    var(--spin);
+  box-shadow: 3px 0 4px rgba(0, 0, 0, 0.35);
+}
+
+html.atelier body .story-book .sb-cover .sb-cover-vol {
+  position: absolute;
+  top: 1.1rem;
+  left: 1.5rem;
+  margin: 0 !important;
+  font-family: var(--serif, 'Fraunces', serif);
+  font-size: 0.82rem;
+  font-style: italic;
+  letter-spacing: 0.04em;
+  color: var(--foil) !important;
+  -webkit-text-fill-color: var(--foil) !important;
+  opacity: 0.85;
+}
+
+html.atelier .story-book .sb-label {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  width: 74%;
+  box-sizing: border-box;
+  padding: 1.2rem 0.9rem 1.1rem;
+  border-radius: 3px;
+  background:
+    radial-gradient(120% 90% at 30% 20%, rgba(255, 255, 255, 0.5), transparent 60%),
+    var(--label);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.5) inset,
+    0 8px 16px rgba(0, 0, 0, 0.38),
+    0 1px 2px rgba(0, 0, 0, 0.3);
+  rotate: -1.5deg;
+  text-align: center;
+}
+
+html.atelier .story-book .sb-label::before {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border: 1px solid rgba(35, 29, 23, 0.6);
+  outline: 1px solid rgba(35, 29, 23, 0.22);
+  outline-offset: -4px;
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+html.atelier body .story-book .sb-cover.wb-sheet .sb-label .sb-cover-kicker {
+  margin: 0 !important;
+  font-size: 0.56rem;
+  letter-spacing: 0.24em;
+  color: var(--label-red) !important;
+  -webkit-text-fill-color: var(--label-red) !important;
+  opacity: 1;
+}
+
+html.atelier body .story-book .sb-cover.wb-sheet .sb-label .sb-cover-title,
+html.atelier body .story-book .sb-cover.wb-sheet .sb-label .sb-cover-title span {
+  font-size: clamp(1.1rem, 2.4vw, 1.45rem);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  text-shadow: none;
+  color: var(--label-ink) !important;
+  -webkit-text-fill-color: var(--label-ink) !important;
+}
+
+html.atelier body .story-book .sb-cover.wb-sheet .sb-label-by {
+  margin: 0 !important;
+  font-family: var(--serif, 'Fraunces', serif);
+  font-size: 0.78rem;
+  font-style: italic;
+  color: #6b5b4b !important;
+  -webkit-text-fill-color: #6b5b4b !important;
+}
+
+html.atelier .story-book .sb-cover-portrait {
+  z-index: 2;
+  margin-top: -0.7rem;
+  translate: 30% 0;
+}
+
+html.atelier body .story-book .sb-cover.wb-sheet .sb-cover-note {
+  left: auto;
+  right: calc(100% + 0.1rem);
+  top: 1.2rem;
+  align-items: flex-end;
+  color: var(--label) !important;
+  -webkit-text-fill-color: var(--label) !important;
+  rotate: -6deg;
+}
+
+html.atelier .story-book .sb-cover-note svg {
+  margin: 0.1rem -1rem 0 0;
+  scale: -1 1;
+}
+
+/* Her sticker: die-cut, a white edge round her outline, slightly askew. */
+html.atelier .story-book .sb-cameo.is-sticker {
+  --cameo-w: 6.4rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  rotate: 6deg;
+  transition: rotate 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), scale 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+html.atelier .story-book .sb-cameo.is-sticker:hover {
+  rotate: 2deg;
+  scale: 1.05;
+}
+
+html.atelier .story-book .sb-cameo.is-sticker .sb-cameo-window {
+  height: calc(var(--cameo-w) * 1.02);
+  border-radius: 0 0 6px 6px;
+  background: none;
+  filter:
+    drop-shadow(1.6px 0 0 #fff) drop-shadow(-1.6px 0 0 #fff)
+    drop-shadow(0 1.6px 0 #fff) drop-shadow(0 -1.6px 0 #fff)
+    drop-shadow(0 5px 6px rgba(0, 0, 0, 0.3));
+}
+
+html.atelier .story-book .sb-cameo.is-sticker .sb-cameo-window::before {
+  content: none;
+}
+
+html.atelier .story-book .sb-cameo.is-sticker .sb-cameo-art {
+  top: 3%;
+}
+
+/* Chapter openers */
+html.atelier .story-book .sb-opener .sb-open {
+  position: relative;
+  gap: 0.2rem;
+  padding-top: 0.6rem;
+}
+
+html.atelier body .story-book .wb-sheet .sb-open-num {
+  position: absolute;
+  right: -0.2rem;
+  bottom: -0.6rem;
+  font-family: var(--serif, 'Fraunces', serif);
+  font-size: 7.5rem;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.06em;
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
+  -webkit-text-stroke: 1px color-mix(in srgb, var(--spin) 55%, transparent);
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+html.atelier body .story-book .wb-sheet .sb-tape {
+  position: relative;
+  z-index: 2;
+  display: inline-block;
+  padding: 0.36rem 1.15rem !important;
+  font-family: var(--sans, 'Outfit', sans-serif);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink) !important;
+  -webkit-text-fill-color: var(--ink) !important;
+  background:
+    repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.18) 0 4px, transparent 4px 9px),
+    var(--tape);
+  clip-path: polygon(2% 0, 98% 0, 100% 20%, 97.5% 40%, 100% 60%, 97.5% 80%, 100% 100%, 2% 100%, 0 80%, 2.5% 60%, 0 40%, 2.5% 20%);
+  rotate: -3deg;
+  margin-bottom: -0.55rem !important;
+}
+
+html.atelier .story-book .sb-tape.is-tape-a { --tape: color-mix(in srgb, var(--spin) 48%, transparent); }
+html.atelier .story-book .sb-tape.is-tape-b { --tape: rgba(125, 155, 255, 0.45); }
+html.atelier .story-book .sb-tape.is-tape-c { --tape: rgba(130, 176, 142, 0.5); }
+html.atelier .story-book .sb-tape.is-tape-d { --tape: rgba(232, 150, 165, 0.5); }
+
+html.atelier .story-book .sb-cameo.is-mood {
+  --cameo-w: 5.2rem;
+  margin: 0.2rem 0 0.75rem;
+  rotate: -5deg;
+}
+
+html.atelier .story-book .sb-cameo.is-mood.is-tilt-r {
+  rotate: 5deg;
+}
+
+html.atelier .story-book .sb-opener .sb-open-title {
+  position: relative;
+  z-index: 1;
+  max-width: 15ch;
+  font-size: clamp(1.2rem, 2.6vw, 1.55rem);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+html.atelier .story-book .sb-squiggle {
+  display: block;
+  width: 5.2rem;
+  height: 0.8rem;
+  margin-top: 0.45rem;
+  overflow: visible;
+  fill: none;
+  stroke: var(--spin);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+/* Act II: the one dark page, where the story turns. */
+html.atelier body .story-book .wb-sheet.sb-act-page {
+  background-color: #1c1815 !important;
+}
+
+html.atelier body .story-book .sb-act-page .sb-open-title {
+  color: #f3eee4 !important;
+  -webkit-text-fill-color: #f3eee4 !important;
+}
+
+html.atelier body .story-book .sb-act-page .sb-open-roman {
+  font-size: clamp(3.4rem, 9vw, 4.6rem);
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
+  -webkit-text-stroke: 1.2px var(--spin);
+}
+
+html.atelier body .story-book .sb-act-page .wb-folio {
+  color: rgba(243, 238, 228, 0.55);
+}
+
+/* Text pages */
+html.atelier .story-book .wb-folio {
+  font-family: var(--serif, 'Fraunces', serif);
+  font-style: italic;
+}
+
+html.atelier body .story-book .wb-sheet .sb-end-mark {
+  color: var(--spin) !important;
+  -webkit-text-fill-color: var(--spin) !important;
+}
+
+/* A notebook's double margin rule, and an italic running head. */
+html.atelier .story-book .wb-sheet.sb-text {
+  background-image:
+    linear-gradient(to right, color-mix(in srgb, var(--spin) 75%, transparent) 0 1px, transparent 1px),
+    linear-gradient(to right, color-mix(in srgb, var(--spin) 45%, transparent) 0 1px, transparent 1px);
+  background-position: 1.2rem 0, 1.38rem 0;
+  background-size: 1px 100%, 1px 100%;
+  background-repeat: no-repeat;
+}
+
+html.atelier body .story-book .sb-text .wb-running span:first-child {
+  font-family: var(--serif, 'Fraunces', serif);
+  font-size: 0.78rem;
+  font-style: italic;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--spin) !important;
+  -webkit-text-fill-color: var(--spin) !important;
+}
+
+html.atelier .story-book .sb-doodle {
+  position: absolute;
+  z-index: 1;
+  right: 2.4rem;
+  bottom: 2.6rem;
+  width: 3.4rem;
+  height: 3.4rem;
+  overflow: visible;
+  fill: none;
+  stroke: color-mix(in srgb, var(--ink) 55%, transparent);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  rotate: -8deg;
+  pointer-events: none;
+}
+
+html.atelier .story-book .sb-doodle.is-left {
+  right: auto;
+  left: 2.6rem;
+  rotate: 7deg;
+}
+
+html.atelier body.dark-theme .story-book .sb-doodle {
+  stroke: color-mix(in srgb, var(--spin) 60%, transparent);
+}
+
+html.atelier body .story-book .wb-sheet.sb-act-page {
+  background-image: none !important;
+}
+
+html.atelier .story-book .wb-sheet.has-ring::after {
+  content: '';
+  position: absolute;
+  right: 22%;
+  bottom: 2.4rem;
+  width: 6.2rem;
+  height: 6.2rem;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, transparent 0 58%, rgba(150, 96, 48, 0.16) 61%, rgba(150, 96, 48, 0.08) 64%, transparent 67%),
+    radial-gradient(circle at 40% 45%, transparent 0 60%, rgba(150, 96, 48, 0.07) 64%, transparent 70%);
+  rotate: 18deg;
+  pointer-events: none;
+}
+
+html.atelier body.dark-theme .story-book .wb-sheet.has-ring::after {
+  opacity: 0.7;
+  filter: invert(0.4);
+}
+
+html.atelier body .story-book .wb-pull mark {
+  padding: 0 0.15em;
+  font-style: italic;
+  background: linear-gradient(100deg, transparent 0.15em, color-mix(in srgb, var(--spin) 30%, transparent) 0.3em, color-mix(in srgb, var(--spin) 22%, transparent) 96%, transparent);
+  background-size: 100% 62%;
+  background-position: 0 70%;
+  background-repeat: no-repeat;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  color: inherit !important;
+  -webkit-text-fill-color: inherit !important;
+}
+
+/* Contents */
+html.atelier body .story-book .wb-sheet .sb-toc-note {
+  position: absolute;
+  z-index: 2;
+  top: calc(var(--wb-rule) * 2 - 6px);
+  right: 2.6rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-family: var(--serif, 'Fraunces', serif);
+  font-size: 0.9rem;
+  font-style: italic;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--spin) !important;
+  -webkit-text-fill-color: var(--spin) !important;
+  rotate: -5deg;
+  pointer-events: none;
+}
+
+html.atelier .story-book .sb-toc-note svg {
+  width: 1.8rem;
+  height: 1.3rem;
+  margin: 0 0.9rem 0 0;
+  overflow: visible;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+html.atelier .story-book .wb-toc-title {
+  background: linear-gradient(color-mix(in srgb, var(--spin) 26%, transparent), color-mix(in srgb, var(--spin) 26%, transparent)) no-repeat 0 80% / 0% 45%;
+  transition: background-size 0.35s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+html.atelier .story-book .wb-toc-row:hover .wb-toc-title,
+html.atelier .story-book .wb-toc-row:focus-visible .wb-toc-title {
+  background-size: 100% 45%;
+}
+
+/* The end, and a marbled endpaper opposite it. */
+html.atelier .story-book .sb-end-page .wb-cta {
+  align-self: center;
+}
+
+html.atelier body .story-book .wb-sheet.sb-endpaper {
+  background:
+    radial-gradient(circle, color-mix(in srgb, var(--foil) 55%, transparent) 0 1.3px, transparent 1.8px) 0 0 / 18px 18px,
+    radial-gradient(circle, rgba(244, 236, 220, 0.18) 0 1px, transparent 1.5px) 9px 9px / 18px 18px,
+    var(--cloth) !important;
+}
+
+html.atelier body .story-book .sb-endpaper .sb-open {
+  justify-content: center;
+}
+
+html.atelier body .story-book .sb-endpaper .sb-endpaper-note {
+  padding: 0.7rem 1.1rem;
+  border-radius: 3px;
+  background: var(--label);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35);
+  font-family: var(--serif, 'Fraunces', serif);
+  font-size: 0.92rem;
+  font-style: italic;
+  color: var(--label-ink) !important;
+  -webkit-text-fill-color: var(--label-ink) !important;
+  rotate: 2deg;
+}
+
+@media (max-width: 700px) {
+  html.atelier .story-book .sb-cameo.is-sticker {
+    --cameo-w: 5.6rem;
+  }
+
+  html.atelier .story-book .sb-cameo.is-mood {
+    --cameo-w: 4.6rem;
+  }
+
+  html.atelier body .story-book .wb-sheet .sb-open-num {
+    font-size: 5.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.atelier .story-book .sb-cameo.is-sticker,
+  html.atelier .story-book .wb-toc-title {
+    transition: none;
+  }
+}

@@ -84,12 +84,49 @@
     '</span>';
   }
 
+  // Her sticker on each chapter's opening page, matched to its mood:
+  // [cell, from the expressions sheet]. Faces: 0 eyes closed, 1 wink, 2 grin,
+  // 3 gasp, 4 giggle, 5 shy, 6 starry, 7 thinking, 8 unimpressed.
+  var MOODS = [
+    [3, true], [6, true], [2, true], [4, true], [1, true], [7, true], [2, true],
+    [5, true], [4, true], [1, false], [8, true], [0, true], [6, true], [1, true]
+  ];
+  var TAPES = ['is-tape-a', 'is-tape-b', 'is-tape-c', 'is-tape-d'];
+  var SQUIGGLE = '<svg class="sb-squiggle" viewBox="0 0 120 14" aria-hidden="true"><path pathLength="1" d="M3 8c8-6 14 6 22 0s14-6 22 0 14 6 22 0 14-6 22 0 14 6 26-1"/></svg>';
+
+  // Pencil doodles for the white space at the foot of a short page.
+  var DOODLES = [
+    // paper plane and its looping trail
+    '<path d="M6 24 44 8 30 40l-8-11Z"/><path d="M22 29 44 8"/><path stroke-dasharray="2 4" d="M4 44c6-2 10-6 8-10s-8-2-6 3"/>',
+    // lightbulb
+    '<path d="M24 6c-8 0-13 6-13 13 0 5 3 8 6 11 1 1 2 3 2 5h10c0-2 1-4 2-5 3-3 6-6 6-11 0-7-5-13-13-13Z"/><path d="M19 39h10M20 43h8M24 2v-1M9 9l-2-2M39 9l2-2"/>',
+    // a star with sparkle ticks
+    '<path d="m24 6 5 11 12 1-9 8 3 12-11-6-11 6 3-12-9-8 12-1Z"/><path d="M42 4l2 4M6 40l-3 3M44 40l2 2"/>',
+    // heart, drawn twice like a pen going round again
+    '<path d="M24 41S6 30 6 18c0-6 5-10 10-10 4 0 7 2 8 5 1-3 4-5 8-5 5 0 10 4 10 10 0 12-18 23-18 23Z"/><path d="M24 38S9 29 9 18c0-4 3-7 7-7"/>',
+    // spiral of thought
+    '<path d="M24 24c0-3-4-3-4 0 0 5 8 5 8 0 0-8-12-8-12 0 0 11 16 11 16 0 0-14-20-14-20 0 0 17 24 17 24 0"/>',
+  ];
+
+  function linesIn(html) {
+    var total = 0;
+    html.replace(/<p[^>]*>([\s\S]*?)<\/p>/g, function (m, inner) {
+      total += Math.max(1, lineCount(inner.replace(/<[^>]+>/g, '')));
+      return m;
+    });
+    return total;
+  }
+
+  function doodle(n) {
+    return '<svg class="sb-doodle' + (n % 2 ? ' is-left' : '') + '" viewBox="0 0 48 48" aria-hidden="true">' + DOODLES[n % DOODLES.length] + '</svg>';
+  }
+
   var ARROW = '<svg viewBox="0 0 40 30" aria-hidden="true"><path pathLength="1" d="M37 4C27 2 15 6 9 17c-1 2-2 5-2 8m0 0-4-6m4 6 5-4"/></svg>';
 
   function sheet(html, attrs) {
     attrs = attrs || {};
     var el = document.createElement('article');
-    el.className = 'wb-sheet' + (attrs.cover ? ' sb-cover' : '');
+    el.className = 'wb-sheet' + (attrs.cover ? ' sb-cover' : '') + (attrs.cls ? ' ' + attrs.cls : '');
     el.innerHTML = html;
     return el;
   }
@@ -163,7 +200,7 @@
       }
       if (node.matches('blockquote')) {
         var quote = textOf(node);
-        blocks.push({ html: '<p class="wb-pull">' + esc(quote) + '</p>', lines: lineCount(quote) + 1, text: quote });
+        blocks.push({ html: '<p class="wb-pull"><mark>' + esc(quote) + '</mark></p>', lines: lineCount(quote) + 1, text: quote });
         return;
       }
       if (node.matches('ul')) {
@@ -237,12 +274,15 @@
   sheets.push(sheet(
     '<div class="wb-write">' +
       '<div class="sb-cover-inner">' +
-        '<i class="sb-cover-corners" aria-hidden="true"></i>' +
-        '<p class="sb-cover-kicker">The long version</p>' +
-        '<h3 class="sb-cover-title"><span>Wanna know me</span><span>beyond resume?</span></h3>' +
-        '<i class="sb-cover-mark" aria-hidden="true"></i>' +
+        '<i class="sb-band" aria-hidden="true"></i>' +
+        '<p class="sb-cover-vol" aria-hidden="true">vol. I</p>' +
+        '<div class="sb-label">' +
+          '<p class="sb-cover-kicker">The long version</p>' +
+          '<h3 class="sb-cover-title"><span>Wanna know me</span><span>beyond resume?</span></h3>' +
+          '<p class="sb-label-by">a journal by Deepika</p>' +
+        '</div>' +
         '<div class="sb-cover-portrait">' +
-          cameo('is-cover', 4, false) +
+          cameo('is-cover is-sticker', 4, false) +
           '<p class="sb-cover-note" aria-hidden="true"><span>psst,</span><span>that’s me</span>' + ARROW + '</p>' +
         '</div>' +
       '</div>' +
@@ -268,9 +308,11 @@
         '<header class="wb-running"><span>The long version</span><span>' + part + '</span></header>' +
         '<p class="wb-kicker">Front matter</p>' +
         '<h3 class="wb-title">Contents</h3>' +
+        (t === 0 ? '<p class="sb-toc-note" aria-hidden="true">start here' + ARROW + '</p>' : '') +
         '<div class="wb-toc">' + slice + '</div>' +
       '</div>' +
-      '<footer class="wb-folio">' + printed++ + '</footer>'
+      '<footer class="wb-folio">' + printed++ + '</footer>',
+      { cls: 'sb-toc-page' }
     ));
     pageMeta.push({ kind: 'index' });
   }
@@ -279,12 +321,13 @@
     if (actPage && chIndex === 9) {
       sheets.push(sheet(
         '<div class="wb-write sb-open">' +
-          '<p class="sb-open-kicker">Act II</p>' +
+          '<p class="sb-open-kicker">' + esc(actPage.kicker || 'Act II') + '</p>' +
           '<p class="sb-open-roman">II</p>' +
           '<h3 class="sb-open-title">' + esc(actPage.title) + '</h3>' +
-          '<i class="sb-open-mark" aria-hidden="true"></i>' +
+          SQUIGGLE +
         '</div>' +
-        '<footer class="wb-folio">' + printed++ + '</footer>'
+        '<footer class="wb-folio">' + printed++ + '</footer>',
+        { cls: 'sb-act-page' }
       ));
       pageMeta.push({ kind: 'act' });
       actPacked.forEach(function (body) {
@@ -300,29 +343,41 @@
     }
 
     chapterStart[chIndex] = sheets.length;
+    var mood = MOODS[chIndex] || [2, true];
     sheets.push(sheet(
       '<div class="wb-write sb-open">' +
-        '<p class="sb-open-kicker">Chapter ' + ch.num + '</p>' +
-        '<p class="sb-open-roman">' + ch.roman + '</p>' +
+        '<span class="sb-open-num" aria-hidden="true">' + ch.num + '</span>' +
+        '<p class="sb-open-kicker sb-tape ' + TAPES[chIndex % TAPES.length] + '">Chapter ' + ch.roman + '</p>' +
+        cameo('is-sticker is-mood' + (chIndex % 2 ? ' is-tilt-r' : ''), mood[0], mood[1]) +
         '<h3 class="sb-open-title">' + esc(ch.title) + '</h3>' +
-        '<i class="sb-open-mark" aria-hidden="true"></i>' +
+        SQUIGGLE +
       '</div>' +
-      '<footer class="wb-folio">' + printed++ + '</footer>'
+      '<footer class="wb-folio">' + printed++ + '</footer>',
+      { cls: 'sb-opener' }
     ));
     pageMeta.push({ kind: 'opener', ch: chIndex });
 
+    var lastPage = packed[chIndex].length - 1;
     packed[chIndex].forEach(function (body, pageIndex) {
       var open = '<p class="wb-line">';
       var first = body.charAt(open.length);
       if (pageIndex === 0 && body.indexOf(open) === 0 && /[A-Za-z]/.test(first)) {
         body = '<p class="wb-line"><span class="wb-drop">' + first + '</span>' + body.slice(open.length + 1);
       }
+      if (pageIndex === lastPage && /<\/p>$/.test(body)) {
+        body = body.slice(0, -4) + '<span class="sb-end-mark" aria-hidden="true"> ✦</span></p>';
+      }
+      // A chai ring on the odd page, the way a real journal gets used.
+      var ring = printed % 9 === 4 ? ' has-ring' : '';
+      var room = PAGE_LINES - 1 - linesIn(body) >= 3;
       sheets.push(sheet(
         '<div class="wb-write">' +
           '<header class="wb-running"><span>Chapter ' + ch.roman + '</span><span>' + esc(ch.title) + '</span></header>' +
           body +
         '</div>' +
-        '<footer class="wb-folio">' + printed++ + '</footer>'
+        (room && !ring ? doodle(printed) : '') +
+        '<footer class="wb-folio">' + printed++ + '</footer>',
+        { cls: 'sb-text' + ring }
       ));
       pageMeta.push({ kind: 'chapter', ch: chIndex });
     });
@@ -330,21 +385,23 @@
 
   sheets.push(sheet(
     '<div class="wb-write sb-open">' +
-      cameo('is-end', 6, true) +
-      '<p class="sb-open-kicker">The end</p>' +
+      '<p class="sb-open-kicker sb-tape is-tape-a">The end</p>' +
+      cameo('is-sticker is-mood', 6, true) +
       '<h3 class="sb-open-title">Watch me. I\'m just getting started.</h3>' +
-      '<i class="sb-open-mark" aria-hidden="true"></i>' +
+      SQUIGGLE +
       '<button type="button" class="wb-cta" data-chapter="cover">Back to the cover</button>' +
     '</div>' +
-    '<footer class="wb-folio">fin</footer>'
+    '<footer class="wb-folio">fin</footer>',
+    { cls: 'sb-opener sb-end-page' }
   ));
   pageMeta.push({ kind: 'end' });
 
   if (sheets.length % 2) {
     sheets.push(sheet(
       '<div class="wb-write sb-open">' +
-        '<p class="sb-open-kicker">Fin</p>' +
-      '</div>'
+        '<p class="sb-endpaper-note">thanks for reading, truly.</p>' +
+      '</div>',
+      { cls: 'sb-endpaper' }
     ));
     pageMeta.push({ kind: 'end' });
   }
