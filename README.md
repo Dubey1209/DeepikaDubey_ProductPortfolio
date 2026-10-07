@@ -77,7 +77,7 @@ GSAP 3.12.7, ScrollTrigger 3.12.7, Lenis 1.1.20, page-flip 2.0.7, and
 ## Cache busting
 
 Every stylesheet and script is referenced with a **single shared** `?v=` token
-(currently `20261013`; the mascot sheet URLs in `atelier.css` carry it too).
+(currently `20261014`; the mascot sheet URLs in `atelier.css` carry it too).
 When you change any CSS, JS or mascot sheet, bump that token —
 in both `index.html` and `my-story.html`.
 
@@ -161,12 +161,19 @@ self-started motion is off under `prefers-reduced-motion`.
 How the motion is kept smooth:
 
 - **An expression changes only her face.** Reactions are shown on two extra
-  layers masked to the brows, eyes and lashes and to the nose and mouth, over
-  the centre direction frame, and the build aligns every reaction face onto
-  that frame's face. Hair, outline and sweater stay the same drawing, so a
-  blink moves only the eyelids. Swapping whole frames gave her away as separate
-  pictures: the hair and outline flickered on every expression. Thinking (a hand
-  at her chin) is the one reaction that replaces the whole figure.
+  layers over the centre direction frame, each through its own mask from
+  `mascots/deepika-face-mask.png` (3x3, laid out like the sheet). The build
+  traces those masks from the skin: the inside of the face, from the brows to
+  just below the mouth, without the ears and kept clear of every outline, and
+  the same for the centre face, intersected. The build also aligns every
+  reaction face onto the centre face, and makes the masked part opaque (the
+  model left white specks between the lashes and see-through holes, which let
+  the open eye beneath show as a ghost lash). Hair, outline, ears, jaw and
+  sweater stay the same drawing, so a blink moves only the eyelids. Swapping
+  whole frames gave her away as separate pictures, and an oval mask reached
+  the jaw, so the reaction's slightly different jaw showed as a second chin.
+  Thinking (a hand at her chin) is the one reaction that replaces the whole
+  figure.
 - **Head turns are overlapping cross-fades.** The new frame rises over the first
   ~60% of the time and the old one falls over the last ~60%, so neither a dip
   in the middle nor an outline vanishing at the end. A change that arrives
@@ -194,15 +201,19 @@ How it is kept sharp:
   for pixel.
 
 There is no card: the sheets have a transparent background and the avatar sits
-straight on the page. In dark theme a soft glow keeps the dark hair from
-merging into the page. Without JavaScript, CSS shows the centre frame.
+straight on the page. In dark theme a soft glow behind her (a static
+`::before` gradient) keeps the dark hair from merging into the page. It used
+to be a `drop-shadow` filter on the layers, which is recomputed from each
+layer's changing opacity, so the whole figure flickered on every expression
+and head turn in dark theme only. Without JavaScript, CSS shows the centre
+frame.
 
 The drawings were generated from a photo, then assembled by
 `tools/build-mascot.mjs` from the raw sheets in `tools/mascot-src/`:
 
 ```bash
 node tools/build-mascot.mjs --check   # measure all 18 frames, write nothing
-node tools/build-mascot.mjs           # write mascots/*.webp
+node tools/build-mascot.mjs           # write mascots/*.webp and the face masks
 ```
 
 The image model does not place figures on an exact grid, so the script finds

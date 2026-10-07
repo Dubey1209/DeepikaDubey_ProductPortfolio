@@ -58,6 +58,14 @@ const SHEETS = [
 
 // How far a reaction face may be moved onto the centre face, in output pixels.
 const ALIGN_REACH = 24;
+// The masks atelier.css shows reaction faces through, one per reaction in the
+// same 3x3 layout; see faceRegion.
+const FACE_MASK = 'mascots/deepika-face-mask.png';
+// Reactions mascot.js shows through that mask. Thinking (7) replaces the whole
+// figure and sleepy (8) is unused, so neither narrows it.
+const FACE_ONLY = [0, 1, 2, 3, 4, 5, 6];
+// The centre direction frame, which every reaction face is laid over.
+const CENTRE_CELL = 4;
 
 // A background pixel this close to the sampled background colour, and
 // connected to the edge of the sheet, becomes transparent. Flood-filling from
@@ -449,6 +457,196 @@ function cutOut(img, bg) {
   return rgba;
 }
 
+/** Square dilation (grow) or erosion (shrink) of a 0/1 mask by `r` pixels. */
+function morph(mask, width, height, r, grow) {
+  const pass = (src, horizontal) => {
+    const out = new Uint8Array(src.length);
+    const lines = horizontal ? height : width;
+    const len = horizontal ? width : height;
+    for (let l = 0; l < lines; l += 1) {
+      for (let i = 0; i < len; i += 1) {
+        let v = grow ? 0 : 1;
+        for (let k = Math.max(0, i - r); k <= Math.min(len - 1, i + r); k += 1) {
+          const s = horizontal ? src[l * width + k] : src[k * width + l];
+          if (grow ? s : !s) {
+            v = grow ? 1 : 0;
+            break;
+          }
+        }
+        out[horizontal ? l * width + i : i * width + l] = v;
+      }
+    }
+    return out;
+  };
+  return pass(pass(mask, true), false);
+}
+
+/**
+ * Where a reaction face may be shown over the centre frame: the inside of
+ * that frame's face, following its real shape.
+ *
+ * Skin with its holes filled (eyes, brows and mouth are not skin but sit
+ * inside it), cut off above the chin line and pulled in from every edge, so
+ * the face outline, jaw and hairline always come from the frame underneath.
+ * An oval did not fit: it reached the jaw on one side, and the reaction's
+ * slightly different jaw showed as a second chin.
+ */
+function faceRegion(skin, width, height) {
+  // Close tiny gaps first, so a lash touching the hair does not open an eye
+  // to the outside and leave it unfilled. Kept small: at 6px it also sealed
+  // the lock of hair across her forehead into the face.
+  let m = morph(morph(skin, width, height, 2, true), width, height, 2, false);
+
+  // Fill holes: everything the outside cannot reach is inside.
+  const outside = new Uint8Array(width * height);
+  const stack = [];
+  for (let x = 0; x < width; x += 1) stack.push(x, (height - 1) * width + x);
+  for (let y = 0; y < height; y += 1) stack.push(y * width, y * width + width - 1);
+  while (stack.length) {
+    const p = stack.pop();
+    if (outside[p] || m[p]) continue;
+    outside[p] = 1;
+    const x = p % width;
+    if (x > 0) stack.push(p - 1);
+    if (x < width - 1) stack.push(p + 1);
+    if (p >= width) stack.push(p - width);
+    if (p < width * (height - 1)) stack.push(p + width);
+  }
+  m = outside.map((o) => (o ? 0 : 1));
+
+  // Only the face itself: the region connected to the middle of the face.
+  const keep = new Uint8Array(width * height);
+  const seed = Math.floor(height * 0.45) * width + Math.floor(width * 0.535);
+  const fill = [seed];
+  while (fill.length) {
+    const p = fill.pop();
+    if (keep[p] || !m[p]) continue;
+    keep[p] = 1;
+    const x = p % width;
+    if (x > 0) fill.push(p - 1);
+    if (x < width - 1) fill.push(p + 1);
+    if (p >= width) fill.push(p - width);
+    if (p < width * (height - 1)) fill.push(p + width);
+  }
+
+  // Between the brows (y .32) and the chin line, and well clear of every
+  // outline. Nothing above the brows changes with an expression, and the lock
+  // of hair lying across her forehead is enclosed by skin, so the hole fill
+  // takes it in; starting just above the brows leaves it to the frame below.
+  // The ears join the face's skin, so they are cut off at the sides too
+  // (skin spans x .23-.76 with the ears, the face alone about .30-.74).
+  const brows = Math.floor(height * 0.295);
+  const chin = Math.floor(height * 0.565);
+  const leftEar = Math.floor(width * 0.295);
+  const rightEar = Math.ceil(width * 0.74);
+  for (let p = 0; p < keep.length; p += 1) {
+    const x = p % width;
+    if (p < brows * width || p >= chin * width || x < leftEar || x > rightEar) keep[p] = 0;
+  }
+  // Every face it shows is intersected, so this only has to stay off the
+  // outline's anti-aliased edge. More than 6px cut the outer lashes, which
+  // sit about 11px inside the cheek outline, and the open eye beneath peeked
+  // out at the corner of a blink.
+  return morph(keep, width, height, 6, false);
+}
+
+/**
+ * Make one cell's face fully opaque, filling any see-through pixel with the
+ * colour around it. `region` (cell-sized, 0/1) is grown by the feather of
+ * the face mask so the soft edge is covered too.
+ */
+function sealFace(sheet, sheetW, region, cellW, cellH, ox, oy) {
+  const area = morph(region, cellW, cellH, 8, true);
+  const at = (x, y) => ((oy + y) * sheetW + ox + x) * 4;
+
+  // The image model leaves specks of near-white between eyelash strokes. Small
+  // white patches that touch skin are those specks; the whites of the eyes are
+  // far larger, and the catch-lights in the pupils touch no skin.
+  const isWhite = (i) => {
+    const r = sheet[i];
+    const g = sheet[i + 1];
+    const b = sheet[i + 2];
+    return r > 222 && g > 210 && b > 195 && Math.max(r, g, b) - Math.min(r, g, b) < 45;
+  };
+  const isSkin = (i) => {
+    const r = sheet[i];
+    const g = sheet[i + 1];
+    const b = sheet[i + 2];
+    return r > 190 && g > 140 && g < 222 && r - b > 62;
+  };
+  const seen = new Uint8Array(cellW * cellH);
+  for (let start = 0; start < seen.length; start += 1) {
+    const sx = start % cellW;
+    const sy = Math.floor(start / cellW);
+    if (seen[start] || !area[start] || sx < 1 || sy < 1 || sx >= cellW - 1 || sy >= cellH - 1) continue;
+    if (!isWhite(at(sx, sy))) continue;
+    const patch = [];
+    let touchesSkin = false;
+    const stack = [start];
+    seen[start] = 1;
+    while (stack.length && patch.length <= 80) {
+      const p = stack.pop();
+      patch.push(p);
+      const x = p % cellW;
+      const y = Math.floor(p / cellW);
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const nx = x + dx;
+        const ny = y + dy;
+        if (nx < 1 || ny < 1 || nx >= cellW - 1 || ny >= cellH - 1) continue;
+        const q = ny * cellW + nx;
+        const j = at(nx, ny);
+        if (isWhite(j)) {
+          if (!seen[q]) {
+            seen[q] = 1;
+            stack.push(q);
+          }
+        } else if (isSkin(j)) {
+          touchesSkin = true;
+        }
+      }
+    }
+    if (patch.length > 80 || !touchesSkin) continue;
+    // Opened up, so the fill below paints them over from their surroundings.
+    for (const p of patch) sheet[at(p % cellW, Math.floor(p / cellW)) + 3] = 0;
+  }
+  for (let pass = 0; pass < 12; pass += 1) {
+    let open = 0;
+    const fills = [];
+    for (let y = 1; y < cellH - 1; y += 1) {
+      for (let x = 1; x < cellW - 1; x += 1) {
+        if (!area[y * cellW + x]) continue;
+        const i = at(x, y);
+        if (sheet[i + 3] >= 250) continue;
+        open += 1;
+        let r = 0;
+        let g = 0;
+        let b = 0;
+        let n = 0;
+        for (let dy = -1; dy <= 1; dy += 1) {
+          for (let dx = -1; dx <= 1; dx += 1) {
+            const j = at(x + dx, y + dy);
+            if (sheet[j + 3] < 250) continue;
+            r += sheet[j];
+            g += sheet[j + 1];
+            b += sheet[j + 2];
+            n += 1;
+          }
+        }
+        if (n) fills.push([i, r / n, g / n, b / n]);
+      }
+    }
+    // Applied after the scan, so each pass grows inwards by one pixel.
+    for (const [i, r, g, b] of fills) {
+      const a = sheet[i + 3] / 255;
+      sheet[i] = Math.round(sheet[i] * a + r * (1 - a));
+      sheet[i + 1] = Math.round(sheet[i + 1] * a + g * (1 - a));
+      sheet[i + 2] = Math.round(sheet[i + 2] * a + b * (1 - a));
+      sheet[i + 3] = 255;
+    }
+    if (!open) break;
+  }
+}
+
 /** A finished piece drawn into an empty cell, as raw RGBA. */
 function placeInCell(piece, left, top, cellW, cellH) {
   return sharp({ create: { width: cellW, height: cellH, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } } })
@@ -642,6 +840,8 @@ async function main() {
   const cellH = CELL_H * RESOLUTION;
   const h = Math.round(commonH * scale);
   let refSkin = null;
+  let faceArea = null;
+  const faceMasks = [];
 
   for (const s of sheets) {
     const rgba = cutOut(s.img, s.bg);
@@ -712,12 +912,23 @@ async function main() {
 
         if (row === 1 && col === 1 && !s.alignFaces) {
           refSkin = skinMask(await placeInCell(piece, left, top, cellW, cellH), cellW, cellH);
+          faceArea = faceRegion(refSkin, cellW, cellH);
         } else if (s.alignFaces && refSkin) {
           const mask = skinMask(await placeInCell(piece, left, top, cellW, cellH), cellW, cellH);
           const { dx, dy } = alignTo(refSkin, mask, cellW, cellH);
           left -= dx;
           top -= dy;
           console.log(`  ${s.out} cell ${row * 3 + col}: face moved ${-dx}, ${-dy}`);
+          // Each face gets its own mask: the inside of both its face and the
+          // centre frame's. One shared mask had to be the inside of every face
+          // at once; a narrower one (shy) then cut the others' outer lashes
+          // and the open eye beneath peeked out at the corner of a blink,
+          // while the centre frame's alone let shy's outline show by her eye.
+          if (FACE_ONLY.includes(row * 3 + col)) {
+            const aligned = skinMask(await placeInCell(piece, left, top, cellW, cellH), cellW, cellH);
+            const region = faceRegion(aligned, cellW, cellH);
+            faceMasks[row * 3 + col] = faceArea.map((v, p) => v & region[p]);
+          }
         }
 
         // Anything past the cell's sides would bleed into the neighbouring
@@ -738,10 +949,24 @@ async function main() {
       }
     }
 
-    await sharp({
+    const sheet = await sharp({
       create: { width: cellW * 3, height: cellH * 3, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } },
     })
       .composite(composites)
+      .raw()
+      .toBuffer();
+
+    // Inside a face nothing may be see-through. The pocket removal above also
+    // opens the specks of background between eyelash strokes, and on a face
+    // layer those holes showed the open eye of the frame underneath as a
+    // ghost at the corner of every blink.
+    const faceCells = s.alignFaces ? FACE_ONLY : [CENTRE_CELL];
+    for (const index of faceCells) {
+      const region = s.alignFaces ? faceMasks[index] : faceArea;
+      if (region) sealFace(sheet, cellW * 3, region, cellW, cellH, (index % 3) * cellW, Math.floor(index / 3) * cellH);
+    }
+
+    await sharp(sheet, { raw: { width: cellW * 3, height: cellH * 3, channels: 4 } })
       // Above 1x, compression artefacts are smaller than a screen pixel, so a
       // lower quality than a 1x sheet would need still looks clean.
       .webp({ quality: 74, alphaQuality: 80, effort: 6 })
@@ -750,6 +975,32 @@ async function main() {
     const { size } = statSync(join(ROOT, s.out));
     console.log(`Wrote ${s.out}  (${cellW * 3} x ${cellH * 3}, scale ${scale.toFixed(3)}, ${Math.round(size / 1024)}KB)`);
   }
+
+  // A 3x3 sheet laid out like the reactions sheet, at display size: a soft
+  // mask needs no more. Feathered by a few pixels so a change has no edge.
+  const maskW = CELL_W;
+  const maskH = CELL_H;
+  const alpha = Buffer.alloc(maskW * 3 * maskH * 3);
+  for (let index = 0; index < 9; index += 1) {
+    const region = faceMasks[index];
+    if (!region) continue;
+    const cell = await sharp(Buffer.from(region.map((v) => v * 255)), {
+      raw: { width: cellW, height: cellH, channels: 1 },
+    })
+      .blur(3)
+      .resize(maskW, maskH, { kernel: 'cubic' })
+      .extractChannel(0)
+      .raw()
+      .toBuffer();
+    const ox = (index % 3) * maskW;
+    const oy = Math.floor(index / 3) * maskH;
+    for (let y = 0; y < maskH; y += 1) cell.copy(alpha, (oy + y) * maskW * 3 + ox, y * maskW, (y + 1) * maskW);
+  }
+  await sharp({ create: { width: maskW * 3, height: maskH * 3, channels: 3, background: '#ffffff' } })
+    .joinChannel(alpha, { raw: { width: maskW * 3, height: maskH * 3, channels: 1 } })
+    .png({ compressionLevel: 9 })
+    .toFile(join(ROOT, FACE_MASK));
+  console.log(`Wrote ${FACE_MASK}`);
 }
 
 await main();

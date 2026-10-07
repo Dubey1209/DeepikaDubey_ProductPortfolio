@@ -102,9 +102,13 @@
   }
 
   function paint(layer, sheet, index) {
+    var position = (index % 3) * 50 + '% ' + Math.floor(index / 3) * 50 + '%';
     layer.classList.toggle('is-look', sheet === 'look');
     layer.classList.toggle('is-react', sheet === 'react');
-    layer.style.backgroundPosition = (index % 3) * 50 + '% ' + Math.floor(index / 3) * 50 + '%';
+    layer.style.backgroundPosition = position;
+    // Face layers have one mask per reaction, laid out like the sheet.
+    layer.style.webkitMaskPosition = position;
+    layer.style.maskPosition = position;
   }
 
   // A pair of layers that cross-fades between frames. `key` is the frame

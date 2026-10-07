@@ -814,9 +814,16 @@ html.atelier .atelier-mascot-layer {
   );
 }
 
-/* Near-black hair against the near-black dark page loses its silhouette. */
-html.atelier body.dark-theme .atelier-mascot-layer {
-  filter: drop-shadow(0 0 18px rgba(243, 238, 228, 0.14));
+/* Near-black hair against the near-black dark page loses its silhouette, so a
+   soft light sits behind her. It is a fixed backdrop, not a drop-shadow on the
+   layers: a filter there was re-rendered each time a layer faded, so every
+   expression made the whole figure and its glow visibly flicker. */
+html.atelier body.dark-theme .atelier-mascot::before {
+  content: '';
+  position: absolute;
+  inset: 2% -4% 6%;
+  background: radial-gradient(ellipse 46% 50% at 50% 46%, rgba(243, 238, 228, 0.11), rgba(243, 238, 228, 0.04) 62%, transparent 100%);
+  pointer-events: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -840,32 +847,32 @@ html.atelier body.dark-theme .atelier-mascot-layer {
    scaling the picture continuously kept it permanently resampled and soft. */
 html.atelier .atelier-mascot-look,
 html.atelier .atelier-mascot-layer.is-look {
-  background-image: url('mascots/deepika-directions.webp?v=20261013');
+  background-image: url('mascots/deepika-directions.webp?v=20261014');
 }
 
 html.atelier .atelier-mascot-react,
 html.atelier .atelier-mascot-layer.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261013');
+  background-image: url('mascots/deepika-reactions.webp?v=20261014');
 }
 
 html.atelier .atelier-mascot-react {
   opacity: 0;
 }
 
-/* Expressions: the reaction sheet seen only where a face changes, so her hair
-   and outline stay exactly as they are. Two soft shapes, measured on the
-   centre frame: a wide band over brows, eyes and lashes (x .34-.72,
-   y .32-.44), which must be fully opaque out to the outer lashes or the open
-   eye underneath ghosts through a blink; and an oval over nose and mouth. */
+/* Expressions: the reaction sheet seen only through the inside of her face,
+   from the brows down to just above the chin, kept clear of every outline.
+   tools/build-mascot.mjs traces one mask per reaction from the faces
+   themselves, in the same 3x3 layout as the sheet, and mascot.js moves the
+   mask with the frame. Her hair, jaw and outline always come from the frame
+   underneath; an oval reached the jaw and showed a second chin. */
 html.atelier .atelier-mascot-face {
   opacity: 0;
-  filter: none !important;
-  -webkit-mask-image:
-    radial-gradient(ellipse 25% 9% at 53.5% 38%, #000 76%, transparent 100%),
-    radial-gradient(ellipse 15% 10.5% at 54% 49%, #000 66%, transparent 100%);
-  mask-image:
-    radial-gradient(ellipse 25% 9% at 53.5% 38%, #000 76%, transparent 100%),
-    radial-gradient(ellipse 15% 10.5% at 54% 49%, #000 66%, transparent 100%);
+  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261014');
+  mask-image: url('mascots/deepika-face-mask.png?v=20261014');
+  -webkit-mask-size: 300% 300%;
+  mask-size: 300% 300%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
 }
 
 /* The SVG filter mascot.js injects; it displaces only the side hair. */
