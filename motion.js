@@ -204,6 +204,20 @@
     document.querySelectorAll('#technical-projects .project-card').forEach(function (el) {
       inject(el, 'fx-scan');
     });
+    document.querySelectorAll('.fun-facts-section .atelier-note').forEach(function (el) {
+      inject(el, 'fx-spot');
+    });
+    document.querySelectorAll('.fx-spot').forEach(function (spot) {
+      var card = spot.parentElement;
+      if (!card || card.dataset.fxGlow) return;
+      card.dataset.fxGlow = '1';
+      card.addEventListener('pointermove', function (e) {
+        if (e.pointerType !== 'mouse') return;
+        var r = card.getBoundingClientRect();
+        card.style.setProperty('--glow-x', (e.clientX - r.left) + 'px');
+        card.style.setProperty('--glow-y', (e.clientY - r.top) + 'px');
+      });
+    });
 
     var cinemaOn = bindScrollCinema();
     if (!cinemaOn) bindFadeFallback();

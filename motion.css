@@ -599,7 +599,7 @@ html.atelier body.nav-away .navbar {
   z-index: 2;
   opacity: 0;
   background: radial-gradient(
-    240px circle at var(--spot-x, 50%) var(--spot-y, 50%),
+    240px circle at var(--glow-x, 50%) var(--glow-y, 50%),
     color-mix(in srgb, var(--spin) 32%, transparent),
     transparent 64%
   );

@@ -77,7 +77,7 @@ GSAP 3.12.7, ScrollTrigger 3.12.7, Lenis 1.1.20, page-flip 2.0.7, and
 ## Cache busting
 
 Every stylesheet and script is referenced with a **single shared** `?v=` token
-(currently `20261022`; the mascot sheet URLs in `atelier.css` carry it too).
+(currently `20261023`; the mascot sheet URLs in `atelier.css` carry it too).
 When you change any CSS, JS or mascot sheet, bump that token —
 in both `index.html` and `my-story.html`.
 
@@ -145,6 +145,13 @@ reduced motion they are simply shown). Tilt and hover lift use the
 The legacy case-studies glow (`::before` in `base.css`, `top: -50%`) reached
 up over these cards and swallowed their hover, so its pseudo-elements are
 `pointer-events: none`.
+
+Each fun-fact card carries a line icon with one habit of its own, played on
+hover: the coffee steams, the lens searches, the play button pulses, the
+pot lid rattles, the hanger swings; the equaliser for music is the one that
+always plays, quietly, and gets louder on hover. Their glow (`.fx-spot`, also
+on work and skill cards) now follows the pointer through `--glow-x/--glow-y`
+instead of sitting in the middle.
 
 Elsewhere each section gets one quiet gesture rather than new content: a
 fun-fact card's kicker hairline stretches into an accent as it lifts, a

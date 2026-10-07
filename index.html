@@ -26,15 +26,15 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Outfit:wght@400;500;600;700&display=swap">
-  <link rel="preload" as="image" href="mascots/deepika-directions.webp?v=20261022" fetchpriority="high">
+  <link rel="preload" as="image" href="mascots/deepika-directions.webp?v=20261023" fetchpriority="high">
   <!-- One shared version token for every local asset. Bump it in both HTML
        files whenever any CSS or JS changes. Per-asset tokens drifted out of
        sync previously, which can serve new CSS against old JavaScript. -->
-  <link rel="stylesheet" href="base.css?v=20261022">
-  <link rel="stylesheet" href="atelier.css?v=20261022">
-  <link rel="stylesheet" href="motion.css?v=20261022">
+  <link rel="stylesheet" href="base.css?v=20261023">
+  <link rel="stylesheet" href="atelier.css?v=20261023">
+  <link rel="stylesheet" href="motion.css?v=20261023">
   <noscript><style>.fx-ch>span{transform:none!important}.home-kicker,.home-subtitle,.home-desc,.home-btns,.home-rotate,.hero-rule{opacity:1!important}.home-photo{filter:none!important;transform:rotate(-3.5deg)!important}</style></noscript>
-  <script src="portfolio-lock.js?v=20261022" defer></script>
+  <script src="portfolio-lock.js?v=20261023" defer></script>
 </head>
 <body>
     <script>
@@ -1118,31 +1118,37 @@
       <div class="atelier-notes">
         <article class="atelier-note atelier-note--wide">
           <span class="atelier-note-kicker">Brew</span>
+          <span class="atelier-note-icon atelier-note-icon--brew" aria-hidden="true"><svg viewBox="0 0 24 24"><path class="note-steam" d="M8.5 3.2c-.9 1 .9 1.9 0 3"/><path class="note-steam" d="M11.5 3.2c-.9 1 .9 1.9 0 3"/><path class="note-steam" d="M14.5 3.2c-.9 1 .9 1.9 0 3"/><path d="M5 9.5h12v3.8a5.2 5.2 0 0 1-5.2 5.2h-1.6A5.2 5.2 0 0 1 5 13.3z"/><path d="M17 11h1.3a2.3 2.3 0 0 1 0 4.6H16.6"/><path d="M4 21h14"/></svg></span>
           <h3>Coffee Connoisseur</h3>
           <p>My day doesn't start until I've had my perfect cup of coffee! Always on the hunt for the richest, most flavorful brews.</p>
         </article>
         <article class="atelier-note">
           <span class="atelier-note-kicker">Sound</span>
+          <span class="atelier-note-icon atelier-note-icon--sound" aria-hidden="true"><svg viewBox="0 0 24 24"><path class="note-bar" d="M5 9v6"/><path class="note-bar" d="M9.67 5v14"/><path class="note-bar" d="M14.33 8v8"/><path class="note-bar" d="M19 10.5v3"/></svg></span>
           <h3>Melody Chaser</h3>
           <p>Life's better with a soundtrack! You'll always find me with my headphones on, coding to the rhythm.</p>
         </article>
         <article class="atelier-note">
           <span class="atelier-note-kicker">Plot</span>
+          <span class="atelier-note-icon atelier-note-icon--plot" aria-hidden="true"><svg viewBox="0 0 24 24"><g class="note-lens"><circle cx="10.5" cy="10.5" r="5.5"/><path d="m14.6 14.6 5 5"/></g></svg></span>
           <h3>Spy Thriller Fanatic</h3>
           <p>Obsessed with spy movies and their mind-bending plots. The more unexpected the twist, the better!</p>
         </article>
         <article class="atelier-note atelier-note--wide">
           <span class="atelier-note-kicker">Rabbit hole</span>
+          <span class="atelier-note-icon atelier-note-icon--hole" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="2.8" y="5" width="18.4" height="14" rx="3.6"/><path class="note-play" d="M10.2 9.4v5.2l4.4-2.6z"/></svg></span>
           <h3>YouTube Explorer</h3>
           <p>From tech tutorials to travel vlogs, I'm always down a YouTube rabbit hole learning something new!</p>
         </article>
         <article class="atelier-note atelier-note--wide">
           <span class="atelier-note-kicker">Kitchen</span>
+          <span class="atelier-note-icon atelier-note-icon--kitchen" aria-hidden="true"><svg viewBox="0 0 24 24"><g class="note-lid"><path d="M3.5 9.5h17"/><path d="M10.5 9.5V8a1.5 1.5 0 0 1 3 0v1.5"/></g><path d="M5 12h14v2.5a5 5 0 0 1-5 5h-4a5 5 0 0 1-5-5z"/><path d="M5 13.5H3M19 13.5h2"/></svg></span>
           <h3>Culinary Artist</h3>
           <p>My kitchen is my lab, and every recipe is an experiment waiting to happen. Warning: Results may vary!</p>
         </article>
         <article class="atelier-note">
           <span class="atelier-note-kicker">Style</span>
+          <span class="atelier-note-icon atelier-note-icon--style" aria-hidden="true"><svg viewBox="0 0 24 24"><g class="note-hanger"><path d="M10 5.6a2 2 0 1 1 2.9 1.8c-.6.3-.9.8-.9 1.4V10"/><path d="M12 10 3.6 16.1a.9.9 0 0 0 .5 1.6h15.8a.9.9 0 0 0 .5-1.6z"/></g></svg></span>
           <h3>Style Storyteller</h3>
           <p>Fashion is my language, and I love telling stories through my unique style combinations!</p>
         </article>
@@ -1267,10 +1273,10 @@
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.20/dist/lenis.min.js" defer></script>
-  <script src="contact-form.js?v=20261022" defer></script>
-  <script src="theme-toggle.js?v=20261022" defer></script>
-  <script src="script.js?v=20261022" defer></script>
-  <script src="motion.js?v=20261022" defer></script>
-  <script src="mascot.js?v=20261022" defer></script>
+  <script src="contact-form.js?v=20261023" defer></script>
+  <script src="theme-toggle.js?v=20261023" defer></script>
+  <script src="script.js?v=20261023" defer></script>
+  <script src="motion.js?v=20261023" defer></script>
+  <script src="mascot.js?v=20261023" defer></script>
 </body>
 </html>
