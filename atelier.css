@@ -1141,12 +1141,12 @@ html.atelier body.dark-theme .atelier-mascot::before {
    scaling the picture continuously kept it permanently resampled and soft. */
 html.atelier .atelier-mascot-look,
 html.atelier .atelier-mascot-layer.is-look {
-  background-image: url('mascots/deepika-directions.webp?v=20261023');
+  background-image: url('mascots/deepika-directions.webp?v=20261024');
 }
 
 html.atelier .atelier-mascot-react,
 html.atelier .atelier-mascot-layer.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261023');
+  background-image: url('mascots/deepika-reactions.webp?v=20261024');
 }
 
 html.atelier .atelier-mascot-react {
@@ -1161,8 +1161,8 @@ html.atelier .atelier-mascot-react {
    underneath; an oval reached the jaw and showed a second chin. */
 html.atelier .atelier-mascot-face {
   opacity: 0;
-  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261023');
-  mask-image: url('mascots/deepika-face-mask.png?v=20261023');
+  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261024');
+  mask-image: url('mascots/deepika-face-mask.png?v=20261024');
   -webkit-mask-size: 300% 300%;
   mask-size: 300% 300%;
   -webkit-mask-repeat: no-repeat;
@@ -4414,6 +4414,201 @@ html.atelier .atelier-note:hover .note-hanger {
   }
   75% {
     rotate: -12deg;
+  }
+}
+
+/* Fun facts as a pinboard: each card is taped up slightly askew, with a
+   margin note in pen pointing at its icon, and one aside by the heading.
+   Tilt uses `rotate` so it survives the scroll reveal's `transform`. */
+html.atelier .fun-facts-section .container {
+  position: relative;
+}
+
+html.atelier .fun-facts-section .atelier-notes {
+  gap: 1.5rem 1.3rem;
+}
+
+html.atelier .fun-facts-section .atelier-note {
+  rotate: var(--note-tilt, 0deg);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease,
+    rotate 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+html.atelier .fun-facts-section .atelier-note:nth-child(1) { --note-tilt: -0.7deg; --tape-x: 9%; --tape-r: -5deg; }
+html.atelier .fun-facts-section .atelier-note:nth-child(2) { --note-tilt: 1deg; --tape-x: 38%; --tape-r: 4deg; }
+html.atelier .fun-facts-section .atelier-note:nth-child(3) { --note-tilt: 0.6deg; --tape-x: 30%; --tape-r: -3deg; }
+html.atelier .fun-facts-section .atelier-note:nth-child(4) { --note-tilt: -0.5deg; --tape-x: 44%; --tape-r: 3deg; }
+html.atelier .fun-facts-section .atelier-note:nth-child(5) { --note-tilt: 0.5deg; --tape-x: 14%; --tape-r: 5deg; }
+html.atelier .fun-facts-section .atelier-note:nth-child(6) { --note-tilt: -1deg; --tape-x: 34%; --tape-r: -4deg; }
+
+html.atelier .fun-facts-section .atelier-note:hover {
+  rotate: 0deg;
+}
+
+/* Washi tape: translucent, faintly striped, with torn ends. */
+html.atelier .fun-facts-section .atelier-note::after {
+  content: "";
+  position: absolute;
+  top: -0.7rem;
+  left: var(--tape-x);
+  z-index: 4;
+  width: 4.6rem;
+  height: 1.35rem;
+  background:
+    repeating-linear-gradient(-45deg, transparent 0 5px, rgba(255, 255, 255, 0.18) 5px 7px),
+    color-mix(in srgb, var(--spin) 30%, transparent);
+  clip-path: polygon(3% 0, 97% 0, 100% 20%, 96% 40%, 100% 62%, 97% 82%, 100% 100%, 2% 100%, 0 80%, 4% 58%, 0 38%, 3% 18%);
+  rotate: var(--tape-r);
+  pointer-events: none;
+  transition: opacity 0.35s ease, scale 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+html.atelier body.dark-theme .fun-facts-section .atelier-note::after {
+  background:
+    repeating-linear-gradient(-45deg, transparent 0 5px, rgba(255, 255, 255, 0.08) 5px 7px),
+    color-mix(in srgb, var(--spin) 34%, transparent);
+}
+
+/* A note in the margin, in pen, pointing at the icon. */
+html.atelier .atelier-note-scribble {
+  position: absolute;
+  top: 0.95rem;
+  right: 4.1rem;
+  z-index: 3;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.1rem;
+  font-family: var(--serif);
+  font-size: 0.92rem;
+  font-style: italic;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  color: var(--spin);
+  rotate: -4deg;
+  pointer-events: none;
+  transition: opacity 0.4s ease, translate 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+html.atelier .atelier-note-scribble svg,
+html.atelier .atelier-notes-aside svg {
+  overflow: visible;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+html.atelier .atelier-note-scribble svg {
+  width: 1.7rem;
+  height: 1.1rem;
+  margin-top: 0.35rem;
+}
+
+html.atelier .atelier-note-scribble path,
+html.atelier .atelier-notes-aside path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+
+html.atelier .atelier-note:hover .atelier-note-scribble {
+  translate: -3px -2px;
+}
+
+html.atelier .atelier-notes-aside {
+  position: absolute;
+  top: 1.6rem;
+  right: 1.2rem;
+  display: flex;
+  align-items: flex-end;
+  gap: 0.2rem;
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 1.1rem;
+  font-style: italic;
+  font-weight: 500;
+  color: var(--spin);
+  rotate: -3deg;
+  pointer-events: none;
+}
+
+html.atelier .atelier-notes-aside svg {
+  order: -1;
+  width: 2.6rem;
+  height: 2.1rem;
+  margin-bottom: -1.6rem;
+  scale: -1 1;
+}
+
+/* Pinned up as the board scrolls in: tape first, then the pen. */
+html.atelier.has-cues .atelier-notes:not(.is-cued) .atelier-note::after {
+  opacity: 0;
+  scale: 1.25;
+}
+
+html.atelier.has-cues .atelier-notes:not(.is-cued) .atelier-note-scribble,
+html.atelier.has-cues .atelier-notes-aside:not(.is-cued) {
+  opacity: 0;
+}
+
+html.atelier.has-cues .atelier-notes:not(.is-cued) .atelier-note-scribble path,
+html.atelier.has-cues .atelier-notes-aside:not(.is-cued) path {
+  stroke-dashoffset: 1;
+}
+
+html.atelier .atelier-notes.is-cued .atelier-note::after {
+  transition-delay: calc(var(--note-i, 0) * 0.12s + 0.5s);
+}
+
+html.atelier .atelier-notes.is-cued .atelier-note-scribble {
+  transition-delay: calc(var(--note-i, 0) * 0.12s + 0.9s);
+}
+
+html.atelier .atelier-notes.is-cued .atelier-note-scribble path,
+html.atelier .atelier-notes-aside.is-cued path {
+  transition: stroke-dashoffset 0.6s cubic-bezier(0.65, 0, 0.35, 1);
+  transition-delay: calc(var(--note-i, 0) * 0.12s + 1.05s);
+}
+
+html.atelier .atelier-notes-aside {
+  transition: opacity 0.5s ease 0.3s;
+}
+
+html.atelier .atelier-notes-aside.is-cued path {
+  transition-delay: 0.55s;
+}
+
+html.atelier .fun-facts-section .atelier-note:nth-child(2) { --note-i: 1; }
+html.atelier .fun-facts-section .atelier-note:nth-child(3) { --note-i: 2; }
+html.atelier .fun-facts-section .atelier-note:nth-child(4) { --note-i: 3; }
+html.atelier .fun-facts-section .atelier-note:nth-child(5) { --note-i: 4; }
+html.atelier .fun-facts-section .atelier-note:nth-child(6) { --note-i: 5; }
+
+@media (max-width: 760px) {
+  html.atelier .atelier-notes-aside {
+    display: none;
+  }
+
+  html.atelier .fun-facts-section .atelier-note {
+    rotate: calc(var(--note-tilt, 0deg) * 0.5);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.atelier.has-cues .atelier-notes .atelier-note::after,
+  html.atelier.has-cues .atelier-notes .atelier-note-scribble,
+  html.atelier.has-cues .atelier-notes-aside {
+    opacity: 1 !important;
+    scale: 1 !important;
+    transition: none !important;
+  }
+
+  html.atelier.has-cues .atelier-notes .atelier-note-scribble path,
+  html.atelier.has-cues .atelier-notes-aside path {
+    stroke-dashoffset: 0 !important;
+    transition: none !important;
   }
 }
 

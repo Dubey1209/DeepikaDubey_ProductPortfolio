@@ -44,6 +44,8 @@ const SHEETS = [
     columns: [{ from: 2, flip: true }, { from: 1 }, { from: 2 }],
     // Source columns whose faces look straight out, for sizing the sheet.
     frontFacing: [1],
+    // The model drew the downward row without her smile; see smileDown.
+    smileDown: true,
   },
   {
     src: 'tools/mascot-src/deepika-reactions-raw.jpg',
@@ -788,6 +790,106 @@ function signedDistance(rgba, width, height) {
 const median = (values) => [...values].sort((a, b) => a - b)[values.length >> 1];
 const hex = (rgb) => `#${rgb.map((v) => v.toString(16).padStart(2, '0')).join('')}`;
 
+// The downward frames came out with a flat, slightly downturned mouth, which
+// read as sad whenever she looked below her. Each gets the smile of the level
+// frame above it: the frown is painted out with the skin around it, and the
+// smile is lifted off as a difference from its own skin, so it lands in this
+// frame's skin tone instead of as a pasted patch. Scaled down because the
+// lowered face is foreshortened.
+//
+// Boxes are measured on the 2x sheet (cell 680 x 800): `smile` is the level
+// frame's mouth with its lip, `frown` the downward frame's mouth, `at` where
+// the smile's centre goes.
+const SMILE_SWAPS = [
+  { from: 3, to: 6, smile: [244, 384, 338, 418], frown: [266, 421, 304, 442], at: [285, 429] },
+  { from: 4, to: 7, smile: [314, 396, 408, 428], frown: [369, 421, 415, 442], at: [392, 429] },
+  { from: 5, to: 8, smile: [346, 384, 438, 418], frown: [378, 421, 415, 442], at: [396, 429] },
+];
+const SMILE_SCALE = 0.72;
+const SMILE_FEATHER = 6;
+
+async function smileDown(sheet, cellW, cellH) {
+  const W = cellW * 3;
+  const px = (x, y) => (y * W + x) * 4;
+
+  for (const swap of SMILE_SWAPS) {
+    const sx = (swap.from % 3) * cellW;
+    const sy = Math.floor(swap.from / 3) * cellH;
+    const dx = (swap.to % 3) * cellW;
+    const dy = Math.floor(swap.to / 3) * cellH;
+
+    // Each pixel over the frown becomes the mean of a row and a column
+    // interpolation between the skin just outside, so the cheek's shading
+    // carries straight across; full strength inside, eased over the feather.
+    const [fx0, fy0, fx1, fy1] = swap.frown;
+    const bx0 = dx + fx0 - SMILE_FEATHER;
+    const bx1 = dx + fx1 + SMILE_FEATHER;
+    const by0 = dy + fy0 - SMILE_FEATHER;
+    const by1 = dy + fy1 + SMILE_FEATHER;
+    const fills = [];
+    for (let y = by0; y <= by1; y += 1) {
+      for (let x = bx0; x <= bx1; x += 1) {
+        const tx = (x - bx0) / (bx1 - bx0);
+        const ty = (y - by0) / (by1 - by0);
+        const L = px(bx0, y);
+        const R = px(bx1, y);
+        const T = px(x, by0);
+        const B = px(x, by1);
+        const fill = [0, 1, 2].map(
+          (c) => (sheet[L + c] * (1 - tx) + sheet[R + c] * tx + sheet[T + c] * (1 - ty) + sheet[B + c] * ty) / 2
+        );
+        const edge = Math.min(x - bx0, bx1 - x, y - by0, by1 - y) / SMILE_FEATHER;
+        const w = Math.max(0, Math.min(1, edge));
+        fills.push([px(x, y), fill, w * w * (3 - 2 * w)]);
+      }
+    }
+    for (const [i, fill, w] of fills) {
+      for (let c = 0; c < 3; c += 1) sheet[i + c] = Math.round(sheet[i + c] * (1 - w) + fill[c] * w);
+    }
+
+    const [ax0, ay0, ax1, ay1] = swap.smile;
+    const pw = ax1 - ax0;
+    const ph = ay1 - ay0;
+    const skin = [0, 0, 0];
+    let n = 0;
+    for (let x = ax0; x < ax1; x += 1) {
+      for (const y of [ay0, ay1]) {
+        const i = px(sx + x, sy + y);
+        for (let c = 0; c < 3; c += 1) skin[c] += sheet[i + c];
+        n += 1;
+      }
+    }
+    for (let c = 0; c < 3; c += 1) skin[c] /= n;
+    // Stored halved around 128 so the raw resize can carry negative values.
+    const delta = Buffer.alloc(pw * ph * 3);
+    for (let y = 0; y < ph; y += 1) {
+      for (let x = 0; x < pw; x += 1) {
+        const i = px(sx + ax0 + x, sy + ay0 + y);
+        const d = [0, 1, 2].map((c) => sheet[i + c] - skin[c]);
+        const a = Math.max(0, Math.min(1, (Math.hypot(d[0], d[1], d[2]) - 10) / 30));
+        for (let c = 0; c < 3; c += 1) delta[(y * pw + x) * 3 + c] = Math.round((d[c] * a) / 2 + 128);
+      }
+    }
+    const sw = Math.round(pw * SMILE_SCALE);
+    const sh = Math.round(ph * SMILE_SCALE);
+    const scaled = await sharp(delta, { raw: { width: pw, height: ph, channels: 3 } })
+      .resize(sw, sh, { kernel: 'lanczos3' })
+      .raw()
+      .toBuffer();
+    const ox = dx + Math.round(swap.at[0] - sw / 2);
+    const oy = dy + Math.round(swap.at[1] - sh / 2);
+    for (let y = 0; y < sh; y += 1) {
+      for (let x = 0; x < sw; x += 1) {
+        const i = px(ox + x, oy + y);
+        const k = (y * sw + x) * 3;
+        for (let c = 0; c < 3; c += 1) {
+          sheet[i + c] = Math.max(0, Math.min(255, Math.round(sheet[i + c] + (scaled[k + c] - 128) * 2)));
+        }
+      }
+    }
+  }
+}
+
 async function main() {
   const sheets = [];
   for (const sheet of SHEETS) {
@@ -974,6 +1076,8 @@ async function main() {
       .composite(composites)
       .raw()
       .toBuffer();
+
+    if (s.smileDown) await smileDown(sheet, cellW, cellH);
 
     // Inside a face nothing may be see-through. The pocket removal above also
     // opens the specks of background between eyelash strokes, and on a face

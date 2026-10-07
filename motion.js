@@ -260,7 +260,7 @@
   // One-shot cues (the underline drawing, the stamp landing) that CSS plays
   // once their element is on screen.
   function bindCues() {
-    var cues = document.querySelectorAll('.atelier-about-mark, .atelier-about-notes');
+    var cues = document.querySelectorAll('.atelier-about-mark, .atelier-about-notes, .fun-facts-section .atelier-notes, .atelier-notes-aside');
     if (!cues.length || html.dataset.fxCues || !('IntersectionObserver' in window)) return;
     html.dataset.fxCues = '1';
     var io = new IntersectionObserver(function (entries) {

@@ -77,7 +77,7 @@ GSAP 3.12.7, ScrollTrigger 3.12.7, Lenis 1.1.20, page-flip 2.0.7, and
 ## Cache busting
 
 Every stylesheet and script is referenced with a **single shared** `?v=` token
-(currently `20261023`; the mascot sheet URLs in `atelier.css` carry it too).
+(currently `20261024`; the mascot sheet URLs in `atelier.css` carry it too).
 When you change any CSS, JS or mascot sheet, bump that token —
 in both `index.html` and `my-story.html`.
 
@@ -127,9 +127,12 @@ never runs off the page; on phones it sits above her head as before. Once per
 visit, after the hero's entrance and the lock screen, she says hello
 (`GREETINGS`; the test harness marks her as having greeted so captures do not
 depend on the timer). In the hero she is ~9% larger (372×438; 240×282 on
-phones). She never uses the bottom row of the direction sheet: those frames
-were drawn without her smile and read as sad, so with the pointer below her
-she keeps the level frame and the spring lean tips her head down.
+phones). The bottom row of the direction sheet was drawn without her smile,
+so she looked sad whenever the pointer was below her. `smileDown` in
+`tools/build-mascot.mjs` fixes it in the build: it paints the flat mouth out
+with the skin around it and gives each downward frame the smile of the level
+frame above, carried as a difference from its own skin so it takes the new
+frame's tone, at 72% for the foreshortened face.
 
 About is a centred column with no photo. The working loop is a row of chips
 (built → measured → shipped → "should it exist?") whose arrows nudge forward
@@ -145,6 +148,13 @@ reduced motion they are simply shown). Tilt and hover lift use the
 The legacy case-studies glow (`::before` in `base.css`, `top: -50%`) reached
 up over these cards and swallowed their hover, so its pseudo-elements are
 `pointer-events: none`.
+
+Fun facts read as a pinboard: each card is taped up (translucent washi tape
+with torn ends, `::after`) slightly askew (`--note-tilt`, straightened on
+hover), with a margin note in pen ("daily ritual", "no spoilers!") and a
+hand-drawn arrow at its icon, plus one aside by the heading ("the off-duty
+version", hidden on phones). The tape lands and the pen draws in through the
+same `bindCues()` as About, staggered card by card.
 
 Each fun-fact card carries a line icon with one habit of its own, played on
 hover: the coffee steams, the lens searches, the play button pulses, the

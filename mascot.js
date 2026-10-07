@@ -327,9 +327,7 @@
       // angle matters, close by it takes a real move to turn her head.
       var reach = Math.max(dist, rect.width * 0.95);
       col = axis(col, dx / reach);
-      // The downward frames were drawn without her smile and read as sad, so
-      // below her she keeps the level frame and the lean tips her head down.
-      row = Math.min(axis(row, dy / reach), 1);
+      row = axis(row, dy / reach);
     }
     requestLook(row * 3 + col);
 
