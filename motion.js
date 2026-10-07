@@ -550,6 +550,7 @@
 
     var kicker = home.querySelector('.home-kicker');
     var photo = home.querySelector('.home-photo');
+    var heroMascot = home.querySelector('.home-mascot');
     var line1 = home.querySelectorAll('.hero-line-1 .fx-ch > span');
     var line2 = home.querySelectorAll('.hero-line-2 .fx-ch > span');
     var subtitle = home.querySelector('.home-subtitle');
@@ -600,6 +601,7 @@
       if (!g) return;
       if (photo) g.set(photo, { clearProps: 'transform,filter,rotation,rotationY,x,y,scale' });
       if (photoStage) g.set(photoStage, { clearProps: 'transform,rotation,y,scale' });
+      if (heroMascot) g.set(heroMascot, { clearProps: 'transform,opacity,visibility,y' });
       g.set(line1, { clearProps: 'transform,opacity,rotation,rotationX,yPercent' });
       g.set(line2, { clearProps: 'transform,opacity,rotation,rotationX,yPercent' });
       if (kicker) g.set(kicker, { clearProps: 'transform,opacity,visibility,letterSpacing' });
@@ -661,6 +663,12 @@
       tl.fromTo(photo, { y: 36, scale: 0.94, rotation: -8 }, {
         y: 0, scale: 1, rotation: -3.5, duration: 1.7, ease: 'expo.out'
       }, 0.1);
+    }
+
+    if (heroMascot) {
+      tl.fromTo(heroMascot, { y: 40, autoAlpha: 0 }, {
+        y: 0, autoAlpha: 1, duration: 1.6, ease: 'expo.out'
+      }, 0.2);
     }
 
     if (subtitle) {

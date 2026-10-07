@@ -263,6 +263,9 @@ export async function preparePage(page, scenario, baseUrl, options = {}) {
         localStorage.setItem('theme', theme);
         if (unlocked) sessionStorage.setItem('portfolio_unlocked', 'true');
         else sessionStorage.removeItem('portfolio_unlocked');
+        // The mascot greets once per visit on a 2.2s timer; whether her
+        // thought cloud is in a capture would depend on timing.
+        sessionStorage.setItem('mascot-greeted', '1');
       } catch {}
     },
     { theme: scenario.theme, unlocked: scenario.unlocked !== false }

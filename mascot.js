@@ -501,8 +501,12 @@
     var d = cloudPath(w, h, text);
     cloudShade.setAttribute('d', d);
     cloudLine.setAttribute('d', d);
-    // Two small puffs trail down-left, towards her head, like a thought.
-    var spots = [[w * 0.17, h + 15, 5.5], [w * 0.17 - 11, h + 28, 3.4]];
+    // Two small puffs trail down towards her head, like a thought: down-left
+    // from a cloud beside her, down-right where the page opens it to her left.
+    var right = getComputedStyle(el).getPropertyValue('--cloud-tail').trim() === 'right';
+    var spots = right
+      ? [[w * 0.83, h + 15, 5.5], [w * 0.83 + 11, h + 28, 3.4]]
+      : [[w * 0.17, h + 15, 5.5], [w * 0.17 - 11, h + 28, 3.4]];
     puffs.forEach(function (puff, i) {
       Array.prototype.forEach.call(puff.childNodes, function (circle) {
         circle.setAttribute('cx', spots[i][0].toFixed(1));
@@ -1195,11 +1199,57 @@
     clearTimeout(breezeTimer);
   }
 
+  // The first time she is seen in a visit, once the page has finished its
+  // entrance (and the lock screen is gone), she says hello.
+  var GREETINGS = {
+    face: GRIN,
+    lines: [
+      'hi! I’m Deepika, welcome in',
+      'hey! so glad you’re here',
+      [WINK, 'hi! poke me, I don’t bite'],
+      'hello! the good stuff is just below',
+      [WINK, 'hi! I turn messy problems into products'],
+      'hey there! make yourself at home',
+    ],
+  };
+  var GREETED_KEY = 'mascot-greeted';
+  var greetTimer = 0;
+
+  function greetSoon() {
+    try {
+      if (sessionStorage.getItem(GREETED_KEY)) return;
+    } catch (err) {
+      // No storage: greet on every visit, which is harmless.
+    }
+    if (document.body.classList.contains('portfolio-is-locked')) {
+      document.addEventListener('portfolio-unlocked', greetSoon, { once: true });
+      return;
+    }
+    clearTimeout(greetTimer);
+    greetTimer = setTimeout(function () {
+      if (!visible || reacting >= 0 || now() - lastPokeAt < 4000) return;
+      try {
+        sessionStorage.setItem(GREETED_KEY, '1');
+      } catch (err) {
+        // See above.
+      }
+      var line = pickLine('greet', GREETINGS);
+      var hold = holdFor(line.text);
+      react(line.face, hold);
+      say(line.text, hold);
+    }, 2200);
+  }
+
   if ('IntersectionObserver' in window) {
     new IntersectionObserver(function (entries) {
       visible = entries[0].isIntersecting;
-      if (visible) start();
-      else stop();
+      if (visible) {
+        start();
+        greetSoon();
+      } else {
+        clearTimeout(greetTimer);
+        stop();
+      }
     }).observe(el);
   } else {
     start();

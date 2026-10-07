@@ -565,6 +565,23 @@ html.atelier .home-right {
   overflow: visible;
 }
 
+/* The mascot is the hero's picture. Her thought cloud opens to her left,
+   over the gap beside the copy, so it never runs off the right edge. */
+html.atelier .home-mascot {
+  width: 340px;
+  max-width: 100%;
+}
+
+html.atelier .home-mascot .atelier-mascot {
+  --cloud-tail: right;
+}
+
+html.atelier .home-mascot .atelier-mascot-bubble {
+  left: auto;
+  right: 62%;
+  transform-origin: 100% 100%;
+}
+
 html.atelier .home-photo {
   width: 300px !important;
   height: 380px !important;
@@ -830,12 +847,12 @@ html.atelier body.dark-theme .atelier-mascot::before {
    scaling the picture continuously kept it permanently resampled and soft. */
 html.atelier .atelier-mascot-look,
 html.atelier .atelier-mascot-layer.is-look {
-  background-image: url('mascots/deepika-directions.webp?v=20261017');
+  background-image: url('mascots/deepika-directions.webp?v=20261018');
 }
 
 html.atelier .atelier-mascot-react,
 html.atelier .atelier-mascot-layer.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261017');
+  background-image: url('mascots/deepika-reactions.webp?v=20261018');
 }
 
 html.atelier .atelier-mascot-react {
@@ -850,8 +867,8 @@ html.atelier .atelier-mascot-react {
    underneath; an oval reached the jaw and showed a second chin. */
 html.atelier .atelier-mascot-face {
   opacity: 0;
-  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261017');
-  mask-image: url('mascots/deepika-face-mask.png?v=20261017');
+  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261018');
+  mask-image: url('mascots/deepika-face-mask.png?v=20261018');
   -webkit-mask-size: 300% 300%;
   mask-size: 300% 300%;
   -webkit-mask-repeat: no-repeat;
@@ -986,6 +1003,14 @@ html.atelier .atelier-mascot-word.is-pre {
     white-space: normal;
     transform-origin: 100% 100%;
   }
+
+  html.atelier .home-mascot .atelier-mascot {
+    --cloud-tail: left;
+  }
+
+  html.atelier .home-mascot .atelier-mascot-bubble {
+    right: -0.5rem;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1056,6 +1081,101 @@ html.atelier .atelier-about-index li > span:last-child {
   color: var(--ink);
   font-weight: 500;
   text-align: right;
+}
+
+/* About's side column: her, written up like a product's spec sheet. The
+   mascot lives in the hero now, so this is the one card on the page that
+   reads like a release note. */
+html.atelier .atelier-spec {
+  max-width: 340px;
+  padding: 1.35rem 1.4rem 1.2rem;
+  border: 1.5px solid var(--ink);
+  border-radius: 1.4rem;
+  background: var(--card);
+  box-shadow: 6px 8px 0 var(--ink);
+}
+
+html.atelier body.dark-theme .atelier-spec {
+  border-color: rgba(243, 238, 228, 0.55);
+  box-shadow: 6px 8px 0 #000;
+}
+
+html.atelier .atelier-spec-head {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.45rem;
+  margin: 0 0 0.9rem;
+}
+
+html.atelier .atelier-spec-name {
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  font-weight: 560;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+html.atelier .atelier-spec-ver {
+  flex: none;
+  padding: 0.18rem 0.55rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+html.atelier .atelier-spec .atelier-about-index {
+  max-width: none;
+  margin: 0;
+}
+
+html.atelier .atelier-spec .atelier-about-index li:last-child {
+  border-bottom: 0;
+}
+
+html.atelier .atelier-spec-status {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0.4rem 0 0;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--line);
+  font-size: 0.86rem;
+  font-weight: 550;
+  color: var(--ink);
+}
+
+html.atelier .atelier-spec-dot {
+  position: relative;
+  flex: none;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: #2f9e5b;
+}
+
+html.atelier .atelier-spec-dot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: #2f9e5b;
+  animation: atelier-spec-pulse 2.4s ease-out infinite;
+}
+
+@keyframes atelier-spec-pulse {
+  0% { transform: scale(1); opacity: 0.55; }
+  80%, 100% { transform: scale(2.6); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.atelier .atelier-spec-dot::after {
+    animation: none;
+    opacity: 0;
+  }
 }
 
 html.atelier h2.about-title.atelier-do-lead,
@@ -3626,7 +3746,8 @@ html.atelier .lock-notification--error {
     padding-left: 0;
   }
 
-  html.atelier .atelier-about-index {
+  html.atelier .atelier-about-index,
+  html.atelier .atelier-spec {
     max-width: none;
   }
 

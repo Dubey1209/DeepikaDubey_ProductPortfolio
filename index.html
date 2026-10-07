@@ -26,15 +26,15 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Outfit:wght@400;500;600;700&display=swap">
-  <link rel="preload" as="image" href="ProfilePhoto.webp">
+  <link rel="preload" as="image" href="mascots/deepika-directions.webp?v=20261018" fetchpriority="high">
   <!-- One shared version token for every local asset. Bump it in both HTML
        files whenever any CSS or JS changes. Per-asset tokens drifted out of
        sync previously, which can serve new CSS against old JavaScript. -->
-  <link rel="stylesheet" href="base.css?v=20261017">
-  <link rel="stylesheet" href="atelier.css?v=20261017">
-  <link rel="stylesheet" href="motion.css?v=20261017">
+  <link rel="stylesheet" href="base.css?v=20261018">
+  <link rel="stylesheet" href="atelier.css?v=20261018">
+  <link rel="stylesheet" href="motion.css?v=20261018">
   <noscript><style>.fx-ch>span{transform:none!important}.home-kicker,.home-subtitle,.home-desc,.home-who,.home-btns,.home-rotate,.hero-rule{opacity:1!important}.home-photo{filter:none!important;transform:rotate(-3.5deg)!important}</style></noscript>
-  <script src="portfolio-lock.js?v=20261017" defer></script>
+  <script src="portfolio-lock.js?v=20261018" defer></script>
 </head>
 <body>
     <script>
@@ -142,7 +142,12 @@
         </div>
       </div>
       <div class="home-right">
-        <img src="ProfilePhoto.webp" alt="Deepika Dubey" class="home-photo" width="300" height="380" fetchpriority="high" decoding="async">
+        <div class="home-mascot">
+          <div class="atelier-mascot" role="img" tabindex="0" aria-label="Cartoon of Deepika Dubey that follows your cursor. Click to poke her.">
+            <span class="atelier-mascot-layer atelier-mascot-look" aria-hidden="true"></span>
+            <span class="atelier-mascot-layer atelier-mascot-react" aria-hidden="true"></span>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -150,26 +155,39 @@
   <section id="about" class="section about-section">
     <div class="container atelier-about">
       <aside class="atelier-about-side">
-        <figure class="atelier-about-frame">
-          <div class="atelier-mascot" role="img" tabindex="0" aria-label="Cartoon of Deepika Dubey that follows your cursor. Click to poke her.">
-            <span class="atelier-mascot-layer atelier-mascot-look" aria-hidden="true"></span>
-            <span class="atelier-mascot-layer atelier-mascot-react" aria-hidden="true"></span>
-          </div>
-        </figure>
-        <ul class="atelier-about-index">
-          <li>
-            <span>Now</span>
-            <span>Shipping product</span>
-          </li>
-          <li>
-            <span>Work</span>
-            <span>Shipped, not just studied</span>
-          </li>
-          <li>
-            <span>Lens</span>
-            <span>User stays in the room</span>
-          </li>
-        </ul>
+        <div class="atelier-spec">
+          <p class="atelier-spec-head">
+            <span class="atelier-spec-name">Deepika, as a product</span>
+            <span class="atelier-spec-ver">v2026 · stable</span>
+          </p>
+          <ul class="atelier-about-index">
+            <li>
+              <span>Now</span>
+              <span>Shipping product</span>
+            </li>
+            <li>
+              <span>Work</span>
+              <span>Shipped, not just studied</span>
+            </li>
+            <li>
+              <span>Lens</span>
+              <span>User stays in the room</span>
+            </li>
+            <li>
+              <span>Stack</span>
+              <span>Builders, Figma, metrics</span>
+            </li>
+            <li>
+              <span>Off-duty</span>
+              <span>Hair oiling &amp; earrings</span>
+            </li>
+            <li>
+              <span>Known issue</span>
+              <span>Asks “but why?” a lot</span>
+            </li>
+          </ul>
+          <p class="atelier-spec-status"><span class="atelier-spec-dot" aria-hidden="true"></span>Open to product conversations</p>
+        </div>
       </aside>
       <div class="atelier-about-copy">
         <p class="atelier-label">About</p>
@@ -1275,10 +1293,10 @@
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.20/dist/lenis.min.js" defer></script>
-  <script src="contact-form.js?v=20261017" defer></script>
-  <script src="theme-toggle.js?v=20261017" defer></script>
-  <script src="script.js?v=20261017" defer></script>
-  <script src="motion.js?v=20261017" defer></script>
-  <script src="mascot.js?v=20261017" defer></script>
+  <script src="contact-form.js?v=20261018" defer></script>
+  <script src="theme-toggle.js?v=20261018" defer></script>
+  <script src="script.js?v=20261018" defer></script>
+  <script src="motion.js?v=20261018" defer></script>
+  <script src="mascot.js?v=20261018" defer></script>
 </body>
 </html>

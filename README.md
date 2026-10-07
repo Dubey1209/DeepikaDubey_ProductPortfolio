@@ -61,7 +61,7 @@ All scripts are `defer`red. Third-party libraries come from the jsDelivr CDN.
 | `theme-toggle.js` | Toggles `.dark-theme` on `<body>`, persisted to `localStorage`. An inline script at the top of `<body>` applies the saved theme early to avoid a flash. |
 | `motion.js` | GSAP + ScrollTrigger + Lenis scroll animations. |
 | `contact-form.js` | Contact form via EmailJS. The SDK is lazy-loaded on first focus of the form rather than on page load. |
-| `mascot.js` | `index.html` only. The cartoon in the About card: looks towards the cursor, reacts when clicked, blinks. See [About mascot](#about-mascot). |
+| `mascot.js` | `index.html` only. The cartoon in the hero: looks towards the cursor, reacts when clicked, blinks. See [About mascot](#about-mascot). |
 | `story-book.js` | Flip-book behaviour on `my-story.html`, using page-flip. |
 
 The visual and computed-style harnesses hide the mascot's drawings (they are in
@@ -77,7 +77,7 @@ GSAP 3.12.7, ScrollTrigger 3.12.7, Lenis 1.1.20, page-flip 2.0.7, and
 ## Cache busting
 
 Every stylesheet and script is referenced with a **single shared** `?v=` token
-(currently `20261017`; the mascot sheet URLs in `atelier.css` carry it too).
+(currently `20261018`; the mascot sheet URLs in `atelier.css` carry it too).
 When you change any CSS, JS or mascot sheet, bump that token —
 in both `index.html` and `my-story.html`.
 
@@ -118,8 +118,18 @@ positioned sheet, so the attributes would have no effect on layout.
 
 ## About mascot
 
-The About card shows a cartoon of Deepika instead of a photo. It follows the
-idea of [page-mascot](https://koboyo.com/page-mascot), which is a React
+The hero shows a cartoon of Deepika instead of a photo. Two pictures of her a
+scroll apart, in two styles (a tilted photo on a coloured card, a frameless
+cartoon), read as inconsistent, so the photo was dropped from the page (it
+stays as `og:image` and favicon) and the mascot moved up from About. There
+her thought cloud opens to her left (`--cloud-tail: right` in the hero), so it
+never runs off the page; on phones it sits above her head as before. Once per
+visit, after the hero's entrance and the lock screen, she says hello
+(`GREETINGS`; the test harness marks her as having greeted so captures do not
+depend on the timer). About's side column is now a spec card, "Deepika, as a
+product", with the old Now / Work / Lens index plus a few lines of her own.
+
+It follows the idea of [page-mascot](https://koboyo.com/page-mascot), which is a React
 component; this is a plain-JS version (`mascot.js`) so the site keeps no React
 and no build step.
 
