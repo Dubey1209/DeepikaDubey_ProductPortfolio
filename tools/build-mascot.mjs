@@ -42,20 +42,26 @@ const SHEETS = [
     src: 'tools/mascot-src/deepika-directions-raw.jpg',
     out: 'mascots/deepika-directions.webp',
     columns: [{ from: 2, flip: true }, { from: 1 }, { from: 2 }],
+    // Source columns whose faces look straight out, for sizing the sheet.
+    frontFacing: [1],
   },
   {
     src: 'tools/mascot-src/deepika-reactions-raw.jpg',
     out: 'mascots/deepika-reactions.webp',
     columns: [{ from: 0 }, { from: 1 }, { from: 2 }],
+    frontFacing: [0, 1, 2],
   },
 ];
 
 // A background pixel this close to the sampled background colour, and
 // connected to the edge of the sheet, becomes transparent. Flood-filling from
-// the edges rather than keying the colour everywhere matters: the cream stripes
-// on the sweater are close to the background colour, but sit inside the black
-// outline, so the fill never reaches them.
-const BG_TOLERANCE = 30;
+// the edges rather than keying the colour everywhere keeps the eye whites.
+//
+// Kept tight. The background's JPEG noise never exceeds 9, but the cream
+// sweater stripes sit at 20-35 and run out to the sleeves with no outline in
+// between: at 30 the fill ran along them and left ~5,000 transparent pixels
+// per frame, which read on the dark theme as the sweater torn into strips.
+const BG_TOLERANCE = 12;
 const RIM_RINGS = 2;
 // How far inside the silhouette the hair's white edge highlight sits.
 const EDGE_REACH = 8;
@@ -202,7 +208,32 @@ function measureCell(img, bg, col, row, band) {
   }
   const anchorX = rows ? sum / rows : (left + right) / 2;
 
-  return { col, row, top, bottom, left, right, width: right - left + 1, height: bottom - top + 1, anchorX };
+  // Face width, from skin pixels across the cheeks and ears. Overall width is
+  // no use for comparing head sizes: it is mostly hair, which the model
+  // spreads differently in every frame.
+  const isSkin = (x, y) => {
+    const i = (y * img.width + x) * 3;
+    const r = img.data[i];
+    const g = img.data[i + 1];
+    const b = img.data[i + 2];
+    return r > 190 && g > 140 && g < 222 && r - b > 62;
+  };
+  const height = bottom - top + 1;
+  const spans = [];
+  for (let y = Math.round(top + height * 0.2); y <= Math.round(top + height * 0.36); y += 1) {
+    let l = -1;
+    let r = -1;
+    for (let x = x0; x < x1; x += 1) {
+      if (isSkin(x, y)) {
+        if (l < 0) l = x;
+        r = x;
+      }
+    }
+    if (l >= 0) spans.push(r - l + 1);
+  }
+  const faceW = spans.length ? [...spans].sort((a, b) => a - b)[spans.length >> 1] : 0;
+
+  return { col, row, top, bottom, left, right, width: right - left + 1, height, anchorX, faceW };
 }
 
 /**
@@ -358,9 +389,11 @@ function cutOut(img, bg) {
     if (isBg[p] || reach[p] === 255) continue;
     const r = data[p * 3];
     const b = data[p * 3 + 2];
-    // Down to mid-grey, to take the anti-aliased pixels where the highlight
-    // meets the outlines; a pure-white cut left a dotted grey trace.
-    if (pixelLum(p) > 120 && r - b < 38) highlight[p] = 1;
+    // Down to dark grey, to take the anti-aliased pixels where the highlight
+    // meets the outlines: a cut at white, then at mid-grey (120), each left a
+    // dotted grey trace along the hair. Brown knit and skin are excluded by
+    // their warmth, not their brightness.
+    if (pixelLum(p) > 45 && r - b < 30) highlight[p] = 1;
   }
 
   // Pixels along the outline are part ink, part cream. Left as they are they
@@ -442,9 +475,23 @@ async function main() {
       console.log(
         `  r${c.row}c${c.col}  ${String(c.width).padStart(4)} x ${String(c.height).padStart(4)}` +
           `  height ${(dh * 100).toFixed(1).padStart(5)}%  width ${(dw * 100).toFixed(1).padStart(5)}%` +
+          `  face ${String(c.faceW).padStart(3)}` +
           `${bad ? '  <-- JUMPS' : ''}`
       );
     }
+  }
+
+  // The image model draws each sheet at its own size: the reactions faces came
+  // out ~3.5% narrower than the front-facing directions faces, so every
+  // reaction made the head visibly shrink and grow back. Each sheet gets one
+  // correction, measured on front-facing faces only (a turned face is narrower
+  // because it is turned, not because it is smaller).
+  const front = (s) => s.cells.filter((c) => s.frontFacing.includes(c.col) && c.faceW);
+  const refFace = median(front(sheets[0]).map((c) => c.faceW));
+  for (const s of sheets) {
+    const faces = front(s).map((c) => c.faceW);
+    s.faceScale = refFace / median(faces);
+    console.log(`${s.out}: front face ${median(faces)}px, scaled x${s.faceScale.toFixed(4)}`);
   }
 
   console.log(failures ? `\n${failures} frame(s) outside tolerance.` : '\nAll 18 frames consistent.');
@@ -470,28 +517,46 @@ async function main() {
   for (const s of sheets) {
     const rgba = cutOut(s.img, s.bg);
     const composites = [];
+    const sheetScale = scale * s.faceScale;
+    // A sheet scaled up shows less sweater, so the hair top stays where every
+    // other frame has it and the sweater still ends flush with the cell.
+    const srcH = Math.min(commonH, Math.floor(commonH / s.faceScale));
 
     for (let row = 0; row < 3; row += 1) {
       for (let col = 0; col < 3; col += 1) {
         const { from, flip } = s.columns[col];
         const c = s.cells.find((cell) => cell.row === row && cell.col === from);
-        const w = Math.round(c.width * scale);
+        const w = Math.round(c.width * sheetScale);
+        const ph = Math.round(srcH * sheetScale);
 
         let pipeline = sharp(rgba, { raw: { width: s.img.width, height: s.img.height, channels: 4 } })
-          .extract({ left: c.left, top: c.top, width: c.width, height: commonH })
-          .resize(w, h, { kernel: 'lanczos3' })
+          .extract({ left: c.left, top: c.top, width: c.width, height: srcH })
+          .resize(w, ph, { kernel: 'lanczos3' })
           // Upscaling the ~330px source softens the ink lines; a light
           // unsharp mask brings the edges back without ringing on flat fills.
           .sharpen({ sigma: 0.8, m1: 0.6, m2: 1.4 });
         if (flip) pipeline = pipeline.flop();
-        const piece = await pipeline.png().toBuffer();
+        let piece = await pipeline.png().toBuffer();
 
         // Hair top at the same height in every cell, the cut sweater flush
         // with the cell bottom, the body's centre on the cell's centre.
         const anchor = flip ? c.right - c.anchorX : c.anchorX - c.left;
-        const left = Math.round(cellW / 2 - anchor * scale) + col * cellW;
-        const top = (row + 1) * cellH - h;
-        composites.push({ input: piece, left: Math.max(col * cellW, left), top });
+        let left = Math.round(cellW / 2 - anchor * sheetScale);
+        const top = cellH - h;
+
+        // Anything past the cell's sides would bleed into the neighbouring
+        // frame and flash at the mascot's edge whenever that frame showed.
+        const cropL = Math.max(0, -left);
+        const cropR = Math.max(0, left + w - cellW);
+        const cropB = Math.max(0, top + ph - cellH);
+        if (cropL || cropR || cropB) {
+          piece = await sharp(piece)
+            .extract({ left: cropL, top: 0, width: w - cropL - cropR, height: ph - cropB })
+            .png()
+            .toBuffer();
+          left += cropL;
+        }
+        composites.push({ input: piece, left: col * cellW + left, top: row * cellH + top });
       }
     }
 

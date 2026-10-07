@@ -1,6 +1,6 @@
 // About-section mascot: looks towards the cursor, reacts to what the visitor
-// does, blinks and breathes on her own, dozes off when left alone, and now and
-// then a breeze lifts her hair.
+// does, blinks and breathes on her own, and now and then a breeze lifts her
+// hair.
 //
 // Plain-JS take on the page-mascot idea (github.com/nilbuild/page-mascot),
 // which is a React component; this site has no React and no build step. The
@@ -12,14 +12,21 @@
 //               6 starry  7 thinking  8 sleepy
 //
 // What triggers each reaction:
-//   pointer arrives on her      grin + perk (at most every 15s)
+//   pointer arrives on her      grin (at most every 15s)
 //   pointer rests on her face   shy
-//   pointer scrubs over her     giggle + wiggle (tickled)
-//   click / Enter / Space       wink, grin, gasp, giggle, starry or shy + bounce
+//   pointer scrubs over her     giggle (tickled)
+//   click / Enter / Space       wink, grin, gasp, giggle, starry or shy
 //   four quick clicks           thinking ("what are you doing?")
 //   any link or button hovered  sometimes starry
-//   7s without the pointer      thinking or wink, once
-//   20s without the pointer     sleepy, until the pointer moves: then gasp
+//
+// Every reaction frame faces straight out, so the ones she starts herself
+// (blinks, starry) wait until she is looking straight out too. Otherwise a
+// cursor resting off to one side would see her head snap to the front and
+// back. For the same reason there is no idle or sleepy reaction: left alone,
+// she keeps looking wherever the cursor was left.
+//
+// Reactions change only the face. The figure never scales or jumps, which
+// read as the whole character shrinking and growing.
 //
 // The markup works without this script: CSS shows the centre direction frame.
 
@@ -43,17 +50,13 @@
   var SHY = 5;
   var STARRY = 6;
   var THINKING = 7;
-  var SLEEPY = 8;
   var POKES = [WINK, GRIN, GASP, GIGGLE, STARRY, SHY];
-
-  var IDLE_AFTER_MS = 7000;
-  var DOZE_AFTER_MS = 20000;
+  var CENTRE = 4;
 
   var current = -1;
+  var lookIndex = CENTRE;
   var reactTimer = 0;
   var blinkTimer = 0;
-  var idleTimer = 0;
-  var dozeTimer = 0;
   var breezeTimer = 0;
   var lastPoke = -1;
   var visible = true;
@@ -84,25 +87,16 @@
     }
   }
 
-  // Reactions she starts herself never cut off one the visitor caused.
+  // Reactions she starts herself never cut off one the visitor caused, and
+  // never turn her head away from where she is looking.
   function autoReaction(index, ms) {
-    if (visible && !isReacting()) showReaction(index, ms);
+    if (visible && !isReacting() && lookIndex === CENTRE) showReaction(index, ms);
   }
 
   function endReaction() {
     clearTimeout(reactTimer);
     el.classList.remove('is-reacting');
     current = -1;
-  }
-
-  function body(cls, ms) {
-    if (reducedMotion) return;
-    el.classList.remove(cls);
-    void el.offsetWidth;
-    el.classList.add(cls);
-    setTimeout(function () {
-      el.classList.remove(cls);
-    }, ms);
   }
 
   // ---- gaze ---------------------------------------------------------------
@@ -127,7 +121,8 @@
       col = nx < -0.38 ? 0 : nx > 0.38 ? 2 : 1;
       row = ny < -0.38 ? 0 : ny > 0.38 ? 2 : 1;
     }
-    position(look, row * 3 + col);
+    lookIndex = row * 3 + col;
+    position(look, lookIndex);
 
     // The nine frames are steps; this is the continuous part. It grows with
     // distance so a cursor resting near her face barely moves her.
@@ -150,28 +145,7 @@
     if (pointer && visible) lookAt(pointer.x, pointer.y);
   }
 
-  // ---- idle, doze, wake -----------------------------------------------------
-
-  function scheduleIdle() {
-    clearTimeout(idleTimer);
-    clearTimeout(dozeTimer);
-    if (reducedMotion) return;
-    idleTimer = setTimeout(function () {
-      if (Math.random() < 0.6) autoReaction(THINKING, 1700);
-      else autoReaction(WINK, 700);
-    }, IDLE_AFTER_MS);
-    dozeTimer = setTimeout(function () {
-      if (visible) showReaction(SLEEPY, 0);
-    }, DOZE_AFTER_MS);
-  }
-
-  function wake() {
-    if (isReacting() && current === SLEEPY) {
-      showReaction(GASP, 800);
-      body('is-perking', 600);
-    }
-    scheduleIdle();
-  }
+  // ---- blinking -------------------------------------------------------------
 
   function scheduleBlink() {
     clearTimeout(blinkTimer);
@@ -248,7 +222,7 @@
   }
 
   function gust() {
-    if (!breeze || breeze.running || !visible || current === SLEEPY) return;
+    if (!breeze || breeze.running || !visible) return;
     var rect = el.getBoundingClientRect();
     breeze.image.setAttribute('width', rect.width);
     breeze.image.setAttribute('height', rect.height);
@@ -297,7 +271,6 @@
       return t - c < 2500;
     });
     clicks.push(t);
-    scheduleIdle();
 
     if (clicks.length >= 4) {
       clicks = [];
@@ -311,8 +284,6 @@
     } while (pick === lastPoke);
     lastPoke = pick;
     showReaction(pick, 1400);
-    if (pick === GIGGLE) body('is-wiggling', 1000);
-    else body('is-bouncing', 720);
   }
 
   var lastGreet = 0;
@@ -321,7 +292,6 @@
     if (now() - lastGreet < 15000 || isReacting()) return;
     lastGreet = now();
     showReaction(GRIN, 1100);
-    body('is-perking', 600);
   });
 
   // Tickle: the pointer reversing direction quickly several times over her.
@@ -341,7 +311,6 @@
     if (reversals.length >= 5) {
       reversals = [];
       showReaction(GIGGLE, 1300);
-      body('is-wiggling', 1000);
     }
   });
 
@@ -355,18 +324,25 @@
     autoReaction(STARRY, 900);
   });
 
+  function queueLook() {
+    if (!frameQueued) {
+      frameQueued = true;
+      requestAnimationFrame(onFrame);
+    }
+  }
+
   window.addEventListener(
     'pointermove',
     function (e) {
       pointer = { x: e.clientX, y: e.clientY };
-      wake();
-      if (!frameQueued) {
-        frameQueued = true;
-        requestAnimationFrame(onFrame);
-      }
+      queueLook();
     },
     { passive: true }
   );
+
+  // Scrolling moves her under a cursor that is standing still, so she has to
+  // re-aim then too, or she keeps staring where the cursor used to be.
+  window.addEventListener('scroll', queueLook, { passive: true });
 
   el.addEventListener('click', poke);
   el.addEventListener('keydown', function (e) {
@@ -382,14 +358,11 @@
 
   function start() {
     scheduleBlink();
-    scheduleIdle();
     scheduleBreeze();
   }
 
   function stop() {
     clearTimeout(blinkTimer);
-    clearTimeout(idleTimer);
-    clearTimeout(dozeTimer);
     clearTimeout(breezeTimer);
   }
 

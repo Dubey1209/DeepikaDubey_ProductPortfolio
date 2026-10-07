@@ -61,7 +61,7 @@ All scripts are `defer`red. Third-party libraries come from the jsDelivr CDN.
 | `theme-toggle.js` | Toggles `.dark-theme` on `<body>`, persisted to `localStorage`. An inline script at the top of `<body>` applies the saved theme early to avoid a flash. |
 | `motion.js` | GSAP + ScrollTrigger + Lenis scroll animations. |
 | `contact-form.js` | Contact form via EmailJS. The SDK is lazy-loaded on first focus of the form rather than on page load. |
-| `mascot.js` | `index.html` only. The cartoon in the About card: looks towards the cursor, reacts when clicked, blinks, dozes after 20s idle. See [About mascot](#about-mascot). |
+| `mascot.js` | `index.html` only. The cartoon in the About card: looks towards the cursor, reacts when clicked, blinks. See [About mascot](#about-mascot). |
 | `story-book.js` | Flip-book behaviour on `my-story.html`, using page-flip. |
 
 The visual and computed-style harnesses hide the mascot's drawings (they are in
@@ -129,18 +129,25 @@ It is two 3×3 sprite sheets in `mascots/`:
   / level / down, columns left / centre / right). The frame follows the
   pointer, aimed at the face.
 - `deepika-reactions.webp` — blink, wink, grin, gasp, giggle, shy, starry,
-  thinking, sleepy. Each is tied to something the visitor does (grin when the
-  pointer arrives, shy when it rests on her face, giggle when it scrubs over
-  her, a random one per click, thinking after four quick clicks, sometimes
-  starry when a link is hovered) or to idling (blinks, thinking or a wink
-  after 7s, sleepy after 20s, a startled gasp on waking). The table at the top
-  of `mascot.js` is the full list.
+  thinking, sleepy (unused). Each is tied to something the visitor does (grin
+  when the pointer arrives, shy when it rests on her face, giggle when it
+  scrubs over her, a random one per click, thinking after four quick clicks,
+  sometimes starry when a link is hovered). The table at the top of
+  `mascot.js` is the full list.
 
-Frames cross-fade rather than cut. She also breathes, bobs on a poke (a small
-squash-and-stretch dip, lift and settle, not a jump), wiggles when tickled, and every 8–17s a
-breeze moves her side hair: an SVG filter displaces the picture by drifting
-noise, masked so the face and body stay still. All of the self-started motion
-is off under `prefers-reduced-motion`.
+Every reaction frame faces straight out. So the reactions she starts herself
+(blinks, starry) only happen while she is already looking straight out, and
+there are no idle reactions: an earlier version went to "thinking" after 7s
+and "sleepy" after 20s, and both look down, so a visitor who left the cursor
+somewhere saw her stop looking at it. Left alone, she keeps looking wherever
+the cursor was left, and re-aims when the page scrolls under it.
+
+Frames cross-fade rather than cut. Reactions change only the face: an earlier
+squash-and-stretch bounce on each click read as the whole character shrinking
+and growing, and was removed. She breathes (a 0.6% lift of the shoulders), and
+every 8–17s a breeze moves her side hair: an SVG filter displaces the picture
+by drifting noise, masked so the face and body stay still. All of the
+self-started motion is off under `prefers-reduced-motion`.
 
 There is no card: the sheets have a transparent background and the avatar sits
 straight on the page. The nine frames are steps, so `mascot.js` also sets
@@ -164,6 +171,22 @@ any figure's width differs from the rest by more than 6% — that would be the
 character visibly growing or shrinking as frames switch. Aligning by the
 sweater's bottom edge instead looked natural but made the head pop ~19px up on
 every blink, because the model draws more sweater in some rows than others.
+
+Width alone does not catch a size jump, because it is mostly hair. The script
+also measures face width from skin pixels, and scales each sheet so its
+front-facing faces match the centre direction frame: the reactions sheet was
+drawn ~3% smaller, so every reaction shrank her head and the end of it grew it
+back.
+
+Two cut-out details that each showed on the dark theme:
+
+- The background is removed at a tolerance of 12. The background's JPEG noise
+  peaks at 9, but the cream sweater stripes sit at 20–35 and run out to the
+  sleeves with no outline, so at the original 30 the fill ran along them and
+  tore the sweater into strips.
+- The thin highlight the model draws along the outside of the hair is painted
+  hair colour down to a luminance of 45. Cuts at white and at mid-grey each
+  left a dotted grey trace that the sharpening step then brightened.
 
 The model will not draw a head turned to the left, so the left column is the
 right column mirrored. The script also removes the cream background (edge flood
