@@ -163,18 +163,128 @@ class PortfolioLock {
       setTimeout(() => { if (Date.now() >= flashUntil) show(held); }, ms);
     };
 
-    // Speech bubble by the window.
+    // Speech bubble by the window: the same inked cloud the site's mascot
+    // talks in, with two small puffs trailing toward her.
     const bubble = porch.querySelector('.lock-say');
+    const NS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('class', 'lock-say-art');
+    const parts = [];
+    for (let i = 0; i < 3; i++) {
+      const shade = document.createElementNS(NS, i ? 'circle' : 'path');
+      const line = document.createElementNS(NS, i ? 'circle' : 'path');
+      shade.setAttribute('class', 'atelier-mascot-cloud-shade');
+      line.setAttribute('class', 'atelier-mascot-cloud-line');
+      svg.append(shade, line);
+      parts.push([shade, line]);
+    }
+    const words = document.createElement('span');
+    words.className = 'lock-say-text';
+    bubble?.append(svg, words);
+
+    const cloudPath = (w, h) => {
+      const a = w / 2, b = h / 2, n = 3.2, steps = 200;
+      const pts = [], lens = [0];
+      for (let i = 0; i <= steps; i++) {
+        const t = (i / steps) * Math.PI * 2 + 2.2;
+        const c = Math.cos(t), s = Math.sin(t);
+        pts.push([a + a * Math.sign(c) * Math.abs(c) ** (2 / n), b + b * Math.sign(s) * Math.abs(s) ** (2 / n)]);
+        if (i) lens.push(lens[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
+      }
+      const count = Math.max(7, Math.round(lens[steps] / 34));
+      const step = lens[steps] / count;
+      const marks = [];
+      for (let k = 0, j = 0; k < count; k++) {
+        const at = k * step;
+        while (j < steps && lens[j + 1] < at) j++;
+        const f = (at - lens[j]) / (lens[j + 1] - lens[j] || 1);
+        marks.push([pts[j][0] + (pts[j + 1][0] - pts[j][0]) * f, pts[j][1] + (pts[j + 1][1] - pts[j][1]) * f]);
+      }
+      let d = `M${marks[0][0].toFixed(1)} ${marks[0][1].toFixed(1)}`;
+      for (let m = 1; m <= count; m++) {
+        const p = marks[m % count], q = marks[m - 1];
+        const r = Math.hypot(p[0] - q[0], p[1] - q[1]) * (0.56 + (m % 3) * 0.04);
+        d += `A${r.toFixed(1)} ${r.toFixed(1)} 0 0 1 ${p[0].toFixed(1)} ${p[1].toFixed(1)}`;
+      }
+      return `${d}Z`;
+    };
+    const drawCloud = () => {
+      const w = bubble.offsetWidth, h = bubble.offsetHeight;
+      const centred = getComputedStyle(bubble).getPropertyValue('--tail').trim() === 'centre';
+      const x = centred ? w * 0.5 : w * 0.8;
+      const spots = [[x, h + 13, 5.5], [x + (centred ? 0 : 10), h + 26, 3.4]];
+      parts[0].forEach((p) => p.setAttribute('d', cloudPath(w, h)));
+      parts.slice(1).forEach((pair, i) => pair.forEach((c) => {
+        c.setAttribute('cx', spots[i][0].toFixed(1));
+        c.setAttribute('cy', spots[i][1].toFixed(1));
+        c.setAttribute('r', String(spots[i][2]));
+      }));
+    };
+
     let sayTimer = 0;
     const say = (text, ms = 3200) => {
       if (!bubble) return;
       clearTimeout(sayTimer);
-      bubble.textContent = text;
+      words.textContent = text;
       bubble.classList.remove('is-in');
+      drawCloud();
       void bubble.offsetWidth;
       bubble.classList.add('is-in');
       sayTimer = setTimeout(() => bubble.classList.remove('is-in'), ms);
     };
+
+    // Stars, each on its own twinkle; the dark theme shows them.
+    const sky = porch.querySelector('.lock-sky');
+    for (let i = 0; i < 34; i++) {
+      const s = document.createElement('b');
+      const big = i < 5;
+      s.className = big ? 'lock-star is-big' : 'lock-star';
+      s.style.cssText = `left:${(Math.random() * 96 + 2).toFixed(1)}%;top:${(Math.random() * 88 + 4).toFixed(1)}%;` +
+        `--s:${big ? 1 : (0.5 + Math.random() * 0.8).toFixed(2)};--d:${(1.6 + Math.random() * 3).toFixed(2)}s;--w:-${(Math.random() * 4).toFixed(2)}s`;
+      sky?.appendChild(s);
+    }
+
+    // Tap the moon for morning, the sun for night: the old one sinks behind
+    // the house, the new theme washes out from where you tapped and the
+    // other one rises.
+    const setDark = (dark) => {
+      document.body.classList.toggle('dark-theme', dark);
+      const icon = document.getElementById('theme-toggle-icon');
+      if (icon) icon.textContent = dark ? '🌙' : '☀️';
+      try { localStorage.setItem('theme', dark ? 'dark' : 'light'); } catch { /* private mode */ }
+    };
+    let flipping = false;
+    porch.querySelectorAll('.lock-sun, .lock-moon').forEach((orb) => {
+      orb.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (flipping) return;
+        flipping = true;
+        const dark = !document.body.classList.contains('dark-theme');
+        const root = document.documentElement;
+        root.style.setProperty('--vt-x', `${e.clientX}px`);
+        root.style.setProperty('--vt-y', `${e.clientY}px`);
+        porch.classList.add('is-setting');
+        flash(dark ? 0 : 2, 1600);
+        setTimeout(() => {
+          const go = () => {
+            setDark(dark);
+            porch.classList.remove('is-setting');
+            porch.classList.add('is-rising');
+          };
+          if (document.startViewTransition && !reduce) {
+            root.classList.add('is-sky-flip');
+            document.startViewTransition(go).finished.finally(() => root.classList.remove('is-sky-flip'));
+          } else {
+            go();
+          }
+          say(dark ? 'Lights out! Cosy night mode, on.' : 'Good morning, sunshine!', 2400);
+          setTimeout(() => {
+            porch.classList.remove('is-rising');
+            flipping = false;
+          }, 1100);
+        }, reduce ? 0 : 420);
+      });
+    });
 
     // A knock opens the door a crack; she peeks out, teases and shuts it
     // again, because the only thing that opens it is a name.

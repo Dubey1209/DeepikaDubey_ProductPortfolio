@@ -1454,12 +1454,12 @@ html.atelier .atelier-mascot.is-m-stretch :is(.atelier-mascot-layer, .atelier-ma
    scaling the picture continuously kept it permanently resampled and soft. */
 html.atelier .atelier-mascot-look,
 html.atelier .atelier-mascot-layer.is-look {
-  background-image: url('mascots/deepika-directions.webp?v=20261112');
+  background-image: url('mascots/deepika-directions.webp?v=20261113');
 }
 
 html.atelier .atelier-mascot-react,
 html.atelier .atelier-mascot-layer.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261112');
+  background-image: url('mascots/deepika-reactions.webp?v=20261113');
 }
 
 html.atelier .atelier-mascot-react {
@@ -1474,8 +1474,8 @@ html.atelier .atelier-mascot-react {
    underneath; an oval reached the jaw and showed a second chin. */
 html.atelier .atelier-mascot-face {
   opacity: 0;
-  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261112');
-  mask-image: url('mascots/deepika-face-mask.png?v=20261112');
+  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261113');
+  mask-image: url('mascots/deepika-face-mask.png?v=20261113');
   -webkit-mask-size: 300% 300%;
   mask-size: 300% 300%;
   -webkit-mask-repeat: no-repeat;
@@ -3937,12 +3937,12 @@ html.atelier .lock-face {
   top: 6%;
   width: 128%;
   aspect-ratio: 680 / 800;
-  background: url('mascots/deepika-directions.webp?v=20261112') no-repeat 50% 50% / 300% 300%;
+  background: url('mascots/deepika-directions.webp?v=20261113') no-repeat 50% 50% / 300% 300%;
   transition: translate 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 html.atelier .lock-face.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261112');
+  background-image: url('mascots/deepika-reactions.webp?v=20261113');
   opacity: 0;
   transition: opacity 0.14s ease;
 }
@@ -4294,32 +4294,118 @@ html.atelier body.dark-theme .lock-bird {
   display: none !important;
 }
 
-html.atelier body.dark-theme .lock-sky {
-  background:
-    radial-gradient(circle at 12% 34%, #f3eee4 0 1px, transparent 1.6px),
-    radial-gradient(circle at 26% 74%, #f0c36a 0 1.2px, transparent 2px),
-    radial-gradient(circle at 44% 16%, #f3eee4 0 0.9px, transparent 1.5px),
-    radial-gradient(circle at 66% 62%, #f3eee4 0 1px, transparent 1.6px),
-    radial-gradient(circle at 84% 22%, #f0c36a 0 1.3px, transparent 2px),
-    radial-gradient(circle at 90% 70%, #f3eee4 0 0.9px, transparent 1.5px);
-  animation: lockTwinkle 3.2s ease-in-out infinite alternate;
+html.atelier .lock-star {
+  position: absolute;
+  display: none;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: #fff8e6;
+  box-shadow: 0 0 4px 1px rgba(255, 240, 200, 0.55);
+  scale: var(--s, 1);
+  animation: lockTwinkle var(--d, 3s) ease-in-out var(--w, 0s) infinite;
+}
+
+html.atelier body.dark-theme .lock-star {
+  display: block;
+}
+
+/* A few bright ones get a four-point glint. */
+html.atelier .lock-star.is-big {
+  width: 3px;
+  height: 3px;
+  background: #ffe9b0;
+}
+
+html.atelier .lock-star.is-big::before,
+html.atelier .lock-star.is-big::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 11px;
+  height: 1px;
+  translate: -50% -50%;
+  background: linear-gradient(90deg, transparent, #ffe9b0, transparent);
+}
+
+html.atelier .lock-star.is-big::after {
+  rotate: 90deg;
 }
 
 @keyframes lockTwinkle {
-  from { opacity: 0.55; }
-  to { opacity: 1; }
+  0%, 100% { opacity: 0.25; scale: calc(var(--s, 1) * 0.7); }
+  50% { opacity: 1; scale: calc(var(--s, 1) * 1.15); }
 }
 
+/* The moon: a cratered disc, its dark side cut by a soft shadow. */
 html.atelier body.dark-theme .lock-moon {
   display: block !important;
-  top: 1.2rem;
+  top: 1.1rem;
   right: 4.4rem;
-  width: 2.3rem;
+  width: 2.5rem;
   aspect-ratio: 1;
+  overflow: hidden;
   border-radius: 50%;
-  box-shadow: inset 0.62rem 0 0 0 #f3e3b4;
-  filter: drop-shadow(0 0 0.7rem rgba(243, 227, 180, 0.45));
-  rotate: 14deg;
+  background:
+    radial-gradient(circle at 62% 30%, rgba(160, 140, 100, 0.45) 0 9%, transparent 11%),
+    radial-gradient(circle at 74% 62%, rgba(160, 140, 100, 0.4) 0 7%, transparent 9%),
+    radial-gradient(circle at 52% 74%, rgba(160, 140, 100, 0.3) 0 5%, transparent 7%),
+    radial-gradient(circle at 84% 42%, rgba(160, 140, 100, 0.3) 0 4%, transparent 6%),
+    radial-gradient(circle at 40% 35%, #fffaf0, #efe2bf 55%, #d9c79a);
+  box-shadow: 0 0 1.2rem 0.3rem rgba(243, 227, 180, 0.28), 0 0 3rem 1rem rgba(243, 227, 180, 0.12);
+  rotate: -20deg;
+}
+
+html.atelier body.dark-theme .lock-moon::after {
+  content: '';
+  position: absolute;
+  inset: -6%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 18% 50%, color-mix(in srgb, var(--paper) 96%, transparent) 0 46%, color-mix(in srgb, var(--paper) 55%, transparent) 54%, transparent 62%);
+}
+
+html.atelier .lock-sun,
+html.atelier body.dark-theme .lock-moon {
+  pointer-events: auto;
+  cursor: pointer;
+  transition: translate 0.45s cubic-bezier(0.55, 0, 0.8, 0.3), opacity 0.4s ease, scale 0.3s;
+}
+
+html.atelier .lock-sun:hover,
+html.atelier body.dark-theme .lock-moon:hover {
+  scale: 1.1;
+}
+
+html.atelier .lock-porch.is-setting .lock-sun,
+html.atelier body.dark-theme .lock-porch.is-setting .lock-moon {
+  translate: 0 5.5rem;
+  opacity: 0;
+}
+
+html.atelier .lock-porch.is-rising .lock-sun,
+html.atelier body.dark-theme .lock-porch.is-rising .lock-moon {
+  animation: lockRiseOrb 0.9s cubic-bezier(0.2, 0.9, 0.3, 1.1) both;
+}
+
+@keyframes lockRiseOrb {
+  from { translate: 0 5.5rem; opacity: 0; }
+  to { translate: 0 0; opacity: 1; }
+}
+
+html.is-sky-flip::view-transition-old(root),
+html.is-sky-flip::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+html.is-sky-flip::view-transition-new(root) {
+  animation: lockSkyWash 0.85s cubic-bezier(0.7, 0, 0.25, 1) both;
+}
+
+@keyframes lockSkyWash {
+  from { clip-path: circle(0 at var(--vt-x, 50%) var(--vt-y, 30%)); }
+  to { clip-path: circle(150vmax at var(--vt-x, 50%) var(--vt-y, 30%)); }
 }
 
 html.atelier body.dark-theme .lock-shoot {
@@ -4486,13 +4572,10 @@ html.atelier .lock-say {
   z-index: 3;
   bottom: calc(100% - 1.4rem);
   right: 62%;
+  bottom: calc(100% - 0.6rem);
   width: max-content;
-  max-width: 13rem;
-  padding: 0.6rem 0.85rem 0.65rem;
-  border: 1.5px solid var(--ink);
-  border-radius: 1rem 1rem 0.25rem 1rem;
-  background: var(--card);
-  box-shadow: 2.5px 3.5px 0 var(--ink);
+  max-width: 13.5rem;
+  padding: 0.85rem 1.35rem 0.9rem;
   font-family: var(--sans);
   font-size: 0.84rem;
   font-weight: 500;
@@ -4513,8 +4596,25 @@ html.atelier .lock-say.is-in {
   translate: 0 0;
 }
 
-html.atelier .lock-say:empty {
-  display: none;
+html.atelier .lock-say-art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+html.atelier .lock-say-text {
+  position: relative;
+  display: block;
+}
+
+html.atelier .lock-say.is-in .lock-say-text {
+  animation: lockBob 3.4s ease-in-out 0.6s infinite;
+}
+
+@keyframes lockBob {
+  50% { translate: 0 -2px; }
 }
 
 @keyframes lockDoorKnock {
@@ -4556,9 +4656,10 @@ html.atelier .portfolio-lock.is-opening .lock-frame::after {
     right: auto;
     left: 50%;
     bottom: calc(100% - 0.6rem);
+    --tail: centre;
+    bottom: calc(100% + 0.6rem);
     max-width: min(15rem, 80vw);
     translate: -50% 10px;
-    border-radius: 1rem;
     transform-origin: 50% 100%;
   }
 
@@ -6215,14 +6316,14 @@ html.atelier .sb-cameo-art {
   top: 11%;
   width: 120%;
   aspect-ratio: 680 / 800;
-  background-image: url('mascots/deepika-directions.webp?v=20261112');
+  background-image: url('mascots/deepika-directions.webp?v=20261113');
   background-repeat: no-repeat;
   background-size: 300% 300%;
   background-position: 50% 50%;
 }
 
 html.atelier .sb-cameo-art.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261112');
+  background-image: url('mascots/deepika-reactions.webp?v=20261113');
 }
 
 html.atelier .sb-cameo-art.is-face {
