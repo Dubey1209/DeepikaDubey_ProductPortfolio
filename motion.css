@@ -119,6 +119,10 @@ html.has-fx-cursor.fx-text .fx-cursor-ball {
   vertical-align: bottom;
 }
 
+.fx-word {
+  white-space: nowrap;
+}
+
 .fx-ch > span {
   display: inline-block;
   transform-origin: 50% 100%;

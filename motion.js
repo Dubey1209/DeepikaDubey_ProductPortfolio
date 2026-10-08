@@ -37,17 +37,24 @@
         return;
       }
       if (child.nodeType !== 3) return;
-      child.textContent.split('').forEach(function (ch) {
-        if (ch === ' ') {
+      // Letters sit inside a word wrapper so a line never breaks mid-word.
+      child.textContent.split(/(\s+)/).forEach(function (word) {
+        if (!word) return;
+        if (/^\s+$/.test(word)) {
           node.insertBefore(document.createTextNode(' '), child);
           return;
         }
-        var outer = document.createElement('span');
-        var inner = document.createElement('span');
-        outer.className = 'fx-ch';
-        inner.textContent = ch;
-        outer.appendChild(inner);
-        node.insertBefore(outer, child);
+        var w = document.createElement('span');
+        w.className = 'fx-word';
+        word.split('').forEach(function (ch) {
+          var outer = document.createElement('span');
+          var inner = document.createElement('span');
+          outer.className = 'fx-ch';
+          inner.textContent = ch;
+          outer.appendChild(inner);
+          w.appendChild(outer);
+        });
+        node.insertBefore(w, child);
       });
       node.removeChild(child);
     });

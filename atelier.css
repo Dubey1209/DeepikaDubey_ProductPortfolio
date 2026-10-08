@@ -1454,12 +1454,12 @@ html.atelier .atelier-mascot.is-m-stretch :is(.atelier-mascot-layer, .atelier-ma
    scaling the picture continuously kept it permanently resampled and soft. */
 html.atelier .atelier-mascot-look,
 html.atelier .atelier-mascot-layer.is-look {
-  background-image: url('mascots/deepika-directions.webp?v=20261105');
+  background-image: url('mascots/deepika-directions.webp?v=20261106');
 }
 
 html.atelier .atelier-mascot-react,
 html.atelier .atelier-mascot-layer.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261105');
+  background-image: url('mascots/deepika-reactions.webp?v=20261106');
 }
 
 html.atelier .atelier-mascot-react {
@@ -1474,8 +1474,8 @@ html.atelier .atelier-mascot-react {
    underneath; an oval reached the jaw and showed a second chin. */
 html.atelier .atelier-mascot-face {
   opacity: 0;
-  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261105');
-  mask-image: url('mascots/deepika-face-mask.png?v=20261105');
+  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261106');
+  mask-image: url('mascots/deepika-face-mask.png?v=20261106');
   -webkit-mask-size: 300% 300%;
   mask-size: 300% 300%;
   -webkit-mask-repeat: no-repeat;
@@ -3837,7 +3837,18 @@ html.atelier .portfolio-lock {
   background: var(--paper) !important;
   background-image: none !important;
   color: var(--ink);
-  padding: max(1.5rem, env(safe-area-inset-top)) 1.5rem max(1.5rem, env(safe-area-inset-bottom));
+  padding: max(4.2rem, env(safe-area-inset-top)) 1.5rem max(1.5rem, env(safe-area-inset-bottom));
+  align-items: flex-start !important;
+  overflow-y: auto !important;
+}
+
+html.atelier .portfolio-lock .atelier-gate {
+  margin: auto;
+}
+
+html.atelier .lock-title .fx-ch {
+  padding: 0 0.04em 0.16em;
+  margin: 0 -0.04em -0.16em;
 }
 
 html.atelier .lock-mast {
@@ -3883,12 +3894,70 @@ html.atelier .lock-title {
   font-weight: 600 !important;
   line-height: 0.94 !important;
   letter-spacing: -0.04em;
-  margin: 0 0 0.85rem !important;
+  margin: 0 0 1.15rem !important;
   max-width: 10ch;
   color: var(--ink) !important;
   -webkit-text-fill-color: var(--ink) !important;
   background: none !important;
   background-image: none !important;
+}
+
+html.atelier .lock-title .lock-ink {
+  position: relative;
+  display: inline-block;
+  font-style: italic;
+  color: var(--spin) !important;
+  -webkit-text-fill-color: var(--spin) !important;
+  white-space: nowrap;
+}
+
+html.atelier .lock-ink-line {
+  position: absolute;
+  left: 0;
+  right: 0.15em;
+  bottom: -0.16em;
+  width: calc(100% - 0.15em);
+  height: 0.22em;
+  overflow: visible;
+  pointer-events: none;
+}
+
+html.atelier .lock-ink-line path {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 3;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: 140;
+  stroke-dashoffset: 140;
+  animation: lockInk 0.9s cubic-bezier(0.65, 0, 0.35, 1) 0.75s forwards;
+}
+
+@keyframes lockInk {
+  to { stroke-dashoffset: 0; }
+}
+
+html.atelier .portfolio-lock .btn-arrow {
+  display: inline-block;
+  width: 0;
+  overflow: hidden;
+  opacity: 0;
+  vertical-align: bottom;
+  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s, translate 0.3s;
+}
+
+html.atelier .portfolio-lock .unlock-form.has-name .btn-arrow {
+  width: 1.4em;
+  opacity: 1;
+}
+
+html.atelier .portfolio-lock .unlock-form.has-name .unlock-btn:hover .btn-arrow {
+  translate: 0.2em 0;
+}
+
+html.atelier .portfolio-lock .unlock-form.has-name .unlock-btn:not(:hover) {
+  background: var(--ink) !important;
+  color: var(--paper) !important;
 }
 
 html.atelier .lock-subtitle {
@@ -4038,8 +4107,10 @@ html.atelier .lock-notification--error {
   html.atelier .atelier-gate,
   html.atelier .atelier-gate.is-opening,
   html.atelier .portfolio-lock.is-opening,
-  html.atelier #site-shell.is-revealing {
+  html.atelier #site-shell.is-revealing,
+  html.atelier .lock-ink-line path {
     animation: none !important;
+    stroke-dashoffset: 0;
   }
 }
 
@@ -5171,14 +5242,14 @@ html.atelier .sb-cameo-art {
   top: 11%;
   width: 120%;
   aspect-ratio: 680 / 800;
-  background-image: url('mascots/deepika-directions.webp?v=20261105');
+  background-image: url('mascots/deepika-directions.webp?v=20261106');
   background-repeat: no-repeat;
   background-size: 300% 300%;
   background-position: 50% 50%;
 }
 
 html.atelier .sb-cameo-art.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261105');
+  background-image: url('mascots/deepika-reactions.webp?v=20261106');
 }
 
 html.atelier .sb-cameo-art.is-face {
