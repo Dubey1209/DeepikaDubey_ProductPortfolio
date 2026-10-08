@@ -26,15 +26,15 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Outfit:wght@400;500;600;700&display=swap">
-  <link rel="preload" as="image" href="mascots/deepika-directions.webp?v=20261109" fetchpriority="high">
+  <link rel="preload" as="image" href="mascots/deepika-directions.webp?v=20261110" fetchpriority="high">
   <!-- One shared version token for every local asset. Bump it in both HTML
        files whenever any CSS or JS changes. Per-asset tokens drifted out of
        sync previously, which can serve new CSS against old JavaScript. -->
-  <link rel="stylesheet" href="base.css?v=20261109">
-  <link rel="stylesheet" href="atelier.css?v=20261109">
-  <link rel="stylesheet" href="motion.css?v=20261109">
+  <link rel="stylesheet" href="base.css?v=20261110">
+  <link rel="stylesheet" href="atelier.css?v=20261110">
+  <link rel="stylesheet" href="motion.css?v=20261110">
   <noscript><style>.fx-ch>span{transform:none!important}.home-kicker,.home-subtitle,.home-desc,.home-btns,.home-rotate,.hero-rule{opacity:1!important}.home-photo{filter:none!important;transform:rotate(-3.5deg)!important}</style></noscript>
-  <script src="portfolio-lock.js?v=20261109" defer></script>
+  <script src="portfolio-lock.js?v=20261110" defer></script>
 </head>
 <body>
     <script>
@@ -55,7 +55,8 @@
       </div>
       <div class="lock-scene">
       <div class="lock-porch" aria-hidden="true">
-        <span class="lock-lamp"></span>
+        <span class="lock-stars"></span>
+        <span class="lock-lamp"><i></i></span>
         <span class="lock-knock">knock knock</span>
         <div class="lock-frame">
           <div class="lock-door">
@@ -64,27 +65,37 @@
               <i class="lock-face is-react"></i>
             </span>
             <span class="lock-plate"><span class="lock-plate-name" id="lock-plate-name">guest</span></span>
+            <span class="lock-slot"></span>
             <span class="lock-knob"></span>
           </div>
         </div>
+        <span class="lock-plant"><i></i><i></i><i></i><i></i></span>
+        <span class="lock-steps"></span>
         <span class="lock-mat">hello</span>
       </div>
       <div class="atelier-gate" id="lock-card">
         <div class="lock-content">
-          <p class="atelier-label">Hello, stranger</p>
+          <p class="lock-stop"><span>Stop 01</span>The front door</p>
           <h1 class="lock-title" id="lock-title">Who’s at the <em class="lock-ink">door?<svg class="lock-ink-line" viewBox="0 0 120 14" preserveAspectRatio="none" aria-hidden="true"><path d="M3 9c18-5 40-7 62-4 16 2 34 3 52-3"/></svg></em></h1>
-          <p class="lock-subtitle" id="lock-subtitle">Tell me your name and I’ll walk you through the work, the side projects and the story behind them.</p>
+          <p class="lock-subtitle" id="lock-subtitle">Less of a scroll, more of a little walk through what I’ve built and how I think. Tell me your name and I’ll show you around.</p>
           <form id="unlock-form" class="unlock-form">
-            <div class="form-group lock-input-group">
-              <label for="visitor-name" class="lock-input-label">Your name</label>
-              <input type="text" id="visitor-name" name="name" placeholder="First name works" required autocomplete="given-name">
-            </div>
+            <label class="lock-tag" for="visitor-name">
+              <span class="lock-tag-head"><b>Hello</b>my name is</span>
+              <input type="text" id="visitor-name" name="name" placeholder="your first name" required autocomplete="given-name" maxlength="40">
+            </label>
             <button type="submit" class="unlock-btn">
               <span class="btn-text">Come in<span class="btn-arrow" aria-hidden="true">→</span></span>
               <span class="btn-loader" style="display: none;">Opening the door…</span>
             </button>
           </form>
-          <p class="lock-note">A first name is plenty. I just like knowing who stopped by.</p>
+          <div class="lock-route">
+            <span class="lock-route-label">Next stops</span>
+            <ol>
+              <li>Case studies</li>
+              <li>Builds</li>
+              <li>My story</li>
+            </ol>
+          </div>
         </div>
       </div>
       </div>
@@ -1298,10 +1309,10 @@
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.20/dist/lenis.min.js" defer></script>
-  <script src="contact-form.js?v=20261109" defer></script>
-  <script src="theme-toggle.js?v=20261109" defer></script>
-  <script src="script.js?v=20261109" defer></script>
-  <script src="motion.js?v=20261109" defer></script>
-  <script src="mascot.js?v=20261109" defer></script>
+  <script src="contact-form.js?v=20261110" defer></script>
+  <script src="theme-toggle.js?v=20261110" defer></script>
+  <script src="script.js?v=20261110" defer></script>
+  <script src="motion.js?v=20261110" defer></script>
+  <script src="mascot.js?v=20261110" defer></script>
 </body>
 </html>

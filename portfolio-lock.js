@@ -42,7 +42,7 @@ class PortfolioLock {
       const first = input.value.trim().split(/\s+/)[0].slice(0, 18);
       form.classList.toggle('has-name', !!first);
       document.getElementById('portfolio-lock')?.style.setProperty('--glow', Math.min(first.length / 6, 1).toFixed(2));
-      if (sub) sub.textContent = first ? `Hi, ${first}! So glad you’re here.` : idle;
+      if (sub) sub.textContent = first ? `Hi, ${first}! Lovely to meet you. Shall we?` : idle;
       if (plate) {
         plate.textContent = first || 'guest';
         plate.classList.toggle('is-empty', !first);
@@ -52,6 +52,7 @@ class PortfolioLock {
           plate.parentElement.classList.add('is-stamp');
         }
       }
+      porch.walk(first.length);
       if (!!first !== had) porch.hold(first ? 2 : null);
       had = !!first;
     });
@@ -67,7 +68,7 @@ class PortfolioLock {
   // an empty knock and winks as the door opens. Cells are 3x3; row 0 looks
   // up, column 0 to the left.
   bindPorch(input) {
-    const quiet = { hold() {}, flash() {} };
+    const quiet = { hold() {}, flash() {}, walk() {} };
     const porch = document.querySelector('.lock-porch');
     const win = porch?.querySelector('.lock-window');
     const look = win?.querySelector('.is-look');
@@ -130,16 +131,42 @@ class PortfolioLock {
       setTimeout(knock, 12000);
     }
 
+    // Footprints walk up to the mat, one per letter typed.
+    const stepsBox = porch.querySelector('.lock-steps');
+    const steps = [];
+    for (let i = 0; i < 8; i++) {
+      const s = document.createElement('i');
+      s.style.setProperty('--i', i);
+      stepsBox?.appendChild(s);
+      steps.push(s);
+    }
+    const walk = (n) => steps.forEach((s, i) => s.classList.toggle('is-on', i < n));
+
+    const flash = (n, ms) => {
+      flashUntil = Date.now() + ms;
+      show(n);
+      setTimeout(() => { if (Date.now() >= flashUntil) show(held); }, ms);
+    };
+
+    porch.addEventListener('pointerenter', () => {
+      if (Date.now() > flashUntil) flash(4, 900);
+    });
+    porch.addEventListener('click', () => {
+      input?.focus();
+      porch.classList.remove('is-knocking');
+      void porch.offsetWidth;
+      porch.classList.add('is-knocking');
+      flash(5, 800);
+    });
+
     return {
+      walk,
       hold(n) {
         held = n;
+        porch.classList.toggle('is-lit', n != null);
         if (Date.now() > flashUntil) show(n);
       },
-      flash(n, ms) {
-        flashUntil = Date.now() + ms;
-        show(n);
-        setTimeout(() => { if (Date.now() >= flashUntil) show(held); }, ms);
-      }
+      flash
     };
   }
 
@@ -160,6 +187,7 @@ class PortfolioLock {
     if (!btn || !btnText || !btnLoader) return;
 
     this.porch?.flash(1, 3000);
+    this.porch?.walk(8);
     btn.disabled = true;
     btnText.style.display = 'none';
     btnLoader.style.display = 'inline';
