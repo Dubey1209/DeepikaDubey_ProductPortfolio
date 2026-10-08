@@ -1454,12 +1454,12 @@ html.atelier .atelier-mascot.is-m-stretch :is(.atelier-mascot-layer, .atelier-ma
    scaling the picture continuously kept it permanently resampled and soft. */
 html.atelier .atelier-mascot-look,
 html.atelier .atelier-mascot-layer.is-look {
-  background-image: url('mascots/deepika-directions.webp?v=20261116');
+  background-image: url('mascots/deepika-directions.webp?v=20261117');
 }
 
 html.atelier .atelier-mascot-react,
 html.atelier .atelier-mascot-layer.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261116');
+  background-image: url('mascots/deepika-reactions.webp?v=20261117');
 }
 
 html.atelier .atelier-mascot-react {
@@ -1474,8 +1474,8 @@ html.atelier .atelier-mascot-react {
    underneath; an oval reached the jaw and showed a second chin. */
 html.atelier .atelier-mascot-face {
   opacity: 0;
-  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261116');
-  mask-image: url('mascots/deepika-face-mask.png?v=20261116');
+  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261117');
+  mask-image: url('mascots/deepika-face-mask.png?v=20261117');
   -webkit-mask-size: 300% 300%;
   mask-size: 300% 300%;
   -webkit-mask-repeat: no-repeat;
@@ -3937,12 +3937,12 @@ html.atelier .lock-face {
   top: 6%;
   width: 128%;
   aspect-ratio: 680 / 800;
-  background: url('mascots/deepika-directions.webp?v=20261116') no-repeat 50% 50% / 300% 300%;
+  background: url('mascots/deepika-directions.webp?v=20261117') no-repeat 50% 50% / 300% 300%;
   transition: translate 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 html.atelier .lock-face.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261116');
+  background-image: url('mascots/deepika-reactions.webp?v=20261117');
   opacity: 0;
   transition: opacity 0.14s ease;
 }
@@ -4001,38 +4001,6 @@ html.atelier .lock-knob {
   border: 1.5px solid var(--ink);
   border-radius: 50%;
   background: radial-gradient(circle at 35% 35%, #fbe3a2, var(--brass) 60%);
-}
-
-html.atelier .lock-mat {
-  position: absolute;
-  left: 50%;
-  bottom: 0;
-  translate: -50% 0;
-  width: 78%;
-  padding: 0.28rem 0;
-  border: 1.5px solid var(--ink);
-  border-radius: 0.4rem;
-  background:
-    repeating-linear-gradient(90deg, transparent 0 5px, rgba(0, 0, 0, 0.08) 5px 6px),
-    color-mix(in srgb, var(--spin) 55%, var(--paper));
-  font-family: var(--serif);
-  font-size: 0.8rem;
-  font-style: italic;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-align: center;
-  color: var(--ink);
-}
-
-/* The floor line the door stands on, lit by whatever leaks under it. */
-html.atelier .lock-porch::after {
-  content: '';
-  position: absolute;
-  left: -13rem;
-  right: -2.5rem;
-  bottom: 1.95rem;
-  height: 1.5px;
-  background: var(--ink);
 }
 
 html.atelier .lock-frame::after {
@@ -4730,16 +4698,6 @@ html.atelier .portfolio-lock.is-opening .lock-frame::after {
 
   html.atelier .lock-say.is-in {
     translate: -50% 0;
-  }
-
-  html.atelier .lock-mat {
-    font-size: 0.66rem;
-  }
-
-  html.atelier .lock-porch::after {
-    bottom: 1.6rem;
-    left: -6.5rem;
-    right: -3.5rem;
   }
 
   html.atelier .lock-steps {
@@ -6381,14 +6339,14 @@ html.atelier .sb-cameo-art {
   top: 11%;
   width: 120%;
   aspect-ratio: 680 / 800;
-  background-image: url('mascots/deepika-directions.webp?v=20261116');
+  background-image: url('mascots/deepika-directions.webp?v=20261117');
   background-repeat: no-repeat;
   background-size: 300% 300%;
   background-position: 50% 50%;
 }
 
 html.atelier .sb-cameo-art.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261116');
+  background-image: url('mascots/deepika-reactions.webp?v=20261117');
 }
 
 html.atelier .sb-cameo-art.is-face {
