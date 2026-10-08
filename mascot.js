@@ -1076,7 +1076,7 @@
     hair: {
       face: GRIN,
       lines: [
-        [GASP, 'careful! fresh champi, still settling in'],
+        [GASP, 'careful! fresh oil massage, still settling in'],
         [GASP, 'nooo, I literally just detangled these'],
         'oil night tonight, shine all week',
         [WINK, 'coconut oil is my love language'],
@@ -1114,14 +1114,14 @@
       lines: [
         'okay, now I’m angry. hmph!',
         'that’s it. I’m officially annoyed',
-        'I said tangle ho jayenge! did anyone listen? no.',
+        'I said they’ll tangle! did anyone listen? no.',
       ],
     },
     hairAngry1: {
       face: ANGRY,
       lines: [
         'do you know how long detangling takes?!',
-        'one more touch and you’re doing my champi',
+        'one more touch and you’re giving me a head massage',
         'these waves are not a stress ball!',
       ],
     },
@@ -1540,7 +1540,7 @@
 
     var line;
     if (hairStreak === 1) line = pickLine('hair', SPOTS.hair);
-    else if (hairStreak === 2) line = { face: GASP, text: 'baar baar mat chhedo, tangle ho jayenge!' };
+    else if (hairStreak === 2) line = { face: GASP, text: 'stop touching them again and again, they’ll tangle!' };
     else if (hairStreak === 3) line = pickLine('hairAgain', SPOTS.hairAgain);
     else if (hairStreak <= 6) line = pickLine('hairAngry' + (hairStreak - 4), SPOTS['hairAngry' + (hairStreak - 4)]);
     else {
