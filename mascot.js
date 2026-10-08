@@ -1458,6 +1458,30 @@
       'scope creep? not on my watch',
       'stakeholder says “quick change”. it never is',
       'my cursor senses are tingling',
+      'hmm… snack now or snack later? now.',
+      'did I drink water today? …let’s say yes',
+      'one more episode? said that three episodes ago',
+      'hmm, is it Friday yet?',
+      'my to-do list is just vibes at this point',
+      'thinking of a reply… 3 business days later',
+      'brb, overthinking a text I sent yesterday',
+      'hmm, nap or productivity? why not both?',
+      '5 minutes of scrolling. it’s been an hour.',
+      'what was I doing? …oh, right. nothing.',
+      'hmm, is it too early for dinner?',
+      'mood: cosy blanket and a good playlist',
+      'should I clean my desk? tomorrow. definitely.',
+      'hmm, did I save that file? ctrl+s, just in case',
+      'counting down to the weekend…',
+      'psst… are you also avoiding something right now?',
+      'hmm, my phone is at 12%. this is fine.',
+      'gentle reminder: you’re doing great',
+      'thinking about that one embarrassing thing from 2015',
+      'hmm, what if I just… took a little break?',
+      'my brain has 37 tabs open and music playing',
+      'psst… stretch your shoulders. yes, you.',
+      'hmm, good ideas always arrive in the shower',
+      'dreaming of a day with zero notifications',
     ],
   };
 
@@ -1625,7 +1649,8 @@
   // has time to land before the next takes over.
   var TEMPO = 1.4;
 
-  function playMoment(m, quiet) {
+  // facing: a poke she answers, so she turns to you wherever the cursor is.
+  function playMoment(m, quiet, facing) {
     momentTimers.forEach(clearTimeout);
     momentTimers = [];
     var steps = m.steps.map(function (s) {
@@ -1636,7 +1661,7 @@
     steps.forEach(function (s, i) {
       var last = i === steps.length - 1;
       momentTimers.push(setTimeout(function () {
-        react(s[0], last ? s[1] : s[1] + 200, quiet);
+        react(s[0], last ? s[1] : s[1] + 200, quiet, facing);
       }, at));
       at += s[1];
     });
@@ -1655,10 +1680,18 @@
   var lastPokeAt = 0;
   var hairStreak = 0;
   var lastHairAt = 0;
+  var angryUntil = 0;
 
   // Touching her hair always gets an answer, a ruffle and a little oiled shine.
   // Keep at it and she minds, then gets properly angry, then forgives you.
   function hairTouch(t, side) {
+    // Her angry face holds for a moment, so it can land: touches meanwhile
+    // only ruffle her hair.
+    if (reacting === ANGRY && t < angryUntil) {
+      lastHairAt = t;
+      gust(16, side);
+      return;
+    }
     hairStreak = t - lastHairAt < 4000 ? hairStreak + 1 : 1;
     lastHairAt = t;
     momentTimers.forEach(clearTimeout);
@@ -1674,13 +1707,18 @@
       hairStreak = 0;
     }
     var angry = line.face === ANGRY;
-    var hold = holdFor(line.text) + (angry ? 600 : 0);
-    // Angry is worth turning round to glare at you for, wherever the cursor is.
-    react(line.face, hold, false, angry);
+    var hold = angry ? Math.max(holdFor(line.text), 3600) + 800 : holdFor(line.text);
+    // She turns round to you for these, wherever the cursor is, so the face
+    // that goes with the line always shows.
+    react(line.face, hold, false, true);
     say(line.text, hold);
     gust(hairStreak === 1 ? 8 : angry ? 16 : 12, side);
     if (hairStreak === 1) burst('spark');
-    if (angry) burst('bang');
+    if (angry) {
+      angryUntil = t + 1600;
+      burst('bang');
+      moveBody('shake');
+    }
   }
 
   function poke(e) {
@@ -1709,14 +1747,14 @@
     }
 
     if (streak < 5 && Math.random() < 0.5) {
-      playMoment(pickMoment());
+      playMoment(pickMoment(), false, true);
       return;
     }
     momentTimers.forEach(clearTimeout);
     momentTimers = [];
     var line = pickLine(key, step);
     var hold = holdFor(line.text);
-    react(line.face, hold);
+    react(line.face, hold, false, true);
     say(line.text, hold);
     if (streak >= 5 + TEASE.length - 1) streak = 0;
   }
