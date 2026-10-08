@@ -36,7 +36,7 @@ class PortfolioLock {
     input?.addEventListener('input', () => {
       const first = input.value.trim().split(/\s+/)[0].slice(0, 18);
       form.classList.toggle('has-name', !!first);
-      if (sub) sub.textContent = first ? `Hi, ${first}. Hit Open.` : idle;
+      if (sub) sub.textContent = first ? `Hi, ${first}! So glad you’re here.` : idle;
     });
 
     form.addEventListener('submit', (e) => {

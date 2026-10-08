@@ -609,8 +609,12 @@
   }
 
   function playLock() {
+    var title = document.querySelector('.lock-title');
     var chars = document.querySelectorAll('.lock-title .fx-ch > span');
-    if (!chars.length || !window.gsap) return;
+    if (!chars.length || !window.gsap) {
+      if (title) title.classList.add('is-set');
+      return;
+    }
     window.gsap.fromTo(chars, {
       yPercent: 130,
       rotationX: 70
@@ -619,7 +623,8 @@
       rotationX: 0,
       duration: 1.05,
       stagger: 0.038,
-      ease: 'expo.out'
+      ease: 'expo.out',
+      onComplete: function () { title.classList.add('is-set'); }
     });
   }
 
@@ -827,8 +832,11 @@
     }, 4500);
   }
 
+  var lockShown = false;
+  try { lockShown = sessionStorage.getItem('portfolio_unlocked') !== 'true'; } catch (e) {}
+  if (lockShown || document.body.classList.contains('portfolio-is-locked')) playLock();
+
   if (document.body.classList.contains('portfolio-is-locked')) {
-    playLock();
     document.addEventListener('portfolio-unlocked', function () {
       setTimeout(startPageMotion, 40);
     }, { once: true });

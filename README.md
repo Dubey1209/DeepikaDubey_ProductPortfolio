@@ -77,7 +77,7 @@ GSAP 3.12.7, ScrollTrigger 3.12.7, Lenis 1.1.20, page-flip 2.0.7, and
 ## Cache busting
 
 Every stylesheet and script is referenced with a **single shared** `?v=` token
-(currently `20261106`; the mascot sheet URLs in `atelier.css` carry it too).
+(currently `20261107`; the mascot sheet URLs in `atelier.css` carry it too).
 When you change any CSS, JS or mascot sheet, bump that token —
 in both `index.html` and `my-story.html`.
 
