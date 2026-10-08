@@ -1111,6 +1111,8 @@
         'okay, is this a stress test?',
         'hmm, logging this as a power-user flow',
         'are you QA? you’d be great at it',
+        'click count rising… filing a bug against you',
+        'this is not a stress ball, it’s a portfolio',
       ],
     },
     {
@@ -1170,6 +1172,11 @@
       'say no to ten things, yes to one',
       'what did the last user interview tell us?',
       'quiet focus mode: on',
+      'my love language is a clean backlog',
+      'if a feature ships and no one uses it… hmm',
+      'scope creep? not on my watch',
+      'stakeholder says “quick change”. it never is',
+      'my cursor senses are tingling',
     ],
   };
 
@@ -1509,8 +1516,8 @@
 
   // The theme actually changing gets a face as well as a thought.
   var THEME_SWITCH = {
-    dark: { face: SHY, lines: ['ooh, cosy mode', 'night shift: on', 'shh… the pixels are sleeping', [WINK, 'dark mode, but make it cute']] },
-    light: { face: GASP, lines: ['aaah, bright!', [GRIN, 'good morning, sunshine!'], 'my eyes! okay, okay, I’m fine', [GRIN, 'daylight mode: fresh and crisp']] },
+    dark: { face: SHY, lines: ['ooh, cosy mode', 'night shift: on', 'shh… the pixels are sleeping', [WINK, 'dark mode, but make it cute'], [GRIN, 'who turned off the sun? oh, you'], 'perfect. now I look mysterious'] },
+    light: { face: GASP, lines: ['aaah, bright!', [GRIN, 'good morning, sunshine!'], 'my eyes! okay, okay, I’m fine', [GRIN, 'daylight mode: fresh and crisp'], 'sunscreen. I need sunscreen', [WINK, 'light mode users are brave. respect']] },
   };
   var wasDark = document.body.classList.contains('dark-theme');
 
@@ -1527,8 +1534,8 @@
   }).observe(document.body, { attributes: true, attributeFilter: ['class'] });
 
   // Copying text from the page, and coming back to the tab.
-  var COPIED = { face: STARRY, lines: ['copying my lines? I’m flattered', [WINK, 'ctrl+c? excellent taste'], [GRIN, 'ooh, quote me on that'], [WINK, 'credit the author, okay?']] };
-  var WELCOME_BACK = { face: GRIN, lines: ['oh, you’re back!', [SHY, 'missed you. kidding. a little'], [WINK, 'welcome back! I kept your seat warm'], 'hey! I knew you’d come back'] };
+  var COPIED = { face: STARRY, lines: ['copying my lines? I’m flattered', [WINK, 'ctrl+c? excellent taste'], [GRIN, 'ooh, quote me on that'], [WINK, 'credit the author, okay?'], 'copy-paste is a valid design pattern'] };
+  var WELCOME_BACK = { face: GRIN, lines: ['oh, you’re back!', [SHY, 'missed you. kidding. a little'], [WINK, 'welcome back! I kept your seat warm'], 'hey! I knew you’d come back', [WINK, 'other tab was boring, right?'], [GRIN, 'back already? the bounce rate thanks you']] };
 
   document.addEventListener('copy', function () {
     if (!visible || reacting >= 0) return;
@@ -1610,6 +1617,11 @@
       'scroll down, the work is good, I promise',
       [WINK, 'taking a tiny break. same as you?'],
       [THINKING, 'hmm, did I ship that fix?'],
+      'is this a meeting that could’ve been an email?',
+      [WINK, 'I’m not idle, I’m “strategically paused”'],
+      'your cursor is very calm. teach me',
+      [THINKING, 'blinking… in a user-centred way'],
+      'staring contest? I never lose. I blink in style',
     ],
   };
 
