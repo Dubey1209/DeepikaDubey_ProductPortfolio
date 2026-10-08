@@ -443,7 +443,7 @@
     if (!visible || reacting >= 0 || body.running || body.key !== 'look:' + lookIndex) return;
     if (lookIndex === CENTRE) {
       face.show('react', BLINK, LID_DOWN_MS);
-      setTimeout(function () {
+    setTimeout(function () {
         if (reacting < 0) face.hide(LID_UP_MS);
       }, LID_DOWN_MS + LID_REST_MS);
       return;
@@ -1589,7 +1589,7 @@
     tech: ['yes, I write code too. engineer brain!', 'warning: actual working code ahead', 'where I break things, then fix them'],
     skills: ['skills: tested in production, not just listed', 'spoiler: saying no is one of them', 'fewer buzzwords, more shipping'],
     certs: ['certificates! proof I did the homework', 'framed in my heart, and on this page', 'yes, I read the whole syllabus'],
-    education: ['where curiosity got a syllabus', 'engineering degree, product heart', 'the origin story, academically'],
+    education: ['where curiosity got a syllabus', 'engineering degree, product heart', 'the origin story, academically', 'first division, with distinction. just saying'],
     experience: ['real work, real users, real deadlines', 'where theory met deadlines', 'the part recruiters scroll to first'],
     writing: ['my brain, but in paragraphs', 'words! thoughts with good formatting', 'grab a coffee, I write with feeling'],
     fun: ['ooh, the fun part. I’m in there!', 'fun facts: 100% true, 0% boring', 'click it. you know you want to'],

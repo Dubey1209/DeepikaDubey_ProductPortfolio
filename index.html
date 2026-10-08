@@ -27,16 +27,16 @@
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="preload" as="font" type="font/woff2" href="fonts/fraunces-latin.woff2" crossorigin>
   <link rel="preload" as="font" type="font/woff2" href="fonts/outfit-latin.woff2" crossorigin>
-  <link rel="preload" as="image" href="mascots/deepika-directions.webp?v=20261126" media="(min-width: 761px)" fetchpriority="high">
-  <link rel="preload" as="image" href="mascots/deepika-directions-sm.webp?v=20261126" media="(max-width: 760px)" fetchpriority="high">
+  <link rel="preload" as="image" href="mascots/deepika-directions.webp?v=20261132" media="(min-width: 761px)" fetchpriority="high">
+  <link rel="preload" as="image" href="mascots/deepika-directions-sm.webp?v=20261132" media="(max-width: 760px)" fetchpriority="high">
   <!-- One shared version token for every local asset. Bump it in both HTML
        files whenever any CSS or JS changes. Per-asset tokens drifted out of
        sync previously, which can serve new CSS against old JavaScript. -->
-  <link rel="stylesheet" href="base.css?v=20261126">
-  <link rel="stylesheet" href="atelier.css?v=20261126">
-  <link rel="stylesheet" href="motion.css?v=20261126">
+  <link rel="stylesheet" href="base.css?v=20261132">
+  <link rel="stylesheet" href="atelier.css?v=20261132">
+  <link rel="stylesheet" href="motion.css?v=20261132">
   <noscript><style>.fx-ch>span{transform:none!important}.home-kicker,.home-subtitle,.home-desc,.home-btns,.home-rotate,.hero-rule{opacity:1!important}.home-photo{filter:none!important;transform:rotate(-3.5deg)!important}</style></noscript>
-  <script src="portfolio-lock.js?v=20261126" defer></script>
+  <script src="portfolio-lock.js?v=20261132" defer></script>
 </head>
 <body>
     <script>
@@ -1107,7 +1107,7 @@
         <div class="atelier-edu-main">
           <h3>Bachelor of Technology</h3>
           <p class="atelier-edu-spec">Artificial Intelligence &amp; Machine Learning</p>
-          <p class="atelier-edu-meta">2022-2026</p>
+          <p class="atelier-edu-meta">2022-2026<span class="atelier-edu-meta-dot" aria-hidden="true"> &middot; </span><button type="button" class="atelier-edu-distinction" aria-haspopup="dialog" aria-controls="degree-viewer">First Division, <span class="atelier-edu-distinction-ring">with Distinction<svg viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M54 4C80 3 98 9 97 20 96 33 70 37 46 36 20 35 2 30 3 19 4 8 28 3 62 5"/></svg></span><span class="atelier-edu-distinction-hint">view degree &#8599;</span></button></p>
           <p class="atelier-edu-note">Started in Electronics &amp; Communication. Ranked in the top 5 of the branch, then earned the move into AIML.</p>
         </div>
         <div class="atelier-edu-stats">
@@ -1171,6 +1171,18 @@
       </a>
     </div>
   </section>
+
+  <dialog id="degree-viewer" class="atelier-degree" aria-label="Degree certificate" data-lenis-prevent>
+    <figure class="atelier-degree-sheet">
+      <img src="BTech_Degree.webp" alt="B.Tech degree certificate in Artificial Intelligence and Machine Learning, awarded First Division with Distinction" width="886" height="878" loading="lazy">
+      <svg class="atelier-edu-ring" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M52 67.3C76 66.9 95.5 67.7 95 69.1 94.4 70.7 72 71.3 49 71.1 25 70.9 4.6 70.6 5.2 69 5.8 67.5 27 67.1 58 67.2"/></svg>
+      <button type="button" class="atelier-degree-close" data-degree-close aria-label="Close">&times;</button>
+    </figure>
+    <div class="atelier-degree-foot">
+      <p class="atelier-degree-caption"><em>First Division, with Distinction.</em> B.Tech, AI &amp; ML &middot; July 2026</p>
+      <button type="button" class="atelier-degree-done" data-degree-close>put it back</button>
+    </div>
+  </dialog>
 
   <!-- Work project modal -->
   <div id="work-modal" class="work-modal" hidden>
@@ -1355,10 +1367,10 @@
   <script src="vendor/gsap.min.js" defer></script>
   <script src="vendor/ScrollTrigger.min.js" defer></script>
   <script src="vendor/lenis.min.js" defer></script>
-  <script src="contact-form.js?v=20261126" defer></script>
-  <script src="theme-toggle.js?v=20261126" defer></script>
-  <script src="script.js?v=20261126" defer></script>
-  <script src="motion.js?v=20261126" defer></script>
-  <script src="mascot.js?v=20261126" defer></script>
+  <script src="contact-form.js?v=20261132" defer></script>
+  <script src="theme-toggle.js?v=20261132" defer></script>
+  <script src="script.js?v=20261132" defer></script>
+  <script src="motion.js?v=20261132" defer></script>
+  <script src="mascot.js?v=20261132" defer></script>
 </body>
 </html>

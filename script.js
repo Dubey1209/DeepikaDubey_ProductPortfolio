@@ -377,6 +377,117 @@ function initExperienceShowcase() {
   });
 })();
 
+// "First Division, with Distinction" in Education opens the degree
+// certificate: the sheet grows out of the line and eases into place, and
+// shrinks back into it on close. The pen rings the line on the certificate
+// once it lands.
+// Escape, a click outside, the close button and "put it back" all close it.
+(function () {
+  var thumb = document.querySelector('.atelier-edu-distinction');
+  var dialog = document.getElementById('degree-viewer');
+  if (!thumb || !dialog || typeof dialog.showModal !== 'function') return;
+  var sheet = dialog.querySelector('.atelier-degree-sheet');
+  var foot = dialog.querySelector('.atelier-degree-foot');
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var canAnimate = !reduce && typeof sheet.animate === 'function';
+  var closing = false;
+
+  // The line, as a transform of the sheet: centred on it, about its width.
+  function fromThumb() {
+    var a = thumb.getBoundingClientRect();
+    var b = sheet.getBoundingClientRect();
+    var dx = a.left + a.width / 2 - (b.left + b.width / 2);
+    var dy = a.top + a.height / 2 - (b.top + b.height / 2);
+    return 'translate(' + dx + 'px, ' + dy + 'px) rotate(-3deg) scale(' + Math.min(0.5, a.width / b.width) + ')';
+  }
+
+  // The custom cursor (motion.js) lives in <body>, under the dialog's top
+  // layer, so it moves into the dialog while it is open.
+  function carryCursor(host) {
+    document.querySelectorAll('.fx-cursor').forEach(function (c) { host.appendChild(c); });
+  }
+
+  function open() {
+    if (dialog.open) return;
+    settle();
+    dialog.showModal();
+    carryCursor(dialog);
+    document.documentElement.classList.add('is-dialog-open');
+    if (window.atelierLenis) window.atelierLenis.stop();
+    if (!canAnimate) {
+      dialog.classList.add('is-shown');
+      return;
+    }
+    sheet.animate([
+      { transform: fromThumb(), opacity: 0 },
+      { opacity: 1, offset: 0.35 },
+      { transform: 'none', opacity: 1 },
+    ], { duration: 620, easing: 'cubic-bezier(0.25, 0.9, 0.25, 1)' }).onfinish = function () {
+      dialog.classList.add('is-shown');
+    };
+    foot.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], {
+      duration: 400, delay: 420, easing: 'ease-out', fill: 'backwards',
+    });
+  }
+
+  function finish() {
+    closing = false;
+    dialog.classList.remove('is-closing', 'is-shown');
+    dialog.close();
+  }
+
+  function close() {
+    if (!dialog.open || closing) return;
+    if (!canAnimate) {
+      finish();
+      return;
+    }
+    closing = true;
+    dialog.classList.add('is-closing');
+    dialog.classList.remove('is-shown');
+    var from = getComputedStyle(sheet).transform;
+    settle();
+    foot.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 160, fill: 'forwards' });
+    var done = false;
+    var end = function () {
+      if (done) return;
+      done = true;
+      finish();
+      settle();
+    };
+    sheet.animate([
+      { transform: from === 'none' ? 'none' : from, opacity: 1 },
+      { opacity: 1, offset: 0.6 },
+      { transform: fromThumb(), opacity: 0 },
+    ], { duration: 420, easing: 'cubic-bezier(0.5, 0, 0.2, 1)', fill: 'forwards' }).onfinish = end;
+    // onfinish has been seen not to fire when a close lands mid-opening.
+    setTimeout(end, 480);
+  }
+
+  function settle() {
+    sheet.getAnimations().forEach(function (a) { a.cancel(); });
+    foot.getAnimations().forEach(function (a) { a.cancel(); });
+  }
+
+  thumb.addEventListener('click', open);
+
+  dialog.addEventListener('click', function (e) {
+    if (e.target === dialog || e.target.closest('[data-degree-close]')) close();
+  });
+
+  dialog.addEventListener('cancel', function (e) {
+    e.preventDefault();
+    close();
+  });
+
+  dialog.addEventListener('close', function () {
+    carryCursor(document.body);
+    document.documentElement.classList.remove('is-dialog-open');
+    if (window.atelierLenis) window.atelierLenis.start();
+    thumb.focus({ preventScroll: true });
+  });
+})();
+
 (function () {
   var pile = document.getElementById('cert-pile');
   var index = document.getElementById('cert-index');

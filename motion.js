@@ -292,7 +292,7 @@
   // One-shot cues (the underline drawing, the stamp landing) that CSS plays
   // once their element is on screen.
   function bindCues() {
-    var cues = document.querySelectorAll('.atelier-about-mark, .atelier-about-notes, .fun-facts-section .atelier-notes, .atelier-notes-aside');
+    var cues = document.querySelectorAll('.atelier-about-mark, .atelier-about-notes, .fun-facts-section .atelier-notes, .atelier-notes-aside, .atelier-edu-distinction');
     if (!cues.length || html.dataset.fxCues || !('IntersectionObserver' in window)) return;
     html.dataset.fxCues = '1';
     var io = new IntersectionObserver(function (entries) {
@@ -787,6 +787,8 @@
     if (typeof LenisCtor !== 'function' || html.dataset.fxLenis) return;
     html.dataset.fxLenis = '1';
     var lenis = new LenisCtor({ duration: 1.25, smoothWheel: true, wheelMultiplier: 0.95 });
+    // Dialogs pause it, so the page doesn't glide along behind them.
+    window.atelierLenis = lenis;
     var ST = window.ScrollTrigger;
     var g = window.gsap;
 
