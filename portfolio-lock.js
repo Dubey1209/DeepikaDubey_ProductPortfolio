@@ -48,6 +48,7 @@ class PortfolioLock {
         plate.textContent = first || 'guest';
         plate.classList.toggle('is-empty', !first);
         if (first && !had) {
+          porch.say('Ooh, that sounds like the passcode…', 2200);
           plate.parentElement.classList.remove('is-stamp');
           void plate.offsetWidth;
           plate.parentElement.classList.add('is-stamp');
@@ -83,7 +84,7 @@ class PortfolioLock {
       ]);
     }
     const knock = document.querySelector('.lock-knock');
-    if (knock) knock.textContent = pick(['knock knock', 'tap tap', 'ding dong', 'anyone home?']);
+    if (knock) knock.textContent = pick(['go on, knock', 'psst… knock', 'try knocking', 'knock if you dare']);
   }
 
   // She looks out of the door's window: eyes follow the pointer (or the
@@ -91,7 +92,7 @@ class PortfolioLock {
   // an empty knock and winks as the door opens. Cells are 3x3; row 0 looks
   // up, column 0 to the left.
   bindPorch(input) {
-    const quiet = { hold() {}, flash() {}, walk() {} };
+    const quiet = { hold() {}, flash() {}, walk() {}, say() {} };
     const porch = document.querySelector('.lock-porch');
     const win = porch?.querySelector('.lock-window');
     const look = win?.querySelector('.is-look');
@@ -143,15 +144,6 @@ class PortfolioLock {
         setTimeout(blink, 2600 + Math.random() * 2600);
       };
       setTimeout(blink, 1800);
-
-      const knock = () => {
-        if (input?.value.trim()) return;
-        porch.classList.remove('is-knocking');
-        void porch.offsetWidth;
-        porch.classList.add('is-knocking');
-      };
-      setTimeout(knock, 1500);
-      setTimeout(knock, 12000);
     }
 
     // Footprints walk up to the mat, one per letter typed.
@@ -171,19 +163,55 @@ class PortfolioLock {
       setTimeout(() => { if (Date.now() >= flashUntil) show(held); }, ms);
     };
 
-    porch.addEventListener('pointerenter', () => {
-      if (Date.now() > flashUntil) flash(4, 900);
-    });
+    // Speech bubble by the window.
+    const bubble = porch.querySelector('.lock-say');
+    let sayTimer = 0;
+    const say = (text, ms = 3200) => {
+      if (!bubble) return;
+      clearTimeout(sayTimer);
+      bubble.textContent = text;
+      bubble.classList.remove('is-in');
+      void bubble.offsetWidth;
+      bubble.classList.add('is-in');
+      sayTimer = setTimeout(() => bubble.classList.remove('is-in'), ms);
+    };
+
+    // A knock opens the door a crack; she peeks out, teases and shuts it
+    // again, because the only thing that opens it is a name.
+    const quips = [
+      'Knock knock! Who’s there? …that’s my line. Name, please.',
+      'Great knock. Very confident. But this door only opens for a name.',
+      'Knuckles: 10/10. Name: still missing.',
+      'Ooh, a visitor! The passcode’s your name, by the way.',
+      'Stranger danger! Kidding. Tell me your name though.',
+      'Knocking won’t work, I’m a modern door. Type your name.'
+    ];
+    let quipAt = Math.floor(Math.random() * quips.length);
+    let knocking = false;
     porch.addEventListener('click', () => {
-      input?.focus();
+      if (knocking || porch.closest('.is-opening')) return;
+      knocking = true;
+      porch.classList.add('has-knocked');
       porch.classList.remove('is-knocking');
       void porch.offsetWidth;
       porch.classList.add('is-knocking');
-      flash(5, 800);
+      flash(3, 700);
+      setTimeout(() => {
+        porch.classList.add('is-ajar');
+        const name = input?.value.trim().split(/\s+/)[0];
+        flash(4, 1400);
+        say(name ? `Oh hey, ${name}! Hit “Come in” and I’m all yours.` : quips[quipAt++ % quips.length]);
+      }, 650);
+      setTimeout(() => {
+        porch.classList.remove('is-ajar');
+        knocking = false;
+        input?.focus({ preventScroll: true });
+      }, 3600);
     });
 
     return {
       walk,
+      say,
       hold(n) {
         held = n;
         porch.classList.toggle('is-lit', n != null);
@@ -199,7 +227,7 @@ class PortfolioLock {
     const name = nameInput?.value.trim() || '';
     if (!name) {
       this.porch?.flash(3, 900);
-      this.notify('Please enter your name.', 'error');
+      this.porch?.say('Locked! The passcode is your name. Any name. Yours, ideally.');
       nameInput?.focus();
       return;
     }
@@ -211,6 +239,7 @@ class PortfolioLock {
 
     this.porch?.flash(1, 3000);
     this.porch?.walk(8);
+    this.porch?.say(`Passcode accepted. Welcome in, ${name.split(/\s+/)[0]}!`, 2000);
     btn.disabled = true;
     btnText.style.display = 'none';
     btnLoader.style.display = 'inline';
