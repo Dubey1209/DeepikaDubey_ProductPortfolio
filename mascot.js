@@ -298,8 +298,10 @@
     return !!pointer && wantLook !== CENTRE;
   }
 
-  function react(index, ms, auto) {
-    if (cursorAside()) {
+  // force: a big moment (the theme flipping) is worth turning to face the
+  // visitor for, wherever the cursor is.
+  function react(index, ms, auto, force) {
+    if (!force && cursorAside()) {
       if (reacting >= 0) endReaction(TURN_MS);
       if (index !== BLINK) heldReaction(index, ms);
       return;
@@ -1516,8 +1518,30 @@
 
   // The theme actually changing gets a face as well as a thought.
   var THEME_SWITCH = {
-    dark: { face: SHY, lines: ['ooh, cosy mode', 'night shift: on', 'shh… the pixels are sleeping', [WINK, 'dark mode, but make it cute'], [GRIN, 'who turned off the sun? oh, you'], 'perfect. now I look mysterious'] },
-    light: { face: GASP, lines: ['aaah, bright!', [GRIN, 'good morning, sunshine!'], 'my eyes! okay, okay, I’m fine', [GRIN, 'daylight mode: fresh and crisp'], 'sunscreen. I need sunscreen', [WINK, 'light mode users are brave. respect']] },
+    dark: {
+      face: GIGGLE,
+      lines: [
+        'ahh, cosy mode. blanket, chai, done',
+        'lights off, ideas on',
+        'shh… the pixels are sleeping',
+        [WINK, 'dark mode: now I look mysterious'],
+        'night shift: fairy lights and focus',
+        [SHY, 'finally, my eyes can relax'],
+        [GRIN, 'moon’s out. time for big ideas'],
+      ],
+    },
+    light: {
+      face: GRIN,
+      lines: [
+        'aaah! sunscreen. I need sunscreen!',
+        'who opened the curtains?! my eyes!',
+        'okay sun, I see you. please chill',
+        'daylight mode: SPF 50 recommended',
+        [GIGGLE, 'so bright… is that my future?'],
+        [WINK, 'light mode users are brave. respect'],
+        'blinded. by the sun, and my own talent',
+      ],
+    },
   };
   var wasDark = document.body.classList.contains('dark-theme');
 
@@ -1527,11 +1551,34 @@
     wasDark = dark;
     if (!visible) return;
     clearTimeout(guideTimer);
+    themeMoment(dark);
+  }).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+
+  // Lights on: dazzled (a gasp and a little jump as the sun blazes in over
+  // her), a squint, then the joke. Lights off: shy and blushing as the moon
+  // and a few stars come out, then a cosy giggle.
+  function themeMoment(dark) {
+    momentTimers.forEach(clearTimeout);
+    momentTimers = [];
     var line = pickLine(dark ? 'theme:dark' : 'theme:light', THEME_SWITCH[dark ? 'dark' : 'light']);
     var hold = holdFor(line.text);
-    react(line.face, hold);
-    say(line.text, hold);
-  }).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    var at = function (fn, ms) { momentTimers.push(setTimeout(fn, ms)); };
+    if (dark) {
+      react(SHY, 1700, false, true);
+      blushFor(hold + 1400);
+      burst('moon');
+      moveBody('lean');
+      at(function () { react(line.face, hold, false, true); }, 1500);
+      at(function () { say(line.text, hold); }, 500);
+    } else {
+      react(GASP, 1000, false, true);
+      burst('sun');
+      moveBody('jump');
+      at(function () { react(BLINK, 650, false, true); }, 850);
+      at(function () { react(line.face, hold, false, true); }, 1450);
+      at(function () { say(line.text, hold); }, 450);
+    }
+  }
 
   // Copying text from the page, and coming back to the tab.
   var COPIED = { face: STARRY, lines: ['copying my lines? I’m flattered', [WINK, 'ctrl+c? excellent taste'], [GRIN, 'ooh, quote me on that'], [WINK, 'credit the author, okay?'], 'copy-paste is a valid design pattern'] };
@@ -2017,6 +2064,15 @@
     '<path class="g-ray is-short" transform="rotate(45 12 12)" d="M12 5.5C12.3 9.6 14.4 11.7 18.5 12 14.4 12.3 12.3 14.4 12 18.5 11.7 14.4 9.6 12.3 5.5 12 9.6 11.7 11.7 9.6 12 5.5z"/>' +
     '<circle class="g-core" cx="12" cy="12" r="2.2"/>' +
     '</svg>';
+  // The theme switch: a sun with turning rays, or a crescent moon.
+  var SUN =
+    '<svg viewBox="0 0 64 64"><g class="s-rays">' +
+    [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map(function (a, i) {
+      return '<rect x="30.5" y="' + (i % 2 ? 4 : 1) + '" width="3" height="' + (i % 2 ? 8 : 11) + '" rx="1.5" transform="rotate(' + a + ' 32 32)"/>';
+    }).join('') +
+    '</g><circle class="s-core" cx="32" cy="32" r="13"/></svg>';
+  var MOON = '<svg viewBox="0 0 64 64"><path class="m-body" d="M40 8a24 24 0 1 0 16 41A20 20 0 0 1 40 8z"/></svg>';
+
   // Where the light sits in her pupils on the open-eyed faces (grin, gasp),
   // as fractions of the box, measured off the reaction sheet.
   var EYE_GLINTS = [[43.6, 39.4], [66, 39.6]];
@@ -2040,6 +2096,34 @@
     var wrap = document.createElement('span');
     wrap.className = 'atelier-mascot-burst is-' + kind;
     wrap.setAttribute('aria-hidden', 'true');
+    if (kind === 'sun' || kind === 'moon') {
+      var sky = document.createElement('span');
+      sky.className = 'atelier-mascot-sky';
+      sky.innerHTML = kind === 'sun' ? SUN : MOON;
+      wrap.appendChild(sky);
+      if (kind === 'sun') {
+        // Warm light washing over her as the sun comes up.
+        var glow = document.createElement('span');
+        glow.className = 'atelier-mascot-glare';
+        wrap.appendChild(glow);
+      } else {
+        [[22, 14, 0.5], [84, 30, 0.75], [30, 2, 0.4], [70, 2, 0.6], [14, 30, 0.9]].forEach(function (s, i) {
+          var star = document.createElement('span');
+          star.className = 'atelier-mascot-star';
+          star.style.setProperty('--x', s[0] + '%');
+          star.style.setProperty('--y', s[1] + '%');
+          star.style.setProperty('--s', s[2]);
+          star.style.setProperty('--d', (0.35 + i * 0.22).toFixed(2) + 's');
+          star.innerHTML = SPARK;
+          wrap.appendChild(star);
+        });
+      }
+      el.appendChild(wrap);
+      setTimeout(function () {
+        if (wrap.parentNode) wrap.parentNode.removeChild(wrap);
+      }, 3600);
+      return;
+    }
     if (MARKS[kind]) {
       MARKS[kind].forEach(function (mark, i) {
         var m = document.createElement('span');

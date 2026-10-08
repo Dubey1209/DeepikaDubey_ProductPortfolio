@@ -1266,6 +1266,100 @@ html.atelier .atelier-mascot-burst.is-spark > span {
   100% { opacity: 0; transform: translate(var(--dx), var(--rise)) scale(calc(var(--s) * 0.8)) rotate(var(--r)); }
 }
 
+/* The theme switch. Lights on: a sun rises beside her head, rays turning,
+   and a warm wash of light falls over her. Lights off: a crescent moon
+   drifts in and a few stars twinkle round her. */
+html.atelier .atelier-mascot-burst > .atelier-mascot-sky {
+  left: 82%;
+  top: 9%;
+  width: 3.6rem;
+  height: 3.6rem;
+  margin: -1.8rem 0 0 -1.8rem;
+}
+
+html.atelier .atelier-mascot-burst.is-sun > .atelier-mascot-sky {
+  animation: mascot-sun 3.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  filter: drop-shadow(0 0 10px rgba(255, 196, 70, 0.75)) drop-shadow(0 0 26px rgba(255, 170, 60, 0.45));
+}
+
+html.atelier .atelier-mascot-sky .s-core {
+  fill: #ffd25e;
+}
+
+html.atelier .atelier-mascot-sky .s-rays {
+  fill: #ffb83b;
+  transform-origin: 32px 32px;
+  animation: mascot-sun-rays 3.2s linear forwards;
+}
+
+html.atelier .atelier-mascot-burst.is-moon > .atelier-mascot-sky {
+  animation: mascot-moon 3.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  filter: drop-shadow(0 0 8px rgba(220, 228, 255, 0.7)) drop-shadow(0 0 22px rgba(160, 180, 255, 0.35));
+}
+
+html.atelier .atelier-mascot-sky .m-body {
+  fill: #f4efd9;
+}
+
+html.atelier .atelier-mascot-burst > .atelier-mascot-glare {
+  /* Larger than her box and faded out well inside its own edges, so the
+     light has no visible border. */
+  left: -40%;
+  top: -40%;
+  width: 180%;
+  height: 180%;
+  margin: 0;
+  background: radial-gradient(42% 40% at 67.8% 27.2%, rgba(255, 214, 120, 0.5), rgba(255, 214, 120, 0.18) 55%, rgba(255, 214, 120, 0) 100%);
+  mix-blend-mode: soft-light;
+  animation: mascot-glare 2.2s ease-out forwards;
+}
+
+html.atelier .atelier-mascot-burst > .atelier-mascot-star {
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  animation: mascot-spark 2.4s ease-in-out var(--d) forwards;
+}
+
+html.atelier .atelier-mascot-star svg {
+  overflow: visible;
+  filter: drop-shadow(0 0 3px rgba(225, 232, 255, 0.9));
+}
+
+html.atelier .atelier-mascot-star .g-ray,
+html.atelier .atelier-mascot-star .g-core {
+  fill: #eef1ff;
+}
+
+html.atelier .atelier-mascot-star .g-ray.is-short {
+  opacity: 0.6;
+}
+
+@keyframes mascot-sun {
+  0% { opacity: 0; transform: translateY(1.4rem) scale(0.4); }
+  22% { opacity: 1; transform: translateY(0) scale(1.08); }
+  34% { transform: scale(1); }
+  78% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-0.4rem) scale(0.92); }
+}
+
+@keyframes mascot-sun-rays {
+  to { transform: rotate(80deg); }
+}
+
+@keyframes mascot-moon {
+  0% { opacity: 0; transform: translate(0.8rem, -0.6rem) rotate(-20deg) scale(0.6); }
+  28% { opacity: 1; transform: translate(0, 0) rotate(0deg) scale(1); }
+  80% { opacity: 1; transform: rotate(4deg); }
+  100% { opacity: 0; transform: translate(-0.2rem, -0.3rem) rotate(6deg) scale(0.95); }
+}
+
+@keyframes mascot-glare {
+  0% { opacity: 0; }
+  18% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
 /* A twinkle, not a pop: it flares, dims, flares again and fades, turning
    only a few degrees, as a glint does when the light shifts. */
 @keyframes mascot-spark {
@@ -1534,12 +1628,12 @@ html.atelier .atelier-mascot-layer.is-look {
 /* Phones get a lighter copy of the direction sheet: the mascot is drawn at
    about 240px there, so the full-size cells are wasted bytes on slow links. */
 html.atelier {
-  --mascot-look: url('mascots/deepika-directions.webp?v=20261124');
+  --mascot-look: url('mascots/deepika-directions.webp?v=20261125');
 }
 
 @media (max-width: 760px) {
   html.atelier {
-    --mascot-look: url('mascots/deepika-directions-sm.webp?v=20261124');
+    --mascot-look: url('mascots/deepika-directions-sm.webp?v=20261125');
   }
 }
 
@@ -1548,7 +1642,7 @@ html.atelier {
    has loaded (it reads the URL from --mascot-react) and sets .has-reactions
    on <html> once it has decoded. */
 html.atelier {
-  --mascot-react: url('mascots/deepika-reactions.webp?v=20261124');
+  --mascot-react: url('mascots/deepika-reactions.webp?v=20261125');
 }
 
 /* mascot.js uses the second layer for direction frames too (.is-look), and
@@ -1570,7 +1664,7 @@ html.atelier.has-reactions .atelier-mascot-layer.is-react {
 }
 
 html.atelier.has-reactions .atelier-mascot-lids {
-  background-image: url('mascots/deepika-blinks.webp?v=20261124');
+  background-image: url('mascots/deepika-blinks.webp?v=20261125');
 }
 
 html.atelier .atelier-mascot-lids {
@@ -1589,8 +1683,8 @@ html.atelier .atelier-mascot-react {
    mask with the frame. Her hair, jaw and outline always come from the frame
    underneath; an oval reached the jaw and showed a second chin. */
 html.atelier.has-reactions .atelier-mascot-face {
-  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261124');
-  mask-image: url('mascots/deepika-face-mask.png?v=20261124');
+  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261125');
+  mask-image: url('mascots/deepika-face-mask.png?v=20261125');
 }
 
 html.atelier .atelier-mascot-face {
@@ -6498,7 +6592,7 @@ html.atelier .sb-cameo-art {
 }
 
 html.atelier .sb-cameo-art.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261124');
+  background-image: url('mascots/deepika-reactions.webp?v=20261125');
 }
 
 html.atelier .sb-cameo-art.is-face {
