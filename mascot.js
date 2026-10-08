@@ -159,12 +159,23 @@
     b.style.opacity = '0';
   }
 
+  // A new frame never waits for the last fade: that queue is what made her
+  // trail the cursor. The running fade is jumped to its end (it is short,
+  // so the jump does not show) and the new one starts from there.
+  Pair.prototype.settle = function () {
+    var running = this.running;
+    if (!running) return;
+    this.running = null;
+    this.next = null;
+    running.forEach(function (a) {
+      a.finish();
+    });
+  };
+
   Pair.prototype.show = function (sheet, index, ms) {
     var key = sheet + ':' + index;
-    if (this.running) {
-      this.next = { key: key, sheet: sheet, index: index, ms: ms };
-      return;
-    }
+    if (key === this.key && !this.running) return;
+    this.settle();
     if (key === this.key) return;
     var incoming = this.back;
     var outgoing = this.key ? this.front : null;
@@ -178,10 +189,7 @@
   };
 
   Pair.prototype.hide = function (ms) {
-    if (this.running) {
-      this.next = { key: '', ms: ms };
-      return;
-    }
+    this.settle();
     if (!this.key) return;
     this.key = '';
     this.fade(null, this.front, ms);
@@ -252,7 +260,50 @@
   // mood). Those give way the moment the visitor points somewhere else.
   var reactAuto = false;
 
+  // Where her cheeks sit in each direction frame, relative to the centre one
+  // (% of the box, measured off the sheet), so the blush turns with her.
+  var FACE_OFFSET = [
+    [-3.3, -3.6], [2.2, -3.8], [2.5, -3.6],
+    [-4, 0.2], [0, 0], [3.1, 0.1],
+    [-5, 2.4], [2.7, 1.8], [3.7, 2.4],
+  ];
+
+  function setFaceOffset(index) {
+    var at = FACE_OFFSET[index] || FACE_OFFSET[CENTRE];
+    el.style.setProperty('--face-dx', at[0] + '%');
+    el.style.setProperty('--face-dy', at[1] + '%');
+  }
+
+  // The reaction faces are drawn looking straight out. With the cursor off
+  // to one side, turning to the front for one would mean looking away from
+  // it, so she keeps her eyes on it and shows the feeling another way: a
+  // blush, a nod, a hop, a thought mark.
+  function heldReaction(index, ms) {
+    if (index === SHY) {
+      blushFor(ms || 2400);
+      moveBody('tilt');
+    } else if (index === GRIN || index === WINK) {
+      moveBody('nod');
+    } else if (index === GIGGLE) {
+      moveBody('squish');
+    } else if (index === GASP) {
+      moveBody('jump');
+    } else if (index === THINKING || index === UNIMPRESSED) {
+      moveBody('tilt');
+      burst('ask');
+    }
+  }
+
+  function cursorAside() {
+    return !!pointer && wantLook !== CENTRE;
+  }
+
   function react(index, ms, auto) {
+    if (cursorAside()) {
+      if (reacting >= 0) endReaction(TURN_MS);
+      if (index !== BLINK) heldReaction(index, ms);
+      return;
+    }
     reacting = index;
     reactAuto = !!auto;
     clearTimeout(faceDelay);
@@ -288,6 +339,7 @@
     // Back to wherever the cursor is now, not where it was when she started.
     lookIndex = wantLook;
     body.show('look', lookIndex, ms || FACE_OUT_MS);
+    setFaceOffset(lookIndex);
   }
 
   function scheduleBlink() {
@@ -328,11 +380,12 @@
   var ENTER = 0.42;
   var LEAVE = 0.22;
   // She settles on a direction only once the cursor has held it this long.
-  var SETTLE_MS = 110;
-  // Each step of a head turn. A turn moves one frame at a time, through the
-  // frames in between, as a head does; jumping left-to-right in one cross-fade
-  // showed two heads at once and read as a machine.
-  var TURN_MS = 170;
+  var SETTLE_MS = 30;
+  // A head turn is one quick cross-fade straight to the frame the cursor is
+  // in. Only a turn right across (left to right, up to down) passes through
+  // the middle, in two fast steps, or both heads showed at once.
+  var TURN_MS = 120;
+  var STEP_MS = 80;
 
   function axis(current, v) {
     if (current === 0) return v < -LEAVE ? 0 : v > ENTER ? 2 : 1;
@@ -346,12 +399,14 @@
   function requestLook(index) {
     if (index === wantLook) return;
     wantLook = index;
-    // The visitor pointing somewhere new outranks a mood she was having to
-    // herself: she lets it go and looks.
-    if (reacting >= 0 && reactAuto && index !== CENTRE && !idling) {
-      momentTimers.forEach(clearTimeout);
-      momentTimers = [];
-      endReaction();
+    // Where the cursor is comes first: a face she is pulling lets go the
+    // moment it points somewhere else, and she turns straight to it.
+    if (reacting >= 0 && index !== CENTRE && pointer) {
+      if (reactAuto) {
+        momentTimers.forEach(clearTimeout);
+        momentTimers = [];
+      }
+      endReaction(TURN_MS);
       return;
     }
     clearTimeout(lookTimer);
@@ -362,16 +417,20 @@
     if (wantLook === lookIndex) return;
     var c = lookIndex % 3;
     var r = Math.floor(lookIndex / 3);
-    var turnX = Math.sign((wantLook % 3) - c);
-    var turnY = Math.sign(Math.floor(wantLook / 3) - r);
+    var dc = (wantLook % 3) - c;
+    var dr = Math.floor(wantLook / 3) - r;
+    var across = Math.abs(dc) > 1 || Math.abs(dr) > 1;
+    var turnX = across ? Math.sign(dc) : dc;
+    var turnY = across ? Math.sign(dr) : dr;
     lookIndex = (r + turnY) * 3 + c + turnX;
     if (reacting < 0) {
-      body.show('look', lookIndex, TURN_MS);
+      body.show('look', lookIndex, across ? STEP_MS : TURN_MS);
       // The head leads with a slight dip, and the body follows through.
-      nudge(turnX * 0.32, turnY * 0.18 + 0.1);
+      nudge(Math.sign(turnX) * 0.32, Math.sign(turnY) * 0.18 + 0.1);
     }
+    setFaceOffset(lookIndex);
     clearTimeout(lookTimer);
-    if (lookIndex !== wantLook) lookTimer = setTimeout(commitLook, TURN_MS - 20);
+    if (lookIndex !== wantLook) lookTimer = setTimeout(commitLook, STEP_MS - 10);
   }
 
   function aim() {
