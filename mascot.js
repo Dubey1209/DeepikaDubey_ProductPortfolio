@@ -1189,31 +1189,31 @@
     hairAngry0: {
       face: ANGRY,
       lines: [
-        'okay, now I’m angry. hmph!',
-        'that’s it. I’m officially annoyed',
-        'I said they’ll tangle! did anyone listen? no.',
-        'hey! hands where I can see them',
-        'excuse me?! this is a no-touch zone',
+        'ouch! stop pulling my hair, it hurts!',
+        'hey! touching them again and again hurts, okay?',
+        'I said they’ll tangle! and now it hurts too. hmph!',
+        'ow! every pull is a new knot. stop it!',
+        'excuse me?! that actually hurt',
       ],
     },
     hairAngry1: {
       face: ANGRY,
       lines: [
-        'do you know how long detangling takes?!',
-        'one more touch and you’re giving me a head massage',
-        'these waves are not a stress ball!',
-        'I’m counting. and I’m not happy.',
-        'you’re lucky I don’t have a comb in my hand',
+        'ouch! now they’re tangled AND my head hurts',
+        'stop! do you know how much detangling hurts?!',
+        'ow ow ow! these waves are not a stress ball!',
+        'it hurts! and now I’ll be combing knots all night',
+        'that’s the third pull! my scalp is filing a complaint',
       ],
     },
     hairAngry2: {
       face: ANGRY,
       lines: [
-        'one more and I’m cutting them short! …kidding. never.',
-        'that’s it, I’m tying a bun. no more fun for you',
-        'I’m telling my coconut oil about you',
-        'not talking to you. for 10 whole seconds.',
-        'that’s it. you’re blocked. …from my hair.',
+        'enough! it hurts, it’s tangled, and I’m angry. hmph!',
+        'ouch! that’s it, I’m tying a bun. no more pulling',
+        'it hurts! one more and I’m cutting them short! …kidding.',
+        'ow! now I need a whole oil night to fix these knots',
+        'stop! my hair hurts. not talking to you for 10 seconds.',
       ],
     },
     // After that she gives up being angry.
@@ -1498,6 +1498,8 @@
     if (y > 0.545) {
       if (y < 0.58 && x > 0.36 && x < 0.72) return 'chin';
       if (y < 0.7 && x > 0.4 && x < 0.66) return 'neck';
+      // Her hair falls over the sweater down both sides.
+      if (x < 0.4 || x > (y < 0.68 ? 0.7 : 0.78)) return 'hair';
       return 'sweater';
     }
     if (y > 0.36 && y < 0.53 && ((x > 0.2 && x < 0.315) || (x > 0.72 && x < 0.79))) return 'ear';
