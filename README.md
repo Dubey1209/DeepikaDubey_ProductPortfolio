@@ -109,8 +109,11 @@ Two deliberate choices here:
   `.home-photo-stage` wrapper via `photo.parentNode` — a `<picture>` tag would
   quietly break the hero animation. WebP support is universal enough to serve
   directly.
-- **`og:image` and the favicon stay JPEG**, and absolute. Social scrapers do
-  not resolve relative URLs, and several still do not decode WebP.
+- **`og:image` stays JPEG**, and absolute. Social scrapers do not resolve
+  relative URLs, and several still do not decode WebP.
+- **The favicon is the mascot**, not the photo: `favicon.png` (64px) and
+  `apple-touch-icon.png` (180px) are her front-facing frame from
+  `deepika-directions.webp`, cropped round on the door-window gold.
 
 The certificate images intentionally have no `width`/`height` attributes: they
 are `width: 100%; height: 100%; object-fit: cover` inside an absolutely
@@ -121,7 +124,7 @@ positioned sheet, so the attributes would have no effect on layout.
 The hero shows a cartoon of Deepika instead of a photo. Two pictures of her a
 scroll apart, in two styles (a tilted photo on a coloured card, a frameless
 cartoon), read as inconsistent, so the photo was dropped from the page (it
-stays as `og:image` and favicon) and the mascot moved up from About. There
+stays as `og:image`) and the mascot moved up from About. There
 her thought cloud opens to her left (`--cloud-tail: right` in the hero), so it
 never runs off the page; on phones it sits above her head as before. Once per
 visit, after the hero's entrance and the lock screen, she says hello
