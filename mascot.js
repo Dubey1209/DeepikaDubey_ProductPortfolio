@@ -353,15 +353,54 @@
     }, 3600 + Math.random() * 4400);
   }
 
-  // Lids close fast and open a little slower, as real ones do. Only the face
-  // layer moves, so a blink touches nothing but the eyes.
+  // A soft, unhurried blink: the lids come down, rest a beat and lift a
+  // little slower than they fell. Facing front it is the drawn blink face;
+  // turned any other way, the lids drawn for that frame
+  // (tools/build-blinks.mjs) are laid over her eyes, so she can blink while
+  // she keeps looking at the cursor.
+  var lids = document.createElement('span');
+  lids.className = 'atelier-mascot-layer atelier-mascot-lids';
+  lids.setAttribute('aria-hidden', 'true');
+  lids.style.zIndex = '3';
+  lids.style.opacity = '0';
+  el.insertBefore(lids, layerB.nextSibling);
+
+  var LID_DOWN_MS = 180;
+  var LID_REST_MS = 90;
+  var LID_UP_MS = 340;
+
   function blink() {
-    if (!visible || reacting >= 0 || lookIndex !== CENTRE || body.key !== 'look:' + CENTRE) return;
-    face.show('react', BLINK, 90);
-    setTimeout(function () {
-      if (reacting < 0) face.hide(190);
-    }, 170);
+    if (!visible || reacting >= 0 || body.running || body.key !== 'look:' + lookIndex) return;
+    if (lookIndex === CENTRE) {
+      face.show('react', BLINK, LID_DOWN_MS);
+      setTimeout(function () {
+        if (reacting < 0) face.hide(LID_UP_MS);
+      }, LID_DOWN_MS + LID_REST_MS);
+      return;
+    }
+    if (!document.documentElement.classList.contains('has-reactions') || typeof lids.animate !== 'function') return;
+    lids.style.backgroundPosition = (lookIndex % 3) * 50 + '% ' + Math.floor(lookIndex / 3) * 50 + '%';
+    // The lid is uncovered from the top down and covered again from the
+    // bottom up, so it falls over the eye and lifts off it like a real one;
+    // a plain fade showed an open and a closed eye at once halfway through.
+    var band = LID_BAND[Math.floor(lookIndex / 3)];
+    var open = band[0] + '%';
+    var shut = band[1] + '%';
+    var total = LID_DOWN_MS + LID_REST_MS + LID_UP_MS;
+    lids.animate(
+      [
+        { opacity: 1, '--lid-y': open, easing: 'cubic-bezier(0.55, 0, 0.8, 0.4)' },
+        { opacity: 1, '--lid-y': shut, offset: LID_DOWN_MS / total },
+        { opacity: 1, '--lid-y': shut, offset: (LID_DOWN_MS + LID_REST_MS) / total, easing: 'cubic-bezier(0.2, 0.6, 0.35, 1)' },
+        { opacity: 1, '--lid-y': open },
+      ],
+      { duration: total }
+    );
   }
+
+  // The eyes' vertical band in each row of the sheet (% of the box), with the
+  // lids' soft edges: looking up the eyes sit higher, looking down lower.
+  var LID_BAND = [[27.5, 40.5], [33.5, 47.5], [39.5, 51]];
 
   // ---- gaze -----------------------------------------------------------------
 
@@ -1683,6 +1722,12 @@
   // hearts); the other half is a face, for which she turns to the front,
   // holds it, and turns back to the cursor.
   var WATCH_ACTS = [
+    // Just resting her eyes on it: a slow blink, now and then a second.
+    [22, function () {
+      blink();
+      if (Math.random() < 0.4) later(blink, 900);
+      return 1800;
+    }],
     // A curious tilt at whatever the cursor is resting on.
     [18, function () {
       moveBody('tilt');

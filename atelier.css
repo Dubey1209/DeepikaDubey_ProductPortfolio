@@ -1538,12 +1538,12 @@ html.atelier .atelier-mascot-layer.is-look {
 /* Phones get a lighter copy of the direction sheet: the mascot is drawn at
    about 240px there, so the full-size cells are wasted bytes on slow links. */
 html.atelier {
-  --mascot-look: url('mascots/deepika-directions.webp?v=20261121');
+  --mascot-look: url('mascots/deepika-directions.webp?v=20261122');
 }
 
 @media (max-width: 760px) {
   html.atelier {
-    --mascot-look: url('mascots/deepika-directions-sm.webp?v=20261121');
+    --mascot-look: url('mascots/deepika-directions-sm.webp?v=20261122');
   }
 }
 
@@ -1552,12 +1552,34 @@ html.atelier {
    has loaded (it reads the URL from --mascot-react) and sets .has-reactions
    on <html> once it has decoded. */
 html.atelier {
-  --mascot-react: url('mascots/deepika-reactions.webp?v=20261121');
+  --mascot-react: url('mascots/deepika-reactions.webp?v=20261122');
 }
 
-html.atelier.has-reactions .atelier-mascot-react,
+/* mascot.js uses the second layer for direction frames too (.is-look), and
+   then it must keep the direction sheet: this rule comes later in the file
+   with the same specificity, so without :not(.is-look) it painted reaction
+   cells (cell 0 is the closed-eyes blink) in place of where she looks. */
+html.atelier.has-reactions .atelier-mascot-react:not(.is-look),
 html.atelier.has-reactions .atelier-mascot-layer.is-react {
   background-image: var(--mascot-react);
+}
+
+/* Closed lids for every direction frame, for blinking while turned. mascot.js
+   sweeps --lid-y down over the eyes and back, a soft-edged lid falling and
+   lifting. */
+@property --lid-y {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 0%;
+}
+
+html.atelier.has-reactions .atelier-mascot-lids {
+  background-image: url('mascots/deepika-blinks.webp?v=20261122');
+}
+
+html.atelier .atelier-mascot-lids {
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(var(--lid-y) - 1.4%), transparent calc(var(--lid-y) + 0.6%));
+  mask-image: linear-gradient(to bottom, #000 calc(var(--lid-y) - 1.4%), transparent calc(var(--lid-y) + 0.6%));
 }
 
 html.atelier .atelier-mascot-react {
@@ -1571,8 +1593,8 @@ html.atelier .atelier-mascot-react {
    mask with the frame. Her hair, jaw and outline always come from the frame
    underneath; an oval reached the jaw and showed a second chin. */
 html.atelier.has-reactions .atelier-mascot-face {
-  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261121');
-  mask-image: url('mascots/deepika-face-mask.png?v=20261121');
+  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261122');
+  mask-image: url('mascots/deepika-face-mask.png?v=20261122');
 }
 
 html.atelier .atelier-mascot-face {
@@ -6480,7 +6502,7 @@ html.atelier .sb-cameo-art {
 }
 
 html.atelier .sb-cameo-art.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261121');
+  background-image: url('mascots/deepika-reactions.webp?v=20261122');
 }
 
 html.atelier .sb-cameo-art.is-face {
