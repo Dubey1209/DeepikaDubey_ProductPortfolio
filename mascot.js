@@ -144,6 +144,71 @@
     // Face layers have one mask per reaction, laid out like the sheet.
     layer.style.webkitMaskPosition = position;
     layer.style.maskPosition = position;
+    if (sheet === 'look' && layer.earrings) hangEarrings(layer.earrings, index);
+  }
+
+  // ---- earrings -------------------------------------------------------------
+  //
+  // Her drop earrings swing. tools/build-earrings.mjs lifts them out of every
+  // direction frame into a sheet of their own, plus a cover that paints the
+  // drawn ones out; each body layer carries a cover and two drops, so they
+  // cross-fade with her head. Per frame, [left, right]: the drop's box in the
+  // cell (x, y, w, h) and its stud within that box (x, y).
+  var EARRINGS = [
+    [[0.2412, 0.4675, 0.0353, 0.0225, 0.5, 0.1111], [0.6647, 0.475, 0.0412, 0.055, 0.5, 0.0455]],
+    [[0.2897, 0.4738, 0.0426, 0.0563, 0.5, 0.0444], [0.725, 0.4537, 0.0353, 0.04, 0.5, 0.0625]],
+    [[0.2985, 0.475, 0.0412, 0.055, 0.5, 0.0455], [0.7279, 0.4675, 0.0368, 0.0225, 0.5, 0.1111]],
+    [[0.2471, 0.4713, 0.0368, 0.0362, 0.5, 0.069], [0.6662, 0.4788, 0.0412, 0.0525, 0.5, 0.0476]],
+    [[0.2779, 0.4775, 0.0412, 0.0512, 0.5, 0.0488], [0.7176, 0.48, 0.0397, 0.0425, 0.5, 0.0588]],
+    [[0.2956, 0.4788, 0.0412, 0.0525, 0.5, 0.0476], [0.7191, 0.4713, 0.0382, 0.0362, 0.5, 0.069]],
+    [[0.2426, 0.4775, 0.0368, 0.035, 0.5, 0.0714], [0.6574, 0.4838, 0.0412, 0.0525, 0.5, 0.0476]],
+    [[0.2971, 0.4825, 0.0412, 0.0512, 0.5, 0.0488], [0.7191, 0.4763, 0.0382, 0.0375, 0.5, 0.0667]],
+    [[0.3044, 0.4838, 0.0412, 0.0525, 0.5, 0.0476], [0.7235, 0.4763, 0.0368, 0.0362, 0.5, 0.069]],
+  ];
+
+  function dressEarrings(layer) {
+    var make = function (cls) {
+      var span = document.createElement('span');
+      span.className = 'atelier-mascot-ear ' + cls;
+      layer.appendChild(span);
+      return span;
+    };
+    layer.earrings = { cover: make('is-cover'), drops: [make('is-drop is-left'), make('is-drop is-right')] };
+  }
+
+  function hangEarrings(set, index) {
+    var col = index % 3;
+    var row = Math.floor(index / 3);
+    set.cover.style.backgroundPosition = col * 50 + '% ' + row * 50 + '%';
+    set.drops.forEach(function (drop, side) {
+      var b = EARRINGS[index][side];
+      var s = drop.style;
+      s.left = b[0] * 100 + '%';
+      s.top = b[1] * 100 + '%';
+      s.width = b[2] * 100 + '%';
+      s.height = b[3] * 100 + '%';
+      s.backgroundSize = 300 / b[2] + '% ' + 300 / b[3] + '%';
+      s.backgroundPosition = ((col + b[0]) / (3 - b[2])) * 100 + '% ' + ((row + b[1]) / (3 - b[3])) * 100 + '%';
+      s.transformOrigin = b[4] * 100 + '% ' + b[5] * 100 + '%';
+    });
+  }
+
+  // Only once both sheets have decoded: the cover alone would take her
+  // earrings off. Still, they would never move, so reduced motion keeps the
+  // drawn ones.
+  if (!reducedMotion) {
+    dressEarrings(layerA);
+    dressEarrings(layerB);
+    var earSheets = [layerA.earrings.cover, layerA.earrings.drops[0]].map(function (span) {
+      var match = /url\(["']?([^"')]+)["']?\)/.exec(getComputedStyle(span).backgroundImage);
+      if (!match) return Promise.reject();
+      var img = new Image();
+      img.src = match[1];
+      return img.decode ? img.decode() : new Promise(function (ok, fail) { img.onload = ok; img.onerror = fail; });
+    });
+    Promise.all(earSheets).then(function () {
+      el.classList.add('has-earrings');
+    }, function () {});
   }
 
   // A pair of layers that cross-fades between frames. `key` is the frame
@@ -322,6 +387,8 @@
     // out of a whole-figure pose (thinking) is not a turn: the face comes in
     // with the body, or her plain face flashed between the two expressions.
     var turning = body.key.indexOf('look:') === 0 && body.key !== 'look:' + CENTRE;
+    if (turning) jiggleEarrings((1 - (+body.key.slice(5) % 3)) * 36 || 14);
+    else if (index !== BLINK) jiggleEarrings((Math.random() < 0.5 ? -1 : 1) * 9);
     body.show('look', CENTRE, TO_FRONT_MS);
     if (turning) {
       faceDelay = setTimeout(function () {
@@ -340,6 +407,7 @@
     face.hide(ms || FACE_OUT_MS);
     // Back to wherever the cursor is now, not where it was when she started.
     lookIndex = wantLook;
+    if (body.key !== 'look:' + lookIndex) jiggleEarrings(((lookIndex % 3) - 1) * 36 || 12);
     body.show('look', lookIndex, ms || FACE_OUT_MS);
     setFaceOffset(lookIndex);
   }
@@ -468,6 +536,8 @@
       body.show('look', lookIndex, across ? STEP_MS : TURN_MS);
       // The head leads with a slight dip, and the body follows through.
       nudge(Math.sign(turnX) * 0.32, Math.sign(turnY) * 0.18 + 0.1);
+      // The earrings are left behind by the turn and swing after it.
+      jiggleEarrings(turnX ? turnX * 60 : (Math.random() < 0.5 ? -1 : 1) * 18);
     }
     setFaceOffset(lookIndex);
     clearTimeout(lookTimer);
@@ -587,6 +657,11 @@
       pos.y = target.y;
       vel.x = 0;
       vel.y = 0;
+      lastVelX = 0;
+      earrings.forEach(function (ear, side) {
+        ear.angle = ear.spin = ear.shown = 0;
+        el.style.setProperty(side ? '--ear-b' : '--ear-a', '0deg');
+      });
       setLean(Math.round(target.x * SHIFT_X * dpr) / dpr, Math.round(target.y * SHIFT_Y * dpr) / dpr, 0);
       springOn = false;
       return;
@@ -596,10 +671,47 @@
     // a machine ticking.
     var lean = Math.abs(tilt) < TILT_DEAD ? 0 : tilt - Math.sign(tilt) * TILT_DEAD;
     setLean(px, py, lean);
+    swingEarrings(dt, lean);
     requestAnimationFrame(stepSpring);
   }
 
   var TILT_DEAD = 0.15;
+
+  // Each drop is a lightly damped pendulum, in degrees, CSS-clockwise (its
+  // bottom swings left). Gravity holds it plumb, so it leans against her
+  // tilt; her head's sideways acceleration leaves it behind; turns and moves
+  // give it a kick. About 1.5 swings a second, dying away over two or so, and
+  // the two ears a touch out of tune so they never swing in lockstep.
+  var EAR_HZ = 1.45;
+  var EAR_DAMPING = 0.12;
+  var EAR_DRAG = 3.2;
+  var EAR_MAX = 11;
+  var earrings = [
+    { angle: 0, spin: 0, tune: 1, shown: 0 },
+    { angle: 0, spin: 0, tune: 1.09, shown: 0 },
+  ];
+  var lastVelX = 0;
+
+  function swingEarrings(dt, lean) {
+    var accel = ((vel.x - lastVelX) * SHIFT_X) / dt;
+    lastVelX = vel.x;
+    earrings.forEach(function (ear, side) {
+      var w = 2 * Math.PI * EAR_HZ * ear.tune;
+      var force = -w * w * (ear.angle + lean) - 2 * EAR_DAMPING * w * ear.spin + accel * EAR_DRAG;
+      ear.spin += force * dt;
+      ear.angle = Math.max(-EAR_MAX, Math.min(EAR_MAX, ear.angle + ear.spin * dt));
+      if (Math.abs(ear.angle - ear.shown) < 0.02) return;
+      ear.shown = ear.angle;
+      el.style.setProperty(side ? '--ear-b' : '--ear-a', ear.angle.toFixed(2) + 'deg');
+    });
+  }
+
+  function jiggleEarrings(spin) {
+    if (reducedMotion || !earrings) return;
+    earrings[0].spin += spin;
+    earrings[1].spin += spin * (0.8 + Math.random() * 0.3);
+    wakeSpring();
+  }
 
   // ---- speech bubble --------------------------------------------------------
   //
@@ -1293,7 +1405,28 @@
     moveUntil = now() + ms;
     clearTimeout(moveTimer);
     moveTimer = setTimeout(function () { el.classList.remove('is-m-' + name); }, ms + 50);
+    (EAR_JOLTS[name] || [[0, 24]]).forEach(function (jolt) {
+      setTimeout(function () { jiggleEarrings(jolt[1]); }, jolt[0] * ms);
+    });
   }
+
+  // The moves run in CSS, out of the spring's sight, so each one jolts the
+  // earrings where it changes direction: [share of the move, kick].
+  var EAR_JOLTS = {
+    hop: [[0, -26], [0.45, 34]],
+    jump: [[0, -30], [0.5, 40]],
+    bounce: [[0, 22], [0.35, -24], [0.7, 18]],
+    dance: [[0, 30], [0.25, -34], [0.5, 34], [0.75, -28]],
+    tilt: [[0, 30], [0.6, -20]],
+    lean: [[0, -28], [0.6, 18]],
+    shake: [[0, 40], [0.25, -44], [0.5, 38]],
+    nod: [[0, 18], [0.4, -14]],
+    shiver: [[0, 18], [0.3, -20], [0.6, 16]],
+    dizzy: [[0, 36], [0.3, -38], [0.6, 30]],
+    doze: [[0.6, 24]],
+    sneeze: [[0.45, 50]],
+    stretch: [[0.3, -24]],
+  };
 
   // Durations of the .is-m-* animations in atelier.css.
   var MOVE_MS = {
@@ -1368,7 +1501,9 @@
     // A small flinch away from the finger.
     if (e && typeof e.clientX === 'number') {
       var rect = el.getBoundingClientRect();
-      nudge(e.clientX < rect.left + rect.width / 2 ? 0.7 : -0.7, -0.35);
+      var away = e.clientX < rect.left + rect.width / 2 ? 1 : -1;
+      nudge(away * 0.7, -0.35);
+      jiggleEarrings(away * 44);
     }
 
     if (streak < 5 && Math.random() < 0.5) {

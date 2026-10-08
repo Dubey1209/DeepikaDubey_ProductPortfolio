@@ -1628,12 +1628,12 @@ html.atelier .atelier-mascot-layer.is-look {
 /* Phones get a lighter copy of the direction sheet: the mascot is drawn at
    about 240px there, so the full-size cells are wasted bytes on slow links. */
 html.atelier {
-  --mascot-look: url('mascots/deepika-directions.webp?v=20261125');
+  --mascot-look: url('mascots/deepika-directions.webp?v=20261126');
 }
 
 @media (max-width: 760px) {
   html.atelier {
-    --mascot-look: url('mascots/deepika-directions-sm.webp?v=20261125');
+    --mascot-look: url('mascots/deepika-directions-sm.webp?v=20261126');
   }
 }
 
@@ -1642,7 +1642,7 @@ html.atelier {
    has loaded (it reads the URL from --mascot-react) and sets .has-reactions
    on <html> once it has decoded. */
 html.atelier {
-  --mascot-react: url('mascots/deepika-reactions.webp?v=20261125');
+  --mascot-react: url('mascots/deepika-reactions.webp?v=20261126');
 }
 
 /* mascot.js uses the second layer for direction frames too (.is-look), and
@@ -1664,12 +1664,46 @@ html.atelier.has-reactions .atelier-mascot-layer.is-react {
 }
 
 html.atelier.has-reactions .atelier-mascot-lids {
-  background-image: url('mascots/deepika-blinks.webp?v=20261125');
+  background-image: url('mascots/deepika-blinks.webp?v=20261126');
 }
 
 html.atelier .atelier-mascot-lids {
   -webkit-mask-image: linear-gradient(to bottom, #000 calc(var(--lid-y) - 1.4%), transparent calc(var(--lid-y) + 0.6%));
   mask-image: linear-gradient(to bottom, #000 calc(var(--lid-y) - 1.4%), transparent calc(var(--lid-y) + 0.6%));
+}
+
+/* Swinging earrings (tools/build-earrings.mjs). Inside each body layer a
+   cover paints the drawn earrings out and two drops hang in their place,
+   turned about the stud by --ear-a / --ear-b. mascot.js places them per
+   frame and sets .has-earrings once both sheets have decoded; reaction
+   frames draw their own earrings, so they show on direction frames only. */
+html.atelier .atelier-mascot-ear {
+  display: none;
+  position: absolute;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
+html.atelier .atelier-mascot.has-earrings .atelier-mascot-layer.is-look > .atelier-mascot-ear {
+  display: block;
+}
+
+html.atelier .atelier-mascot-ear.is-cover {
+  inset: 0;
+  background-image: url('mascots/deepika-earcover.webp?v=20261126');
+  background-size: 300% 300%;
+}
+
+html.atelier .atelier-mascot-ear.is-drop {
+  background-image: url('mascots/deepika-eardrops.webp?v=20261126');
+}
+
+html.atelier .atelier-mascot-ear.is-left {
+  transform: rotate(var(--ear-a, 0deg));
+}
+
+html.atelier .atelier-mascot-ear.is-right {
+  transform: rotate(var(--ear-b, 0deg));
 }
 
 html.atelier .atelier-mascot-react {
@@ -1683,8 +1717,8 @@ html.atelier .atelier-mascot-react {
    mask with the frame. Her hair, jaw and outline always come from the frame
    underneath; an oval reached the jaw and showed a second chin. */
 html.atelier.has-reactions .atelier-mascot-face {
-  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261125');
-  mask-image: url('mascots/deepika-face-mask.png?v=20261125');
+  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261126');
+  mask-image: url('mascots/deepika-face-mask.png?v=20261126');
 }
 
 html.atelier .atelier-mascot-face {
@@ -6592,7 +6626,7 @@ html.atelier .sb-cameo-art {
 }
 
 html.atelier .sb-cameo-art.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261125');
+  background-image: url('mascots/deepika-reactions.webp?v=20261126');
 }
 
 html.atelier .sb-cameo-art.is-face {
