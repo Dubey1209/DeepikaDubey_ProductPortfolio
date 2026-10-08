@@ -36,6 +36,7 @@ class PortfolioLock {
     input?.addEventListener('input', () => {
       const first = input.value.trim().split(/\s+/)[0].slice(0, 18);
       form.classList.toggle('has-name', !!first);
+      document.getElementById('portfolio-lock')?.style.setProperty('--glow', Math.min(first.length / 6, 1).toFixed(2));
       if (sub) sub.textContent = first ? `Hi, ${first}! So glad you’re here.` : idle;
     });
 
