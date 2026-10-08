@@ -1208,9 +1208,42 @@ html.atelier .atelier-mascot-burst.is-heart svg {
   filter: drop-shadow(0 2px 4px rgba(255, 92, 122, 0.35));
 }
 
+/* Glints: warm gold hairline rays round a white-hot core, with a soft bloom,
+   the way light catches on hair or in an eye. */
 html.atelier .atelier-mascot-burst.is-spark svg {
-  fill: var(--spin);
-  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--spin) 55%, transparent));
+  overflow: visible;
+  filter:
+    drop-shadow(0 0 1.5px rgba(255, 244, 214, 0.95))
+    drop-shadow(0 0 5px rgba(255, 196, 92, 0.55));
+}
+
+html.atelier .atelier-mascot-burst.is-spark .g-ray {
+  fill: #f4bf55;
+}
+
+html.atelier .atelier-mascot-burst.is-spark .g-ray.is-short {
+  opacity: 0.7;
+}
+
+html.atelier .atelier-mascot-burst.is-spark .g-core {
+  fill: #fffdf6;
+}
+
+/* Bursts move with her lean, so a glint stays on the hair it caught. */
+html.atelier .atelier-mascot-burst.is-spark {
+  transform-origin: 50% 100%;
+  transform: translate(var(--mascot-tx, 0px), var(--mascot-ty, 0px)) rotate(var(--mascot-tilt, 0deg));
+}
+
+html.atelier .atelier-mascot-burst.is-spark > .is-eye {
+  width: 9px;
+  height: 9px;
+  margin: -4.5px 0 0 -4.5px;
+  animation: mascot-eye-glint 1.9s ease-in-out var(--d) forwards;
+}
+
+html.atelier .atelier-mascot-burst.is-spark > .is-eye .g-ray {
+  fill: #fff;
 }
 
 html.atelier .atelier-mascot-burst.is-heart > span {
@@ -1218,7 +1251,10 @@ html.atelier .atelier-mascot-burst.is-heart > span {
 }
 
 html.atelier .atelier-mascot-burst.is-spark > span {
-  animation: mascot-spark 1.3s cubic-bezier(0.34, 1.56, 0.64, 1) var(--d) forwards;
+  width: 16px;
+  height: 16px;
+  margin: -8px 0 0 -8px;
+  animation: mascot-spark 1.9s ease-in-out var(--d) forwards;
 }
 
 @keyframes mascot-heart {
@@ -1228,10 +1264,22 @@ html.atelier .atelier-mascot-burst.is-spark > span {
   100% { opacity: 0; transform: translate(var(--dx), var(--rise)) scale(calc(var(--s) * 0.8)) rotate(var(--r)); }
 }
 
+/* A twinkle, not a pop: it flares, dims, flares again and fades, turning
+   only a few degrees, as a glint does when the light shifts. */
 @keyframes mascot-spark {
   0% { opacity: 0; transform: scale(0) rotate(0deg); }
-  40% { opacity: 1; transform: scale(var(--s)) rotate(var(--r)); }
-  100% { opacity: 0; transform: scale(0.2) rotate(calc(var(--r) * 4)); }
+  22% { opacity: 1; transform: scale(var(--s)) rotate(calc(var(--r) * 0.5)); }
+  42% { opacity: 0.55; transform: scale(calc(var(--s) * 0.45)) rotate(calc(var(--r) * 0.7)); }
+  62% { opacity: 1; transform: scale(calc(var(--s) * 0.9)) rotate(var(--r)); }
+  100% { opacity: 0; transform: scale(0) rotate(calc(var(--r) * 1.4)); }
+}
+
+@keyframes mascot-eye-glint {
+  0% { opacity: 0; transform: scale(0) rotate(0deg); }
+  25% { opacity: 1; transform: scale(1) rotate(10deg); }
+  45% { opacity: 0.6; transform: scale(0.5) rotate(14deg); }
+  65% { opacity: 1; transform: scale(0.9) rotate(18deg); }
+  100% { opacity: 0; transform: scale(0) rotate(24deg); }
 }
 
 /* Marks beside her head for her little moments: notes, ?, !, zzz, a drop
@@ -1488,12 +1536,12 @@ html.atelier .atelier-mascot-layer.is-look {
 /* Phones get a lighter copy of the direction sheet: the mascot is drawn at
    about 240px there, so the full-size cells are wasted bytes on slow links. */
 html.atelier {
-  --mascot-look: url('mascots/deepika-directions.webp?v=20261119');
+  --mascot-look: url('mascots/deepika-directions.webp?v=20261120');
 }
 
 @media (max-width: 760px) {
   html.atelier {
-    --mascot-look: url('mascots/deepika-directions-sm.webp?v=20261119');
+    --mascot-look: url('mascots/deepika-directions-sm.webp?v=20261120');
   }
 }
 
@@ -1502,7 +1550,7 @@ html.atelier {
    has loaded (it reads the URL from --mascot-react) and sets .has-reactions
    on <html> once it has decoded. */
 html.atelier {
-  --mascot-react: url('mascots/deepika-reactions.webp?v=20261119');
+  --mascot-react: url('mascots/deepika-reactions.webp?v=20261120');
 }
 
 html.atelier.has-reactions .atelier-mascot-react,
@@ -1521,8 +1569,8 @@ html.atelier .atelier-mascot-react {
    mask with the frame. Her hair, jaw and outline always come from the frame
    underneath; an oval reached the jaw and showed a second chin. */
 html.atelier.has-reactions .atelier-mascot-face {
-  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261119');
-  mask-image: url('mascots/deepika-face-mask.png?v=20261119');
+  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261120');
+  mask-image: url('mascots/deepika-face-mask.png?v=20261120');
 }
 
 html.atelier .atelier-mascot-face {
@@ -6430,7 +6478,7 @@ html.atelier .sb-cameo-art {
 }
 
 html.atelier .sb-cameo-art.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261119');
+  background-image: url('mascots/deepika-reactions.webp?v=20261120');
 }
 
 html.atelier .sb-cameo-art.is-face {

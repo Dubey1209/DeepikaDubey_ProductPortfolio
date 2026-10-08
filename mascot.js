@@ -16,7 +16,11 @@
 //   pointer scrubs over her     giggle (tickled)
 //   click / Enter / Space       a face that suits where she was touched; keep
 //                               going and she says something about it
-//   any link or button hovered  sometimes starry
+//   cursor resting on the page  she keeps watching it and, now and then, has
+//                               a little moment (a tilt, hearts, a smile)
+//
+// The cursor comes first: wherever it goes she looks, and a mood she was
+// having to herself ends the moment it moves.
 //
 // One character, not a slideshow:
 //   - An expression changes only her face. The reaction faces are drawn on
@@ -237,28 +241,41 @@
 
   // ---- reactions ------------------------------------------------------------
 
-  function react(index, ms) {
+  // Expressions are eased in and out slowly enough to read as a feeling
+  // passing over her face; at the old 180ms they flickered like a slideshow.
+  // Blinks stay quick, as real ones are.
+  var FACE_IN_MS = 360;
+  var FACE_OUT_MS = 520;
+  var TO_FRONT_MS = 400;
+
+  // Whether the running reaction is one she started herself (idle, a passing
+  // mood). Those give way the moment the visitor points somewhere else.
+  var reactAuto = false;
+
+  function react(index, ms, auto) {
     reacting = index;
+    reactAuto = !!auto;
     clearTimeout(faceDelay);
     clearTimeout(reactTimer);
     if (ms) reactTimer = setTimeout(endReaction, ms);
+    var faceIn = index === BLINK ? 110 : FACE_IN_MS;
 
     if (WHOLE.indexOf(index) >= 0) {
-      face.hide(200);
-      body.show('react', index, 300);
+      face.hide(260);
+      body.show('react', index, TO_FRONT_MS);
       return;
     }
     // The faces look straight out, so she turns to the front first. Coming
     // out of a whole-figure pose (thinking) is not a turn: the face comes in
     // with the body, or her plain face flashed between the two expressions.
     var turning = body.key.indexOf('look:') === 0 && body.key !== 'look:' + CENTRE;
-    body.show('look', CENTRE, 240);
+    body.show('look', CENTRE, TO_FRONT_MS);
     if (turning) {
       faceDelay = setTimeout(function () {
-        face.show('react', index, 180);
-      }, 160);
+        face.show('react', index, faceIn);
+      }, TO_FRONT_MS * 0.7);
     } else {
-      face.show('react', index, 180);
+      face.show('react', index, faceIn);
     }
   }
 
@@ -266,14 +283,11 @@
     clearTimeout(reactTimer);
     clearTimeout(faceDelay);
     reacting = -1;
-    face.hide(ms || 280);
-    body.show('look', lookIndex, 300);
-  }
-
-  // Reactions she starts herself never cut off one the visitor caused, and
-  // never turn her head away from where she is looking.
-  function autoReact(index, ms) {
-    if (visible && reacting < 0 && lookIndex === CENTRE) react(index, ms);
+    reactAuto = false;
+    face.hide(ms || FACE_OUT_MS);
+    // Back to wherever the cursor is now, not where it was when she started.
+    lookIndex = wantLook;
+    body.show('look', lookIndex, ms || FACE_OUT_MS);
   }
 
   function scheduleBlink() {
@@ -308,10 +322,13 @@
   // Thresholds with hysteresis: a frame is entered past ENTER and kept until
   // the cursor comes back past LEAVE, so a cursor sitting on a boundary does
   // not flick between two frames.
-  var ENTER = 0.5;
-  var LEAVE = 0.24;
+  // ENTER is about 25 degrees off an axis, so each of the eight directions
+  // owns a fair slice of the circle; at 30 degrees she kept staring straight
+  // ahead at a cursor that was clearly up and to one side.
+  var ENTER = 0.42;
+  var LEAVE = 0.22;
   // She settles on a direction only once the cursor has held it this long.
-  var SETTLE_MS = 150;
+  var SETTLE_MS = 110;
   // Each step of a head turn. A turn moves one frame at a time, through the
   // frames in between, as a head does; jumping left-to-right in one cross-fade
   // showed two heads at once and read as a machine.
@@ -329,6 +346,14 @@
   function requestLook(index) {
     if (index === wantLook) return;
     wantLook = index;
+    // The visitor pointing somewhere new outranks a mood she was having to
+    // herself: she lets it go and looks.
+    if (reacting >= 0 && reactAuto && index !== CENTRE && !idling) {
+      momentTimers.forEach(clearTimeout);
+      momentTimers = [];
+      endReaction();
+      return;
+    }
     clearTimeout(lookTimer);
     if (index !== lookIndex) lookTimer = setTimeout(commitLook, SETTLE_MS);
   }
@@ -354,7 +379,7 @@
     var rect = el.getBoundingClientRect();
     var dx = pointer.x - (rect.left + rect.width / 2);
     // Aim at the face, which sits in the upper part of the figure.
-    var dy = pointer.y - (rect.top + rect.height * 0.42);
+    var dy = pointer.y - (rect.top + rect.height * 0.4);
     var dist = Math.sqrt(dx * dx + dy * dy);
     var nx = dist ? dx / dist : 0;
     var ny = dist ? dy / dist : 0;
@@ -368,7 +393,7 @@
     } else {
       // Direction scaled down inside a radius around her: far away only the
       // angle matters, close by it takes a real move to turn her head.
-      var reach = Math.max(dist, rect.width * 0.95);
+      var reach = Math.max(dist, rect.width * 0.7);
       col = axis(col, dx / reach);
       row = axis(row, dy / reach);
     }
@@ -385,8 +410,8 @@
       faceSince = 0;
     } else if (!faceSince) {
       faceSince = now();
-    } else if (now() - faceSince > 900 && reacting < 0) {
-      react(SHY, 1800);
+    } else if (now() - faceSince > 1400 && reacting < 0) {
+      react(SHY, 2600, true);
       faceSince = now() + 4000;
     }
   }
@@ -1124,7 +1149,7 @@
 
   // Long enough to read at an easy pace, never so long she seems stuck.
   function holdFor(text) {
-    return Math.min(4200, 1600 + text.length * 45);
+    return Math.min(4800, 2200 + text.length * 45);
   }
 
   // Little moments: a run of faces with a body move, a small effect and a
@@ -1201,16 +1226,22 @@
   var lastMoment = '';
 
   // quiet: no speech bubble, for moments she has on her own at rest.
+  // Each beat of a moment is held a little longer than written, so one face
+  // has time to land before the next takes over.
+  var TEMPO = 1.4;
+
   function playMoment(m, quiet) {
     momentTimers.forEach(clearTimeout);
     momentTimers = [];
-    var total = m.steps.reduce(function (sum, s) { return sum + s[1]; }, 0);
+    var steps = m.steps.map(function (s) {
+      return [s[0], s[0] === BLINK ? s[1] : Math.round(s[1] * TEMPO)];
+    });
+    var total = steps.reduce(function (sum, s) { return sum + s[1]; }, 0);
     var at = 0;
-    m.steps.forEach(function (s, i) {
-      var last = i === m.steps.length - 1;
+    steps.forEach(function (s, i) {
+      var last = i === steps.length - 1;
       momentTimers.push(setTimeout(function () {
-        if (s[0] === BLINK && !last) react(BLINK, s[1] + 200);
-        else react(s[0], last ? s[1] : s[1] + 200);
+        react(s[0], last ? s[1] : s[1] + 200, quiet);
       }, at));
       at += s[1];
     });
@@ -1262,7 +1293,7 @@
   el.addEventListener('pointerenter', function () {
     if (now() - lastGreet < 15000 || reacting >= 0) return;
     lastGreet = now();
-    react(GRIN, 1100);
+    react(GRIN, 1900, true);
   });
 
   // A pointer resting on her for a moment gets a passing thought, at most
@@ -1277,7 +1308,7 @@
       lastMuse = now();
       var line = pickLine('muse', MUSINGS);
       var hold = holdFor(line.text);
-      react(line.face, hold);
+      react(line.face, hold, true);
       say(line.text, hold);
     }, 2200);
   }
@@ -1308,18 +1339,8 @@
     reversals.push(t);
     if (reversals.length >= 5) {
       reversals = [];
-      react(GIGGLE, 1300);
+      react(GIGGLE, 1900, true);
     }
-  });
-
-  var lastStarry = 0;
-
-  document.addEventListener('pointerover', function (e) {
-    var hovered = e.target.closest && e.target.closest('a, button');
-    if (!hovered || el.contains(hovered) || guideKey(hovered)) return;
-    if (now() - lastStarry < 8000 || Math.random() > 0.35) return;
-    lastStarry = now();
-    autoReact(STARRY, 900);
   });
 
   // ---- tour guide -----------------------------------------------------------
@@ -1452,6 +1473,7 @@
   });
 
   var aimQueued = false;
+  var touchTimer = 0;
 
   function queueAim() {
     if (aimQueued) return;
@@ -1467,6 +1489,9 @@
     function (e) {
       pointer = { x: e.clientX, y: e.clientY };
       queueAim();
+      // A finger lifts off the glass; there is no cursor left to watch.
+      clearTimeout(touchTimer);
+      if (e.pointerType === 'touch') touchTimer = setTimeout(function () { pointer = null; }, 2500);
     },
     { passive: true }
   );
@@ -1482,7 +1507,7 @@
   // round, smiles to herself, thinks, hums; and after a long quiet, now and
   // then, says something. Any movement hands her gaze back to the visitor.
 
-  var IDLE_AFTER = 6000;
+  var IDLE_AFTER = 4500;
   var lastActive = now();
   var idling = false;
   var idleTimer = 0;
@@ -1547,24 +1572,24 @@
     }],
     // A shy little smile and a blush, to nobody in particular.
     [20, function () {
-      react(SHY, 2600);
-      blushFor(2600);
-      return 2900;
+      react(SHY, 2800, true);
+      blushFor(2800);
+      return 3300;
     }],
     // A soft smile to herself, eyes closing happily.
     [16, function () {
-      react(GIGGLE, 1800);
-      return 2100;
+      react(GIGGLE, 2200, true);
+      return 2700;
     }],
     // A warm grin, as if remembering something nice.
     [12, function () {
-      react(GRIN, 1600);
-      return 1900;
+      react(GRIN, 2200, true);
+      return 2700;
     }],
     // A moment of thought, chin on hand.
     [10, function () {
-      react(THINKING, 2600);
-      return 2900;
+      react(THINKING, 3000, true);
+      return 3400;
     }],
     // An eye roll, unhurried: up and round, a beat, back with a blink.
     [6, function () {
@@ -1593,15 +1618,77 @@
     }],
   ];
 
-  function pickIdleAct() {
-    var total = IDLE_ACTS.reduce(function (sum, act) { return sum + act[0]; }, 0);
+  // With a mouse resting on the page she keeps her eyes on it: no glancing
+  // round the room at someone who is right there. Half of what she does
+  // keeps her head turned to the cursor (a little gesture, a thought mark,
+  // hearts); the other half is a face, for which she turns to the front,
+  // holds it, and turns back to the cursor.
+  var WATCH_ACTS = [
+    // A curious tilt at whatever the cursor is resting on.
+    [18, function () {
+      moveBody('tilt');
+      later(function () { burst('ask'); }, 500);
+      return 2600;
+    }],
+    // A little nod and a hum.
+    [14, function () {
+      moveBody('nod');
+      burst('note');
+      return 2400;
+    }],
+    // Hearts, without looking away.
+    [12, function () {
+      moveBody('hop');
+      burst('heart');
+      return 2800;
+    }],
+    // A warm smile at the visitor.
+    [20, function () {
+      react(GRIN, 2400, true);
+      return 2900;
+    }],
+    // A soft giggle to herself.
+    [14, function () {
+      react(GIGGLE, 2200, true);
+      return 2700;
+    }],
+    // Shy, cheeks warming.
+    [12, function () {
+      react(SHY, 2800, true);
+      blushFor(2800);
+      return 3300;
+    }],
+    // A wink, held long enough to read.
+    [10, function () {
+      react(WINK, 1700, true);
+      return 2200;
+    }],
+  ];
+
+  function pickFrom(acts) {
+    var total = acts.reduce(function (sum, act) { return sum + act[0]; }, 0);
     var r = Math.random() * total;
-    for (var i = 0; i < IDLE_ACTS.length; i += 1) {
-      r -= IDLE_ACTS[i][0];
-      if (r <= 0) return IDLE_ACTS[i][1];
+    for (var i = 0; i < acts.length; i += 1) {
+      r -= acts[i][0];
+      if (r <= 0) return acts[i][1];
     }
-    return IDLE_ACTS[0][1];
+    return acts[0][1];
   }
+
+  function pickIdleAct() {
+    return pickFrom(pointer ? WATCH_ACTS : IDLE_ACTS);
+  }
+
+  // The mouse leaving the window: nothing to look at, so she is free to
+  // look round on her own again.
+  document.addEventListener('pointerout', function (e) {
+    if (e.pointerType === 'mouse' && !e.relatedTarget) {
+      pointer = null;
+      col = 1;
+      row = 1;
+      requestLook(CENTRE);
+    }
+  });
 
   function scheduleIdle(ms) {
     clearTimeout(idleTimer);
@@ -1619,7 +1706,7 @@
     var busy;
     if (quiet > 30000 && now() - lastIdleLine > 45000 && Math.random() < 0.4) {
       lastIdleLine = now();
-      gazeTo(CENTRE);
+      if (!pointer) gazeTo(CENTRE);
       var line = pickLine('idle', IDLE_LINES);
       var hold = holdFor(line.text);
       react(line.face, hold);
@@ -1636,6 +1723,11 @@
     if (!idling) return;
     idling = false;
     clearIdleSteps();
+    if (reacting >= 0 && reactAuto) {
+      momentTimers.forEach(clearTimeout);
+      momentTimers = [];
+      endReaction();
+    }
     if (pointer) queueAim();
     else requestLook(CENTRE);
   }
@@ -1812,7 +1904,17 @@
   el.appendChild(blush);
 
   var HEART = '<svg viewBox="0 0 24 24"><path d="M12 20.6 4.3 12.9a4.8 4.8 0 0 1 6.8-6.8l.9.9.9-.9a4.8 4.8 0 0 1 6.8 6.8z"/></svg>';
-  var SPARK = '<svg viewBox="0 0 24 24"><path d="M12 2.5c.7 5 2.4 7 7.5 7.9v1.2c-5.1.9-6.8 2.9-7.5 7.9h-1c-.7-5-2.4-7-7.5-7.9v-1.2c5.1-.9 6.8-2.9 7.5-7.9z"/></svg>';
+  // A glint, as light catches it: four long hairline rays, four short ones
+  // between them, and a white-hot core.
+  var SPARK =
+    '<svg viewBox="0 0 24 24">' +
+    '<path class="g-ray" d="M12 0C12.5 7.3 16.7 11.5 24 12 16.7 12.5 12.5 16.7 12 24 11.5 16.7 7.3 12.5 0 12 7.3 11.5 11.5 7.3 12 0z"/>' +
+    '<path class="g-ray is-short" transform="rotate(45 12 12)" d="M12 5.5C12.3 9.6 14.4 11.7 18.5 12 14.4 12.3 12.3 14.4 12 18.5 11.7 14.4 9.6 12.3 5.5 12 9.6 11.7 11.7 9.6 12 5.5z"/>' +
+    '<circle class="g-core" cx="12" cy="12" r="2.2"/>' +
+    '</svg>';
+  // Where the light sits in her pupils on the open-eyed faces (grin, gasp),
+  // as fractions of the box, measured off the reaction sheet.
+  var EYE_GLINTS = [[43.6, 39.4], [66, 39.6]];
 
   // Particles in the mascot's own box: hearts rise from her cheeks, sparkles
   // pop around her head. Positions are fractions of the box (see spotAt).
@@ -1850,7 +1952,7 @@
       }, 3200);
       return;
     }
-    var count = kind === 'heart' ? 7 : 6;
+    var count = kind === 'heart' ? 7 : 5;
     for (var i = 0; i < count; i += 1) {
       var p = document.createElement('span');
       var side = i % 2 ? 1 : -1;
@@ -1861,15 +1963,30 @@
         p.style.setProperty('--rise', -(110 + Math.random() * 90) + 'px');
         p.style.setProperty('--s', (0.7 + Math.random() * 0.6).toFixed(2));
       } else {
-        var a = (i / count) * Math.PI * 2 + Math.random() * 0.5;
-        p.style.setProperty('--x', (53.5 + Math.cos(a) * 30) + '%');
-        p.style.setProperty('--y', (30 + Math.sin(a) * 20) + '%');
-        p.style.setProperty('--s', (0.6 + Math.random() * 0.7).toFixed(2));
+        // Strung along an arc over her crown and down past her ears, clear
+        // of the face: glints on the hair, not stars in her eyes.
+        var a = Math.PI * (1.08 + (i / (count - 1)) * 0.84) + (Math.random() - 0.5) * 0.18;
+        p.style.setProperty('--x', (53.5 + Math.cos(a) * (37 + Math.random() * 5)) + '%');
+        p.style.setProperty('--y', (30 + Math.sin(a) * (27 + Math.random() * 4)) + '%');
+        p.style.setProperty('--s', (i === 1 || i === 3 ? 0.95 : 0.55 + Math.random() * 0.25).toFixed(2));
       }
-      p.style.setProperty('--d', (i * 0.12 + Math.random() * 0.1).toFixed(2) + 's');
+      p.style.setProperty('--d', (i * 0.16 + Math.random() * 0.12).toFixed(2) + 's');
       p.style.setProperty('--r', (side * (8 + Math.random() * 18)).toFixed(0) + 'deg');
       p.innerHTML = kind === 'heart' ? HEART : SPARK;
       wrap.appendChild(p);
+    }
+    // Light catching in her eyes, only on a front-facing open-eyed face, and
+    // once that face has faded in.
+    if (kind === 'spark' && (reacting === GRIN || reacting === GASP)) {
+      EYE_GLINTS.forEach(function (at, j) {
+        var g = document.createElement('span');
+        g.className = 'is-eye';
+        g.style.setProperty('--x', at[0] + '%');
+        g.style.setProperty('--y', at[1] + '%');
+        g.style.setProperty('--d', (0.75 + j * 0.08).toFixed(2) + 's');
+        g.innerHTML = SPARK;
+        wrap.appendChild(g);
+      });
     }
     el.appendChild(wrap);
     setTimeout(function () {
