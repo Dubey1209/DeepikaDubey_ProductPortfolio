@@ -111,11 +111,10 @@ Two deliberate choices here:
   directly.
 - **`og:image` stays JPEG**, and absolute. Social scrapers do not resolve
   relative URLs, and several still do not decode WebP.
-- **The favicon is the mascot**, not the photo: `favicon-32.png`,
-  `favicon.png` (64px) and `apple-touch-icon.png` (180px) are her
-  front-facing frame from `deepika-directions.webp`, cropped round inside a
-  gold ring. The tab icons are cropped close (eyes and fringe fill the
-  circle) so she still reads at 16px; the home-screen icon shows more hair.
+- **The favicon is the logo mark**, not a face: a cream serif `P` and blue
+  `{}` on an ink rounded square (`favicon-32.png`, `favicon.png` at 64px,
+  and a full-bleed `apple-touch-icon.png` at 180px, since iOS rounds it
+  itself). A portrait, photo or cartoon, turns to mush at 16px.
 
 The certificate images intentionally have no `width`/`height` attributes: they
 are `width: 100%; height: 100%; object-fit: cover` inside an absolutely
