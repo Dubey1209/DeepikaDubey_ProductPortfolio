@@ -32,12 +32,28 @@ class PortfolioLock {
 
     const input = document.getElementById('visitor-name');
     const sub = document.getElementById('lock-subtitle');
+    const plate = document.getElementById('lock-plate-name');
     const idle = sub?.textContent || '';
+    const porch = this.bindPorch(input);
+    this.porch = porch;
+    plate?.classList.add('is-empty');
+    let had = false;
     input?.addEventListener('input', () => {
       const first = input.value.trim().split(/\s+/)[0].slice(0, 18);
       form.classList.toggle('has-name', !!first);
       document.getElementById('portfolio-lock')?.style.setProperty('--glow', Math.min(first.length / 6, 1).toFixed(2));
       if (sub) sub.textContent = first ? `Hi, ${first}! So glad you’re here.` : idle;
+      if (plate) {
+        plate.textContent = first || 'guest';
+        plate.classList.toggle('is-empty', !first);
+        if (first && !had) {
+          plate.parentElement.classList.remove('is-stamp');
+          void plate.offsetWidth;
+          plate.parentElement.classList.add('is-stamp');
+        }
+      }
+      if (!!first !== had) porch.hold(first ? 2 : null);
+      had = !!first;
     });
 
     form.addEventListener('submit', (e) => {
@@ -46,11 +62,93 @@ class PortfolioLock {
     });
   }
 
+  // She looks out of the door's window: eyes follow the pointer (or the
+  // form while it has focus), she blinks, grins once a name is in, gasps at
+  // an empty knock and winks as the door opens. Cells are 3x3; row 0 looks
+  // up, column 0 to the left.
+  bindPorch(input) {
+    const quiet = { hold() {}, flash() {} };
+    const porch = document.querySelector('.lock-porch');
+    const win = porch?.querySelector('.lock-window');
+    const look = win?.querySelector('.is-look');
+    const react = win?.querySelector('.is-react');
+    if (!porch || !look || !react) return quiet;
+
+    const cell = (n) => `${(n % 3) * 50}% ${Math.floor(n / 3) * 50}%`;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let held = null;
+    let flashUntil = 0;
+    let gazeCell = 4;
+
+    const show = (n) => {
+      if (n == null) {
+        win.classList.remove('is-face-on');
+        return;
+      }
+      react.style.backgroundPosition = cell(n);
+      win.classList.add('is-face-on');
+    };
+    const gaze = (n) => {
+      if (n === gazeCell) return;
+      gazeCell = n;
+      look.style.backgroundPosition = cell(n);
+    };
+    const toward = (x, y) => {
+      const r = win.getBoundingClientRect();
+      const dx = x - (r.left + r.width / 2);
+      const dy = y - (r.top + r.height / 2);
+      const col = dx < -70 ? 0 : dx > 70 ? 2 : 1;
+      const row = dy < -70 ? 0 : dy > 70 ? 2 : 1;
+      gaze(row * 3 + col);
+    };
+
+    document.addEventListener('pointermove', (e) => {
+      if (document.activeElement !== input) toward(e.clientX, e.clientY);
+    }, { passive: true });
+    input?.addEventListener('focus', () => {
+      const r = input.getBoundingClientRect();
+      toward(r.left + Math.min(r.width, 160), r.top + r.height / 2);
+    });
+
+    if (!reduce) {
+      const blink = () => {
+        if (Date.now() > flashUntil && document.body.classList.contains('portfolio-is-locked')) {
+          show(0);
+          setTimeout(() => { if (Date.now() > flashUntil) show(held); }, 140);
+        }
+        setTimeout(blink, 2600 + Math.random() * 2600);
+      };
+      setTimeout(blink, 1800);
+
+      const knock = () => {
+        if (input?.value.trim()) return;
+        porch.classList.remove('is-knocking');
+        void porch.offsetWidth;
+        porch.classList.add('is-knocking');
+      };
+      setTimeout(knock, 1500);
+      setTimeout(knock, 12000);
+    }
+
+    return {
+      hold(n) {
+        held = n;
+        if (Date.now() > flashUntil) show(n);
+      },
+      flash(n, ms) {
+        flashUntil = Date.now() + ms;
+        show(n);
+        setTimeout(() => { if (Date.now() >= flashUntil) show(held); }, ms);
+      }
+    };
+  }
+
   async handleSubmit(e) {
     const form = e.currentTarget;
     const nameInput = document.getElementById('visitor-name');
     const name = nameInput?.value.trim() || '';
     if (!name) {
+      this.porch?.flash(3, 900);
       this.notify('Please enter your name.', 'error');
       nameInput?.focus();
       return;
@@ -61,6 +159,7 @@ class PortfolioLock {
     const btnLoader = btn?.querySelector('.btn-loader');
     if (!btn || !btnText || !btnLoader) return;
 
+    this.porch?.flash(1, 3000);
     btn.disabled = true;
     btnText.style.display = 'none';
     btnLoader.style.display = 'inline';

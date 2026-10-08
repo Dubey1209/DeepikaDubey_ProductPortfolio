@@ -1454,12 +1454,12 @@ html.atelier .atelier-mascot.is-m-stretch :is(.atelier-mascot-layer, .atelier-ma
    scaling the picture continuously kept it permanently resampled and soft. */
 html.atelier .atelier-mascot-look,
 html.atelier .atelier-mascot-layer.is-look {
-  background-image: url('mascots/deepika-directions.webp?v=20261108');
+  background-image: url('mascots/deepika-directions.webp?v=20261109');
 }
 
 html.atelier .atelier-mascot-react,
 html.atelier .atelier-mascot-layer.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261108');
+  background-image: url('mascots/deepika-reactions.webp?v=20261109');
 }
 
 html.atelier .atelier-mascot-react {
@@ -1474,8 +1474,8 @@ html.atelier .atelier-mascot-react {
    underneath; an oval reached the jaw and showed a second chin. */
 html.atelier .atelier-mascot-face {
   opacity: 0;
-  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261108');
-  mask-image: url('mascots/deepika-face-mask.png?v=20261108');
+  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261109');
+  mask-image: url('mascots/deepika-face-mask.png?v=20261109');
   -webkit-mask-size: 300% 300%;
   mask-size: 300% 300%;
   -webkit-mask-repeat: no-repeat;
@@ -3845,11 +3845,336 @@ html.atelier .portfolio-lock {
 html.atelier .portfolio-lock .atelier-gate {
   position: relative;
   z-index: 1;
+}
+
+html.atelier .lock-scene {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: auto minmax(0, 27rem);
+  align-items: center;
+  gap: clamp(3rem, 8vw, 7rem);
   margin: auto;
 }
 
+/* The porch: a front door with a round window she looks out of, a brass
+   plate that takes the visitor's name and a lamp that comes on for them. */
+html.atelier .lock-porch {
+  --door: #b0501f;
+  --door-deep: #8a3c16;
+  --brass: #d9a441;
+  --light: #ffd98a;
+  position: relative;
+  width: 15.5rem;
+  padding-bottom: 1.6rem;
+  animation: lockRise 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+html.atelier body.dark-theme .lock-porch {
+  --door: #9c4719;
+  --door-deep: #6f3010;
+}
+
+html.atelier .lock-frame {
+  position: relative;
+  aspect-ratio: 5 / 8;
+  padding: 0.55rem 0.55rem 0;
+  border: 1.5px solid var(--ink);
+  border-bottom: 0;
+  border-radius: 999px 999px 0 0;
+  background:
+    radial-gradient(80% 60% at 50% 70%, #fff4d6, var(--light) 45%, color-mix(in srgb, var(--light) 60%, var(--door)) 100%);
+  box-shadow: 9px 0 0 var(--ink);
+  perspective: 900px;
+}
+
+html.atelier .lock-door {
+  position: absolute;
+  inset: 0.55rem 0.55rem 0;
+  border: 1.5px solid var(--ink);
+  border-bottom: 0;
+  border-radius: 999px 999px 0 0;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), transparent 40%),
+    var(--door);
+  transform-origin: left center;
+  transition: transform 0.85s cubic-bezier(0.7, 0, 0.2, 1);
+  backface-visibility: hidden;
+}
+
+html.atelier .lock-door::before {
+  content: '';
+  position: absolute;
+  left: 14%;
+  right: 14%;
+  bottom: 7%;
+  height: 30%;
+  border: 1.5px solid var(--door-deep);
+  border-radius: 0.35rem;
+}
+
+html.atelier .lock-window {
+  position: absolute;
+  top: 9%;
+  left: 50%;
+  width: 46%;
+  aspect-ratio: 1;
+  translate: -50% 0;
+  overflow: hidden;
+  border: 3px solid var(--brass);
+  border-radius: 50%;
+  background:
+    radial-gradient(70% 60% at 50% 45%, #fff1c9, var(--light) 60%, #f0b860);
+  box-shadow: 0 0 0 1.5px var(--ink), inset 0 0 0 1.5px rgba(0, 0, 0, 0.12);
+}
+
+html.atelier .lock-face {
+  position: absolute;
+  left: -14%;
+  top: 6%;
+  width: 128%;
+  aspect-ratio: 680 / 800;
+  background: url('mascots/deepika-directions.webp?v=20261109') no-repeat 50% 50% / 300% 300%;
+  transition: translate 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+html.atelier .lock-face.is-react {
+  background-image: url('mascots/deepika-reactions.webp?v=20261109');
+  opacity: 0;
+  transition: opacity 0.14s ease;
+}
+
+html.atelier .lock-window.is-face-on .lock-face.is-react {
+  opacity: 1;
+}
+
+html.atelier .lock-plate {
+  position: absolute;
+  top: 52%;
+  left: 50%;
+  translate: -50% 0;
+  min-width: 62%;
+  max-width: 84%;
+  padding: 0.3rem 0.7rem 0.34rem;
+  border: 1.5px solid var(--ink);
+  border-radius: 0.3rem;
+  background: linear-gradient(180deg, #f1cf7e, var(--brass));
+  box-shadow: 0 2px 0 var(--ink);
+  text-align: center;
+}
+
+html.atelier .lock-plate-name {
+  display: block;
+  overflow: hidden;
+  font-family: var(--serif);
+  font-size: 0.95rem;
+  font-style: italic;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: #2b1d0e;
+  transition: opacity 0.2s;
+}
+
+html.atelier .lock-plate-name.is-empty {
+  opacity: 0.45;
+}
+
+html.atelier .lock-plate.is-stamp {
+  animation: lockStamp 0.35s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+@keyframes lockStamp {
+  40% { scale: 1.08; }
+}
+
+html.atelier .lock-knob {
+  position: absolute;
+  right: 11%;
+  top: 60%;
+  width: 0.85rem;
+  aspect-ratio: 1;
+  border: 1.5px solid var(--ink);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fbe3a2, var(--brass) 60%);
+}
+
+html.atelier .lock-mat {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  translate: -50% 0;
+  width: 78%;
+  padding: 0.28rem 0;
+  border: 1.5px solid var(--ink);
+  border-radius: 0.4rem;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 5px, rgba(0, 0, 0, 0.08) 5px 6px),
+    color-mix(in srgb, var(--spin) 55%, var(--paper));
+  font-family: var(--serif);
+  font-size: 0.8rem;
+  font-style: italic;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-align: center;
+  color: var(--ink);
+}
+
+/* The floor line the door stands on, lit by whatever leaks under it. */
+html.atelier .lock-porch::after {
+  content: '';
+  position: absolute;
+  left: -2.5rem;
+  right: -2.5rem;
+  bottom: 1.95rem;
+  height: 1.5px;
+  background: var(--ink);
+}
+
+html.atelier .lock-frame::after {
+  content: '';
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: -0.55rem;
+  height: 1rem;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--light) 90%, transparent), transparent);
+  opacity: calc(0.25 + var(--glow) * 0.75);
+  transition: opacity 0.5s ease;
+  filter: blur(2px);
+}
+
+html.atelier .lock-lamp {
+  position: absolute;
+  top: 34%;
+  right: -2.4rem;
+  width: 1.1rem;
+  height: 1.7rem;
+  border: 1.5px solid var(--ink);
+  border-radius: 0.55rem 0.55rem 0.25rem 0.25rem;
+  background: color-mix(in srgb, var(--light) calc(25% + var(--glow) * 75%), var(--paper));
+  box-shadow: 0 0 calc(var(--glow) * 2.6rem) calc(var(--glow) * 0.9rem) color-mix(in srgb, var(--light) 70%, transparent);
+  transition: background 0.4s, box-shadow 0.5s;
+}
+
+html.atelier .lock-lamp::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: -0.55rem;
+  width: 1.5px;
+  height: 0.5rem;
+  background: var(--ink);
+}
+
+html.atelier .lock-knock {
+  position: absolute;
+  top: 8%;
+  right: calc(100% + 0.5rem);
+  font-family: var(--serif);
+  font-size: 1rem;
+  font-style: italic;
+  white-space: nowrap;
+  color: var(--spin);
+  rotate: -8deg;
+  opacity: 0;
+  pointer-events: none;
+}
+
+html.atelier .lock-porch.is-knocking .lock-knock {
+  animation: lockKnockNote 2.2s ease forwards;
+}
+
+html.atelier .lock-porch.is-knocking .lock-door {
+  animation: lockDoorKnock 0.7s ease-in-out;
+}
+
+@keyframes lockKnockNote {
+  0% { opacity: 0; translate: -4px 6px; }
+  18%, 70% { opacity: 1; translate: 0 0; }
+  100% { opacity: 0; translate: 4px -6px; }
+}
+
+@keyframes lockDoorKnock {
+  12%, 42% { translate: 1.5px 0; }
+  26%, 56% { translate: -1px 0; }
+  0%, 70%, 100% { translate: 0 0; }
+}
+
+html.atelier .portfolio-lock.is-opening .lock-door {
+  transform: rotateY(84deg);
+}
+
+html.atelier .portfolio-lock.is-opening .lock-frame::after {
+  opacity: 1;
+}
+
+@media (max-width: 860px) {
+  html.atelier .lock-scene {
+    grid-template-columns: minmax(0, 27rem);
+    justify-items: center;
+    gap: 2rem;
+  }
+
+  html.atelier .lock-porch {
+    width: 9.5rem;
+    padding-bottom: 1.3rem;
+  }
+
+  html.atelier .lock-plate-name {
+    font-size: 0.72rem;
+  }
+
+  html.atelier .lock-lamp {
+    right: -1.9rem;
+    width: 0.85rem;
+    height: 1.3rem;
+  }
+
+  html.atelier .lock-knock {
+    font-size: 0.85rem;
+  }
+
+  html.atelier .lock-mat {
+    font-size: 0.66rem;
+  }
+
+  html.atelier .lock-porch::after {
+    bottom: 1.6rem;
+  }
+}
+
+@media (max-height: 520px) and (orientation: landscape) {
+  html.atelier .lock-scene {
+    grid-template-columns: auto minmax(0, 24rem);
+    gap: 3rem;
+  }
+
+  html.atelier .lock-porch {
+    width: 8rem;
+  }
+
+  html.atelier .portfolio-lock {
+    padding-top: max(3.2rem, env(safe-area-inset-top)) !important;
+  }
+
+  html.atelier .portfolio-lock .lock-title {
+    font-size: 2.3rem !important;
+    margin-bottom: 0.8rem !important;
+  }
+
+  html.atelier .portfolio-lock .lock-subtitle {
+    margin-bottom: 1rem !important;
+  }
+
+  html.atelier .portfolio-lock .lock-note {
+    display: none;
+  }
+}
+
 html.atelier .portfolio-lock {
-  perspective: 1800px;
   --glow: 0;
 }
 
@@ -3916,17 +4241,6 @@ html.atelier .lock-input-group:focus-within::after {
   scale: 1 1;
 }
 
-html.atelier .lock-title.is-set .lock-ink {
-  animation: lockKnock 0.9s ease-in-out 0.6s;
-  transform-origin: 50% 90%;
-}
-
-@keyframes lockKnock {
-  15%, 45% { rotate: -5deg; }
-  30%, 60% { rotate: 3deg; }
-  0%, 75%, 100% { rotate: 0deg; }
-}
-
 html.atelier .lock-title .fx-ch {
   padding: 0 0.12em 0.26em;
   margin: 0 -0.12em -0.26em;
@@ -3950,17 +4264,17 @@ html.atelier .lock-mast .logo {
 }
 
 html.atelier .atelier-gate {
-  width: min(100%, 32rem) !important;
-  max-width: 32rem;
-  padding: 2.35rem 2.1rem 1.9rem !important;
-  border: 1.5px solid var(--ink) !important;
-  border-radius: 1.15rem !important;
-  background: var(--card) !important;
+  width: min(100%, 27rem) !important;
+  max-width: 27rem;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: none !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-  box-shadow: 10px 12px 0 var(--ink) !important;
+  box-shadow: none !important;
   overflow: visible !important;
-  animation: lockSheetIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  max-height: none !important;
 }
 
 html.atelier .atelier-gate::before,
@@ -4131,11 +4445,11 @@ html.atelier .lock-note {
 }
 
 html.atelier .atelier-gate.is-opening {
-  animation: lockSheetOut 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  animation: lockSheetOut 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
 }
 
 html.atelier .portfolio-lock.is-opening {
-  animation: lockPaperFade 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: lockPaperFade 0.4s ease 0.5s forwards;
 }
 
 @keyframes lockSheetIn {
@@ -4152,12 +4466,8 @@ html.atelier .portfolio-lock.is-opening {
 @keyframes lockSheetOut {
   to {
     opacity: 0;
-    transform: rotateY(-72deg);
+    transform: translateX(14px);
   }
-}
-
-html.atelier .atelier-gate.is-opening {
-  transform-origin: left center;
 }
 
 @keyframes lockPaperFade {
@@ -4209,7 +4519,9 @@ html.atelier .lock-notification--error {
 
   html.atelier .lock-glow,
   html.atelier .lock-content > *,
-  html.atelier .lock-title .lock-ink {
+  html.atelier .lock-porch,
+  html.atelier .lock-door,
+  html.atelier .lock-plate {
     animation: none !important;
   }
 }
@@ -5342,14 +5654,14 @@ html.atelier .sb-cameo-art {
   top: 11%;
   width: 120%;
   aspect-ratio: 680 / 800;
-  background-image: url('mascots/deepika-directions.webp?v=20261108');
+  background-image: url('mascots/deepika-directions.webp?v=20261109');
   background-repeat: no-repeat;
   background-size: 300% 300%;
   background-position: 50% 50%;
 }
 
 html.atelier .sb-cameo-art.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261108');
+  background-image: url('mascots/deepika-reactions.webp?v=20261109');
 }
 
 html.atelier .sb-cameo-art.is-face {
