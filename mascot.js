@@ -42,6 +42,29 @@
 //
 // The markup works without this script: CSS shows the centre direction frame.
 
+// The reaction sheet (atelier.css, --mascot-react) loads once the page has,
+// so it doesn't compete with the fonts and the direction sheet for first
+// paint; .has-reactions switches it on everywhere (here and the lock door).
+(function () {
+  var root = document.documentElement;
+  function ready() { root.classList.add('has-reactions'); }
+  function load() {
+    var match = /url\(["']?([^"')]+)["']?\)/.exec(getComputedStyle(root).getPropertyValue('--mascot-react'));
+    if (!match) return ready();
+    var img = new Image();
+    img.onload = ready;
+    img.onerror = ready;
+    img.src = match[1];
+    if (img.decode) img.decode().then(ready, function () {});
+  }
+  function soon() {
+    if (window.requestIdleCallback) window.requestIdleCallback(load, { timeout: 1500 });
+    else setTimeout(load, 300);
+  }
+  if (document.readyState === 'complete') soon();
+  else window.addEventListener('load', soon, { once: true });
+})();
+
 (function () {
   'use strict';
 
@@ -104,6 +127,12 @@
   }
 
   function paint(layer, sheet, index) {
+    // Until the reaction sheet has arrived, a reaction holds the centre frame
+    // rather than fading to an empty layer.
+    if (sheet === 'react' && !document.documentElement.classList.contains('has-reactions')) {
+      sheet = 'look';
+      index = CENTRE;
+    }
     var position = (index % 3) * 50 + '% ' + Math.floor(index / 3) * 50 + '%';
     layer.classList.toggle('is-look', sheet === 'look');
     layer.classList.toggle('is-react', sheet === 'react');

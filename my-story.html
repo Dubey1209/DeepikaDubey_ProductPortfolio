@@ -23,14 +23,14 @@
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
   <link rel="icon" type="image/png" sizes="64x64" href="favicon.png">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Outfit:wght@400;500;600;700&display=swap">
-  <link rel="preload" as="image" href="mascots/deepika-directions.webp?v=20261118">
+  <link rel="preload" as="font" type="font/woff2" href="fonts/fraunces-latin.woff2" crossorigin>
+  <link rel="preload" as="font" type="font/woff2" href="fonts/outfit-latin.woff2" crossorigin>
+  <link rel="preload" as="image" href="mascots/deepika-directions.webp?v=20261119" media="(min-width: 761px)">
+  <link rel="preload" as="image" href="mascots/deepika-directions-sm.webp?v=20261119" media="(max-width: 760px)">
   <!-- Keep this token identical to index.html. -->
-  <link rel="stylesheet" href="base.css?v=20261118">
-  <link rel="stylesheet" href="atelier.css?v=20261118">
-  <link rel="stylesheet" href="motion.css?v=20261118">
+  <link rel="stylesheet" href="base.css?v=20261119">
+  <link rel="stylesheet" href="atelier.css?v=20261119">
+  <link rel="stylesheet" href="motion.css?v=20261119">
 </head>
 <body class="my-story-page">
   <script>
@@ -46,7 +46,7 @@
   <a href="#main-content" class="skip-link">Skip to main content</a>
   <nav class="navbar" role="navigation" aria-label="Main Navigation">
     <div class="container navbar-container">
-      <a href="index.html#home" class="logo" role="banner">P<span class="logo-brace">{ }</span></a>
+      <a href="index.html#home" class="logo"><span aria-hidden="true">P<span class="logo-brace">{ }</span></span><span class="sr-only">Deepika Dubey, home</span></a>
       <button class="menu-toggle" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="navLinks">
         <span class="menu-icon"></span>
         <span class="sr-only">Menu</span>
@@ -292,7 +292,7 @@
     <div class="container">
       <div class="atelier-footer-grid">
         <div class="atelier-footer-brand">
-          <a href="index.html#home" class="atelier-footer-logo">P<span class="logo-brace">{ }</span></a>
+          <a href="index.html#home" class="atelier-footer-logo"><span aria-hidden="true">P<span class="logo-brace">{ }</span></span><span class="sr-only">Deepika Dubey, home</span></a>
           <p>I blend tech, design, and product thinking to ship things people actually use.</p>
         </div>
         <div>
@@ -334,13 +334,13 @@
     <button class="scroll-top-btn" type="button" aria-label="Scroll to top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.20/dist/lenis.min.js" defer></script>
-  <script src="script.js?v=20261118" defer></script>
-  <script src="theme-toggle.js?v=20261118" defer></script>
-  <script src="motion.js?v=20261118" defer></script>
+  <script src="vendor/gsap.min.js" defer></script>
+  <script src="vendor/ScrollTrigger.min.js" defer></script>
+  <script src="vendor/lenis.min.js" defer></script>
+  <script src="script.js?v=20261119" defer></script>
+  <script src="theme-toggle.js?v=20261119" defer></script>
+  <script src="motion.js?v=20261119" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.js" defer></script>
-  <script src="story-book.js?v=20261118" defer></script>
+  <script src="story-book.js?v=20261119" defer></script>
 </body>
 </html>

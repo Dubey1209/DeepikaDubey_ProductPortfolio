@@ -413,6 +413,34 @@ html.atelier .logo {
   letter-spacing: 0.02em;
 }
 
+html.is-unlocked #portfolio-lock {
+  display: none !important;
+}
+
+html.is-unlocked #site-shell {
+  display: block !important;
+}
+
+/* Out of sight until a keyboard user tabs to it. */
+html.atelier .skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 10000;
+  padding: 0.6rem 1rem;
+  border-radius: 0.6rem;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--sans);
+  font-weight: 600;
+  text-decoration: none;
+  translate: 0 -200%;
+}
+
+html.atelier .skip-link:focus-visible {
+  translate: 0 0;
+}
+
 html.atelier .logo-brace {
   color: var(--accent);
   font-weight: 700;
@@ -1454,12 +1482,32 @@ html.atelier .atelier-mascot.is-m-stretch :is(.atelier-mascot-layer, .atelier-ma
    scaling the picture continuously kept it permanently resampled and soft. */
 html.atelier .atelier-mascot-look,
 html.atelier .atelier-mascot-layer.is-look {
-  background-image: url('mascots/deepika-directions.webp?v=20261118');
+  background-image: var(--mascot-look);
 }
 
-html.atelier .atelier-mascot-react,
-html.atelier .atelier-mascot-layer.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261118');
+/* Phones get a lighter copy of the direction sheet: the mascot is drawn at
+   about 240px there, so the full-size cells are wasted bytes on slow links. */
+html.atelier {
+  --mascot-look: url('mascots/deepika-directions.webp?v=20261119');
+}
+
+@media (max-width: 760px) {
+  html.atelier {
+    --mascot-look: url('mascots/deepika-directions-sm.webp?v=20261119');
+  }
+}
+
+/* The reaction sheet and face masks are only needed once she reacts, so they
+   stay off the first-paint path: mascot.js fetches the sheet after the page
+   has loaded (it reads the URL from --mascot-react) and sets .has-reactions
+   on <html> once it has decoded. */
+html.atelier {
+  --mascot-react: url('mascots/deepika-reactions.webp?v=20261119');
+}
+
+html.atelier.has-reactions .atelier-mascot-react,
+html.atelier.has-reactions .atelier-mascot-layer.is-react {
+  background-image: var(--mascot-react);
 }
 
 html.atelier .atelier-mascot-react {
@@ -1472,10 +1520,13 @@ html.atelier .atelier-mascot-react {
    themselves, in the same 3x3 layout as the sheet, and mascot.js moves the
    mask with the frame. Her hair, jaw and outline always come from the frame
    underneath; an oval reached the jaw and showed a second chin. */
+html.atelier.has-reactions .atelier-mascot-face {
+  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261119');
+  mask-image: url('mascots/deepika-face-mask.png?v=20261119');
+}
+
 html.atelier .atelier-mascot-face {
   opacity: 0;
-  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261118');
-  mask-image: url('mascots/deepika-face-mask.png?v=20261118');
   -webkit-mask-size: 300% 300%;
   mask-size: 300% 300%;
   -webkit-mask-repeat: no-repeat;
@@ -1904,6 +1955,14 @@ html.atelier .atelier-cert-sheet.is-active {
   transform: rotate(-1.4deg) translate(0, 0) scale(1.02);
   z-index: 8;
   box-shadow: 9px 11px 0 var(--ink);
+}
+
+/* On touch screens the slivers of the sheets behind are too thin to tap
+   reliably; the index below the pile switches certificates there. */
+@media (hover: none) {
+  html.atelier .atelier-cert-sheet:not(.is-active) {
+    pointer-events: none;
+  }
 }
 
 html.atelier .atelier-cert-caption h3 {
@@ -2511,6 +2570,11 @@ html.atelier .atelier-essay-num {
   color: var(--ink);
   opacity: 0.1;
   pointer-events: none;
+}
+
+/* Drawn from an attribute: it's a watermark, not text to read. */
+html.atelier .atelier-essay-num::before {
+  content: attr(data-num);
 }
 
 html.atelier .atelier-essay-meta {
@@ -3937,12 +4001,15 @@ html.atelier .lock-face {
   top: 6%;
   width: 128%;
   aspect-ratio: 680 / 800;
-  background: url('mascots/deepika-directions.webp?v=20261118') no-repeat 50% 50% / 300% 300%;
+  background: var(--mascot-look) no-repeat 50% 50% / 300% 300%;
   transition: translate 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+html.atelier.has-reactions .lock-face.is-react {
+  background-image: var(--mascot-react);
+}
+
 html.atelier .lock-face.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261118');
   opacity: 0;
   transition: opacity 0.14s ease;
 }
@@ -4935,6 +5002,19 @@ html.atelier .lock-title.is-set .fx-ch {
   overflow: visible;
 }
 
+/* The title arrives split into letters in the HTML and rises in CSS from
+   first paint, so it never waits on the deferred scripts (it is the lock
+   screen's largest paint). */
+html.atelier .lock-title .fx-ch > span {
+  animation: lockCharIn 1.05s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--i, 0) * 38ms);
+}
+
+@keyframes lockCharIn {
+  from { transform: perspective(600px) translateY(130%) rotateX(70deg); }
+  to { transform: none; }
+}
+
 html.atelier .lock-mast {
   position: absolute;
   top: max(1.4rem, env(safe-area-inset-top));
@@ -5200,6 +5280,10 @@ html.atelier .lock-notification--error {
 
   html.atelier .lock-title .fx-ch {
     overflow: visible;
+  }
+
+  html.atelier .lock-title .fx-ch > span {
+    animation: none;
   }
 
   html.atelier .lock-glow,
@@ -6339,14 +6423,14 @@ html.atelier .sb-cameo-art {
   top: 11%;
   width: 120%;
   aspect-ratio: 680 / 800;
-  background-image: url('mascots/deepika-directions.webp?v=20261118');
+  background-image: var(--mascot-look);
   background-repeat: no-repeat;
   background-size: 300% 300%;
   background-position: 50% 50%;
 }
 
 html.atelier .sb-cameo-art.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261118');
+  background-image: url('mascots/deepika-reactions.webp?v=20261119');
 }
 
 html.atelier .sb-cameo-art.is-face {

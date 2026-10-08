@@ -25,18 +25,18 @@
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
   <link rel="icon" type="image/png" sizes="64x64" href="favicon.png">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Outfit:wght@400;500;600;700&display=swap">
-  <link rel="preload" as="image" href="mascots/deepika-directions.webp?v=20261118" fetchpriority="high">
+  <link rel="preload" as="font" type="font/woff2" href="fonts/fraunces-latin.woff2" crossorigin>
+  <link rel="preload" as="font" type="font/woff2" href="fonts/outfit-latin.woff2" crossorigin>
+  <link rel="preload" as="image" href="mascots/deepika-directions.webp?v=20261119" media="(min-width: 761px)" fetchpriority="high">
+  <link rel="preload" as="image" href="mascots/deepika-directions-sm.webp?v=20261119" media="(max-width: 760px)" fetchpriority="high">
   <!-- One shared version token for every local asset. Bump it in both HTML
        files whenever any CSS or JS changes. Per-asset tokens drifted out of
        sync previously, which can serve new CSS against old JavaScript. -->
-  <link rel="stylesheet" href="base.css?v=20261118">
-  <link rel="stylesheet" href="atelier.css?v=20261118">
-  <link rel="stylesheet" href="motion.css?v=20261118">
+  <link rel="stylesheet" href="base.css?v=20261119">
+  <link rel="stylesheet" href="atelier.css?v=20261119">
+  <link rel="stylesheet" href="motion.css?v=20261119">
   <noscript><style>.fx-ch>span{transform:none!important}.home-kicker,.home-subtitle,.home-desc,.home-btns,.home-rotate,.hero-rule{opacity:1!important}.home-photo{filter:none!important;transform:rotate(-3.5deg)!important}</style></noscript>
-  <script src="portfolio-lock.js?v=20261118" defer></script>
+  <script src="portfolio-lock.js?v=20261119" defer></script>
 </head>
 <body>
     <script>
@@ -45,6 +45,13 @@
           var saved = localStorage.getItem('theme');
           if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.body.classList.add('dark-theme');
+          }
+        } catch (e) {}
+        // A visitor already let in this session gets the site on first
+        // paint instead of after the scripts load (atelier.css, is-unlocked).
+        try {
+          if (sessionStorage.getItem('portfolio_unlocked') === 'true') {
+            document.documentElement.classList.add('is-unlocked');
           }
         } catch (e) {}
       })();
@@ -104,8 +111,27 @@
       <div class="atelier-gate" id="lock-card">
         <div class="lock-content">
           <p class="lock-stop"><span>Stop 01</span><em id="lock-hello">The front door</em></p>
-          <h1 class="lock-title" id="lock-title">Who’s at the <em class="lock-ink">door?<svg class="lock-ink-line" viewBox="0 0 120 14" preserveAspectRatio="none" aria-hidden="true"><path d="M3 9c18-5 40-7 62-4 16 2 34 3 52-3"/></svg></em></h1>
+          <h1 class="lock-title" id="lock-title" data-fx-split="1" aria-label="Who’s at the door?"><span aria-hidden="true"><span class="fx-word"><span class="fx-ch"><span style="--i:0">W</span></span><span class="fx-ch"><span style="--i:1">h</span></span><span class="fx-ch"><span style="--i:2">o</span></span><span class="fx-ch"><span style="--i:3">’</span></span><span class="fx-ch"><span style="--i:4">s</span></span></span> <span class="fx-word"><span class="fx-ch"><span style="--i:5">a</span></span><span class="fx-ch"><span style="--i:6">t</span></span></span> <span class="fx-word"><span class="fx-ch"><span style="--i:7">t</span></span><span class="fx-ch"><span style="--i:8">h</span></span><span class="fx-ch"><span style="--i:9">e</span></span></span> <em class="lock-ink"><span class="fx-word"><span class="fx-ch"><span style="--i:10">d</span></span><span class="fx-ch"><span style="--i:11">o</span></span><span class="fx-ch"><span style="--i:12">o</span></span><span class="fx-ch"><span style="--i:13">r</span></span><span class="fx-ch"><span style="--i:14">?</span></span></span><svg class="lock-ink-line" viewBox="0 0 120 14" preserveAspectRatio="none" aria-hidden="true"><path d="M3 9c18-5 40-7 62-4 16 2 34 3 52-3"/></svg></em></span></h1>
           <p class="lock-subtitle" id="lock-subtitle">Come on in. I’ll show you around.</p>
+          <script>
+            // A different welcome each visit, set before first paint so the
+            // text never swaps under the visitor.
+            (function () {
+              var pick = function (list) { return list[Math.floor(Math.random() * list.length)]; };
+              var h = new Date().getHours();
+              document.getElementById('lock-hello').textContent =
+                h >= 5 && h < 12 ? 'Good morning' : h >= 12 && h < 17 ? 'Good afternoon' : h >= 17 && h < 22 ? 'Good evening' : 'Up late too?';
+              document.getElementById('lock-subtitle').textContent = pick([
+                'Come on in. I’ll show you around.',
+                'Pull up a chair. I’ll show you around.',
+                'So glad you found the place. Come in.',
+                'Kick off your shoes. Stay a while.',
+                'You made it. Come on in.'
+              ]);
+              var knock = document.querySelector('.lock-knock');
+              if (knock) knock.textContent = pick(['go on, knock', 'psst… knock', 'try knocking', 'knock if you dare']);
+            })();
+          </script>
           <form id="unlock-form" class="unlock-form" novalidate>
             <div class="lock-field">
               <label for="visitor-name" class="lock-input-label">The passcode is your name</label>
@@ -126,7 +152,7 @@
       <a href="#main-content" class="skip-link">Skip to main content</a>
   <nav class="navbar" role="navigation" aria-label="Main Navigation">
     <div class="container navbar-container">
-      <a href="#home" class="logo" role="banner">P<span class="logo-brace">{ }</span></a>
+      <a href="#home" class="logo"><span aria-hidden="true">P<span class="logo-brace">{ }</span></span><span class="sr-only">Deepika Dubey, back to top</span></a>
       <button class="menu-toggle" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="navLinks">
         <span class="menu-icon"></span>
         <span class="sr-only">Menu</span>
@@ -1035,13 +1061,13 @@
             <button type="button" class="atelier-cert-sheet is-active" data-href="https://www.theforage.com/simulations/electronic-arts/product-management-5c7c" aria-pressed="true">
               <img src="PM_Certificate.webp" alt="Product Management certificate from Forage" loading="lazy">
             </button>
-            <button type="button" class="atelier-cert-sheet" data-href="https://www.theforage.com/simulations/electronic-arts/software-engineering-awbf" aria-pressed="false">
+            <button type="button" class="atelier-cert-sheet" tabindex="-1" data-href="https://www.theforage.com/simulations/electronic-arts/software-engineering-awbf" aria-pressed="false">
               <img src="SE_Certficate.webp" alt="Software Engineering certificate from Forage" loading="lazy">
             </button>
-            <button type="button" class="atelier-cert-sheet" data-href="https://drive.google.com/file/d/1uFqPQBEJE3FnAjZFmRcebcRN1Uh0UEf-/view?usp=sharing" aria-pressed="false">
+            <button type="button" class="atelier-cert-sheet" tabindex="-1" data-href="https://drive.google.com/file/d/1uFqPQBEJE3FnAjZFmRcebcRN1Uh0UEf-/view?usp=sharing" aria-pressed="false">
               <img src="ProductRoadmapCertificate.webp" alt="Product Roadmapping certificate from Product School" loading="lazy">
             </button>
-            <button type="button" class="atelier-cert-sheet" data-href="https://drive.google.com/file/d/1aovQRAlyL5h29cs7x-6eNvTcAjCA8B4_/view?usp=sharing" aria-pressed="false">
+            <button type="button" class="atelier-cert-sheet" tabindex="-1" data-href="https://drive.google.com/file/d/1aovQRAlyL5h29cs7x-6eNvTcAjCA8B4_/view?usp=sharing" aria-pressed="false">
               <img src="ProductStrategyCertificate.webp" alt="Product Strategy certificate from Product School" loading="lazy">
             </button>
           </div>
@@ -1051,20 +1077,20 @@
             <a class="atelier-cert-cta" id="cert-link" href="https://www.theforage.com/simulations/electronic-arts/product-management-5c7c" target="_blank" rel="noopener">View certificate</a>
           </div>
         </div>
-        <div class="atelier-cert-index" id="cert-index" role="list">
-          <button type="button" class="is-active" data-issuer="Forage" data-title="Product Management">
+        <div class="atelier-cert-index" id="cert-index" role="group" aria-label="Choose a certificate">
+          <button type="button" class="is-active" aria-pressed="true" data-issuer="Forage" data-title="Product Management">
             <span>Forage</span>
             Product Management
           </button>
-          <button type="button" data-issuer="Forage" data-title="Software Engineering">
+          <button type="button" aria-pressed="false" data-issuer="Forage" data-title="Software Engineering">
             <span>Forage</span>
             Software Engineering
           </button>
-          <button type="button" data-issuer="Product School" data-title="Product Roadmapping">
+          <button type="button" aria-pressed="false" data-issuer="Product School" data-title="Product Roadmapping">
             <span>Product School</span>
             Product Roadmapping
           </button>
-          <button type="button" data-issuer="Product School" data-title="Product Strategy">
+          <button type="button" aria-pressed="false" data-issuer="Product School" data-title="Product Strategy">
             <span>Product School</span>
             Product Strategy
           </button>
@@ -1132,7 +1158,7 @@
       </div>
 
       <a class="atelier-essay" href="https://medium.com/@dubeydeepika1209/a-pms-notes-on-being-superficial-71626b57238d" target="_blank" rel="noopener">
-        <span class="atelier-essay-num" aria-hidden="true">01</span>
+        <span class="atelier-essay-num" data-num="01" aria-hidden="true"></span>
         <p class="atelier-essay-meta">
           <span>Medium</span>
           <span class="atelier-essay-leader" aria-hidden="true"></span>
@@ -1283,7 +1309,7 @@
     <div class="container">
       <div class="atelier-footer-grid">
         <div class="atelier-footer-brand">
-          <a href="#home" class="atelier-footer-logo">P<span class="logo-brace">{ }</span></a>
+          <a href="#home" class="atelier-footer-logo"><span aria-hidden="true">P<span class="logo-brace">{ }</span></span><span class="sr-only">Deepika Dubey, back to top</span></a>
           <p>I blend tech, design, and product thinking to ship things people actually use.</p>
         </div>
         <div>
@@ -1326,13 +1352,13 @@
   </footer>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.20/dist/lenis.min.js" defer></script>
-  <script src="contact-form.js?v=20261118" defer></script>
-  <script src="theme-toggle.js?v=20261118" defer></script>
-  <script src="script.js?v=20261118" defer></script>
-  <script src="motion.js?v=20261118" defer></script>
-  <script src="mascot.js?v=20261118" defer></script>
+  <script src="vendor/gsap.min.js" defer></script>
+  <script src="vendor/ScrollTrigger.min.js" defer></script>
+  <script src="vendor/lenis.min.js" defer></script>
+  <script src="contact-form.js?v=20261119" defer></script>
+  <script src="theme-toggle.js?v=20261119" defer></script>
+  <script src="script.js?v=20261119" defer></script>
+  <script src="motion.js?v=20261119" defer></script>
+  <script src="mascot.js?v=20261119" defer></script>
 </body>
 </html>

@@ -4,6 +4,7 @@ import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { extname, join, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { gzipSync } from 'node:zlib';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 
@@ -21,6 +22,7 @@ const MIME = {
   '.ico': 'image/x-icon',
   '.txt': 'text/plain; charset=utf-8',
   '.xml': 'application/xml; charset=utf-8',
+  '.woff2': 'font/woff2',
 };
 
 export function startServer(port = 4173) {
@@ -39,11 +41,17 @@ export function startServer(port = 4173) {
         return;
       }
 
-      const body = await readFile(filePath);
-      res.writeHead(200, {
-        'Content-Type': MIME[extname(filePath).toLowerCase()] ?? 'application/octet-stream',
-        'Cache-Control': 'no-store',
-      });
+      let body = await readFile(filePath);
+      const type = MIME[extname(filePath).toLowerCase()] ?? 'application/octet-stream';
+      const headers = { 'Content-Type': type, 'Cache-Control': 'no-store' };
+      // Compress text the way GitHub Pages does, so Lighthouse runs against
+      // this server see realistic transfer sizes.
+      if (/text|javascript|json|xml|svg/.test(type) && /\bgzip\b/.test(req.headers['accept-encoding'] ?? '')) {
+        body = gzipSync(body);
+        headers['Content-Encoding'] = 'gzip';
+        headers.Vary = 'Accept-Encoding';
+      }
+      res.writeHead(200, headers);
       res.end(body);
     } catch {
       res.writeHead(404, { 'Content-Type': 'text/plain' }).end('Not found');

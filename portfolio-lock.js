@@ -33,7 +33,6 @@ class PortfolioLock {
     const input = document.getElementById('visitor-name');
     const sub = document.getElementById('lock-subtitle');
     const plate = document.getElementById('lock-plate-name');
-    this.dressPorch(sub);
     const idle = sub?.textContent || '';
     const porch = this.bindPorch(input);
     this.porch = porch;
@@ -67,26 +66,6 @@ class PortfolioLock {
 
   // Every visit reads a little differently: the greeting follows the clock,
   // the welcome line and the knock are picked at random.
-  dressPorch(sub) {
-    const pick = (list) => list[Math.floor(Math.random() * list.length)];
-    const h = new Date().getHours();
-    const hello = document.getElementById('lock-hello');
-    if (hello) {
-      hello.textContent = h >= 5 && h < 12 ? 'Good morning' : h < 17 && h >= 12 ? 'Good afternoon' : h >= 17 && h < 22 ? 'Good evening' : 'Up late too?';
-    }
-    if (sub) {
-      sub.textContent = pick([
-        'Come on in. I’ll show you around.',
-        'Pull up a chair. I’ll show you around.',
-        'So glad you found the place. Come in.',
-        'Kick off your shoes. Stay a while.',
-        'You made it. Come on in.'
-      ]);
-    }
-    const knock = document.querySelector('.lock-knock');
-    if (knock) knock.textContent = pick(['go on, knock', 'psst… knock', 'try knocking', 'knock if you dare']);
-  }
-
   // She looks out of the door's window: eyes follow the pointer (or the
   // form while it has focus), she blinks, grins once a name is in, gasps at
   // an empty knock and winks as the door opens. Cells are 3x3; row 0 looks
@@ -106,7 +85,7 @@ class PortfolioLock {
     let gazeCell = 4;
 
     const show = (n) => {
-      if (n == null) {
+      if (n == null || !document.documentElement.classList.contains('has-reactions')) {
         win.classList.remove('is-face-on');
         return;
       }
@@ -455,4 +434,11 @@ class PortfolioLock {
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => new PortfolioLock());
+// Deferred, so the document is parsed by now; starting here rather than on
+// DOMContentLoaded means the lock (or the site) doesn't wait for the
+// animation libraries further down to download.
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => new PortfolioLock());
+} else {
+  new PortfolioLock();
+}

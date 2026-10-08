@@ -393,9 +393,11 @@ function initExperienceShowcase() {
       var on = n === i;
       sheet.classList.toggle('is-active', on);
       sheet.setAttribute('aria-pressed', on ? 'true' : 'false');
+      sheet.tabIndex = on ? 0 : -1;
     });
     tabs.forEach(function (tab, n) {
       tab.classList.toggle('is-active', n === i);
+      tab.setAttribute('aria-pressed', n === i ? 'true' : 'false');
     });
     var tab = tabs[i];
     if (tab && issuerEl) issuerEl.textContent = tab.getAttribute('data-issuer') || '';

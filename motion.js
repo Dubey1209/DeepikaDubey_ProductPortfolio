@@ -279,16 +279,12 @@
           el.textContent = '0.0';
           requestAnimationFrame(tick);
         }
-        if (window.ScrollTrigger) {
-          window.ScrollTrigger.create({ trigger: stat, start: 'top 80%', once: true, onEnter: runCount });
-        } else {
-          var cgpaIo = new IntersectionObserver(function (entries) {
-            if (!entries[0] || !entries[0].isIntersecting) return;
-            runCount();
-            cgpaIo.disconnect();
-          }, { threshold: 0.4 });
-          cgpaIo.observe(stat);
-        }
+        var cgpaIo = new IntersectionObserver(function (entries) {
+          if (!entries[0] || !entries[0].isIntersecting) return;
+          runCount();
+          cgpaIo.disconnect();
+        }, { threshold: 0.4 });
+        cgpaIo.observe(stat);
       }
     }
   }
@@ -353,35 +349,55 @@
       g.set(el, { clearProps: 'transform,filter,rotation,rotationX,rotationY,x,y,z,scale,skewX' });
     }
 
+    // One-shot reveals ("play once when its top passes N% of the viewport")
+    // run off IntersectionObservers, one per N, instead of a ScrollTrigger
+    // each: dozens of triggers meant dozens of forced page layouts on load
+    // and on every refresh. Scrubbed effects below still use ScrollTrigger.
+    var watchers = {};
+    function whenSeen(el, start, fn) {
+      var pct = parseFloat(String(start || '').replace('top', '')) || 88;
+      var w = watchers[pct];
+      if (!w) {
+        var calls = new Map();
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (!entry.isIntersecting && entry.boundingClientRect.top > 0) return;
+            io.unobserve(entry.target);
+            var cb = calls.get(entry.target);
+            calls.delete(entry.target);
+            if (cb) cb();
+          });
+        }, { rootMargin: '0px 0px -' + (100 - pct) + '% 0px' });
+        w = watchers[pct] = { io: io, calls: calls };
+      }
+      w.calls.set(el, fn);
+      w.io.observe(el);
+    }
+
     function fly(els, fromFn, opts) {
       opts = opts || {};
       Array.prototype.slice.call(els).forEach(function (el, i) {
         if (!el || el.dataset.fxCinema) return;
         el.dataset.fxCinema = '1';
-        ST.create({
-          trigger: el,
-          start: opts.start || 'top 88%',
-          once: true,
-          onEnter: function () {
-            g.set(el, { transformPerspective: 1800, transformOrigin: opts.origin || '50% 50%' });
-            g.fromTo(el, fromFn(el, i), {
-              x: 0,
-              y: 0,
-              z: 0,
-              rotation: 0,
-              rotationX: 0,
-              rotationY: 0,
-              scale: 1,
-              skewX: 0,
-              filter: 'blur(0px)',
-              duration: opts.duration || 1.35,
-              delay: Math.min(i * (opts.stagger || 0.12), 0.5),
-              ease: opts.ease || 'expo.out',
-              overwrite: 'auto',
-              onComplete: function () { clearT(el); }
-            });
-            setTimeout(function () { clearT(el); }, 3200);
-          }
+        whenSeen(el, opts.start, function () {
+          g.set(el, { transformPerspective: 1800, transformOrigin: opts.origin || '50% 50%' });
+          g.fromTo(el, fromFn(el, i), {
+            x: 0,
+            y: 0,
+            z: 0,
+            rotation: 0,
+            rotationX: 0,
+            rotationY: 0,
+            scale: 1,
+            skewX: 0,
+            filter: 'blur(0px)',
+            duration: opts.duration || 1.35,
+            delay: Math.min(i * (opts.stagger || 0.12), 0.5),
+            ease: opts.ease || 'expo.out',
+            overwrite: 'auto',
+            onComplete: function () { clearT(el); }
+          });
+          setTimeout(function () { clearT(el); }, 3200);
         });
       });
     }
@@ -403,19 +419,14 @@
       var bits = el.querySelectorAll('.fx-title-word > span');
       g.set(el, { perspective: 800 });
       g.set(bits, { yPercent: 125 });
-      ST.create({
-        trigger: el,
-        start: 'top 90%',
-        once: true,
-        onEnter: function () {
-          g.fromTo(bits, { yPercent: 130, rotationX: 55 }, {
-            yPercent: 0,
-            rotationX: 0,
-            duration: 1.2,
-            stagger: 0.055,
-            ease: 'expo.out'
-          });
-        }
+      whenSeen(el, 'top 90%', function () {
+        g.fromTo(bits, { yPercent: 130, rotationX: 55 }, {
+          yPercent: 0,
+          rotationX: 0,
+          duration: 1.2,
+          stagger: 0.055,
+          ease: 'expo.out'
+        });
       });
       setTimeout(function () { g.set(bits, { clearProps: 'transform' }); }, 4500);
     }
@@ -473,25 +484,20 @@
     Array.prototype.slice.call(document.querySelectorAll('.atelier-skill-card')).forEach(function (card, i) {
       if (card.dataset.fxCinema) return;
       card.dataset.fxCinema = '1';
-      ST.create({
-        trigger: card,
-        start: 'top 88%',
-        once: true,
-        onEnter: function () {
-          g.fromTo(card, { y: 28 }, {
-            y: 0,
-            duration: 1.05, delay: Math.min(i * 0.1, 0.36), ease: 'expo.out',
-            onComplete: function () { clearT(card); }
+      whenSeen(card, 'top 88%', function () {
+        g.fromTo(card, { y: 28 }, {
+          y: 0,
+          duration: 1.05, delay: Math.min(i * 0.1, 0.36), ease: 'expo.out',
+          onComplete: function () { clearT(card); }
+        });
+        var tags = card.querySelectorAll('.atelier-skill-tags li');
+        if (tags.length) {
+          g.fromTo(tags, { y: 22 }, {
+            y: 0, duration: 0.7, stagger: 0.06, delay: 0.28, ease: 'power3.out',
+            onComplete: function () { g.set(tags, { clearProps: 'transform' }); }
           });
-          var tags = card.querySelectorAll('.atelier-skill-tags li');
-          if (tags.length) {
-            g.fromTo(tags, { y: 22 }, {
-              y: 0, duration: 0.7, stagger: 0.06, delay: 0.28, ease: 'power3.out',
-              onComplete: function () { g.set(tags, { clearProps: 'transform' }); }
-            });
-          }
-          setTimeout(function () { clearT(card); }, 3200);
         }
+        setTimeout(function () { clearT(card); }, 3200);
       });
     });
 
@@ -514,22 +520,17 @@
     Array.prototype.slice.call(document.querySelectorAll('.atelier-exp-row')).forEach(function (row, i) {
       if (row.dataset.fxCinema) return;
       row.dataset.fxCinema = '1';
-      ST.create({
-        trigger: row,
-        start: 'top 90%',
-        once: true,
-        onEnter: function () {
-          g.fromTo(row, { x: -70, y: 18, filter: 'blur(6px)' }, {
-            x: 0, y: 0, filter: 'blur(0px)',
-            duration: 1.25, delay: Math.min(i * 0.1, 0.4), ease: 'expo.out',
-            onComplete: function () { clearT(row); }
-          });
-          var line = row.querySelector('.atelier-exp-leader');
-          if (line) {
-            g.fromTo(line, { scaleX: 0 }, { scaleX: 1, duration: 1.05, delay: 0.2, ease: 'power3.inOut' });
-          }
-          setTimeout(function () { clearT(row); }, 3200);
+      whenSeen(row, 'top 90%', function () {
+        g.fromTo(row, { x: -70, y: 18, filter: 'blur(6px)' }, {
+          x: 0, y: 0, filter: 'blur(0px)',
+          duration: 1.25, delay: Math.min(i * 0.1, 0.4), ease: 'expo.out',
+          onComplete: function () { clearT(row); }
+        });
+        var line = row.querySelector('.atelier-exp-leader');
+        if (line) {
+          g.fromTo(line, { scaleX: 0 }, { scaleX: 1, duration: 1.05, delay: 0.2, ease: 'power3.inOut' });
         }
+        setTimeout(function () { clearT(row); }, 3200);
       });
     });
 
@@ -608,24 +609,19 @@
     return true;
   }
 
+  // The letters rise in CSS (atelier.css, lockCharIn); once the last one
+  // lands the clips open so the italic and descenders aren't cut.
   function playLock() {
     var title = document.querySelector('.lock-title');
-    var chars = document.querySelectorAll('.lock-title .fx-ch > span');
-    if (!chars.length || !window.gsap) {
-      if (title) title.classList.add('is-set');
+    if (!title) return;
+    var chars = title.querySelectorAll('.fx-ch > span');
+    var last = chars[chars.length - 1];
+    if (!last || reduce) {
+      title.classList.add('is-set');
       return;
     }
-    window.gsap.fromTo(chars, {
-      yPercent: 130,
-      rotationX: 70
-    }, {
-      yPercent: 0,
-      rotationX: 0,
-      duration: 1.05,
-      stagger: 0.038,
-      ease: 'expo.out',
-      onComplete: function () { title.classList.add('is-set'); }
-    });
+    last.addEventListener('animationend', function () { title.classList.add('is-set'); }, { once: true });
+    setTimeout(function () { title.classList.add('is-set'); }, 2000);
   }
 
   function playLanding() {
@@ -794,10 +790,12 @@
     var ST = window.ScrollTrigger;
     var g = window.gsap;
 
+    // Only real scrolls update ScrollTrigger; Lenis scrolls the window, so
+    // the native scroll listener above still fires for the progress bar.
+    if (ST) lenis.on('scroll', ST.update);
+
     function tick(time) {
       lenis.raf(time);
-      if (ST) ST.update();
-      onScroll();
     }
 
     if (g && g.ticker) {
@@ -819,9 +817,10 @@
         if (!document.querySelector('.home-section')) bindHeroMag();
       });
     });
-    bindCardMotion();
+    // Everything below the fold can wait for the hero's first frames.
+    var idle = window.requestIdleCallback || function (fn) { return setTimeout(fn, 200); };
+    idle(bindCardMotion, { timeout: 900 });
     bootLenis();
-    setTimeout(bindCardMotion, 300);
     setTimeout(bindCardMotion, 1200);
     setTimeout(function () {
       var home = document.querySelector('.home-section');
