@@ -1126,7 +1126,7 @@ html.atelier .atelier-mascot-layer {
   background-size: 300% 300%;
   background-position: 50% 50%;
   pointer-events: none;
-  transform-origin: 50% 100%;
+  transform-origin: 50% 64%;
   transform: translate(var(--mascot-tx, 0px), var(--mascot-ty, 0px)) rotate(var(--mascot-tilt, 0deg));
   /* Kept on their own layers for good. Promoted only while a fade ran, the
      picture was redrawn a different way at the start and end of every fade
@@ -1166,7 +1166,7 @@ html.atelier .atelier-mascot-blush {
     radial-gradient(7% 3.8% at 40% 47.5%, rgba(255, 92, 122, 0.5), rgba(255, 92, 122, 0) 100%),
     radial-gradient(7% 3.8% at 67% 47.5%, rgba(255, 92, 122, 0.5), rgba(255, 92, 122, 0) 100%);
   mix-blend-mode: multiply;
-  transform-origin: 50% 100%;
+  transform-origin: 50% 64%;
   /* --face-dx/dy follow her cheeks when she has turned her head. */
   translate: var(--face-dx, 0%) var(--face-dy, 0%);
   transform: translate(var(--mascot-tx, 0px), var(--mascot-ty, 0px)) rotate(var(--mascot-tilt, 0deg));
@@ -1233,7 +1233,7 @@ html.atelier .atelier-mascot-burst.is-spark .g-core {
 
 /* Bursts move with her lean, so a glint stays on the hair it caught. */
 html.atelier .atelier-mascot-burst.is-spark {
-  transform-origin: 50% 100%;
+  transform-origin: 50% 64%;
   transform: translate(var(--mascot-tx, 0px), var(--mascot-ty, 0px)) rotate(var(--mascot-tilt, 0deg));
 }
 
@@ -1396,101 +1396,97 @@ html.atelier .atelier-mascot.is-m-doze :is(.atelier-mascot-layer, .atelier-masco
 html.atelier .atelier-mascot.is-m-sneeze :is(.atelier-mascot-layer, .atelier-mascot-blush) { animation: m-sneeze 1.5s ease-in-out; }
 html.atelier .atelier-mascot.is-m-stretch :is(.atelier-mascot-layer, .atelier-mascot-blush) { animation: m-stretch 2.4s ease-in-out; }
 
+/* Kept small and pivoting at her neck (transform-origin on the layers):
+   swung from the bottom edge, by degrees, she rocked like a cut-out pinned
+   at the base. A person moves a few pixels and a degree or two. */
 @keyframes m-hop {
-  0%, 100% { translate: 0 0; scale: 1; }
-  15% { translate: 0 3px; scale: 1.03 0.97; }
-  42% { translate: 0 -16px; scale: 0.98 1.03; }
-  68% { translate: 0 0; scale: 1.03 0.97; }
-  84% { scale: 0.995 1.005; }
+  0%, 100% { translate: 0 0; }
+  18% { translate: 0 1.5px; }
+  45% { translate: 0 -9px; }
+  72% { translate: 0 0.5px; }
 }
 
 @keyframes m-jump {
-  0%, 100% { translate: 0 0; scale: 1; }
-  12% { translate: 0 2px; scale: 1.02 0.98; }
-  38% { translate: 0 -22px; scale: 0.97 1.04; }
-  70% { translate: 0 0; scale: 1.03 0.97; }
+  0%, 100% { translate: 0 0; }
+  15% { translate: 0 2px; }
+  42% { translate: 0 -13px; }
+  74% { translate: 0 0.5px; }
 }
 
 @keyframes m-bounce {
-  0%, 50%, 100% { translate: 0 0; scale: 1; }
-  22%, 72% { translate: 0 -10px; scale: 0.99 1.02; }
-  46%, 96% { scale: 1.02 0.98; }
+  0%, 50%, 100% { translate: 0 0; }
+  25%, 75% { translate: 0 -6px; }
 }
 
 @keyframes m-dance {
   0%, 100% { rotate: 0deg; translate: 0 0; }
-  15% { rotate: -3deg; translate: -4px -3px; }
-  32% { rotate: 3deg; translate: 4px 0; }
-  50% { rotate: -3deg; translate: -4px -3px; }
-  68% { rotate: 3deg; translate: 4px 0; }
-  85% { rotate: -1.5deg; translate: -2px -1px; }
+  20% { rotate: -1.4deg; translate: -2px -1px; }
+  45% { rotate: 1.4deg; translate: 2px 0; }
+  70% { rotate: -1deg; translate: -1.5px -1px; }
+  88% { rotate: 0.4deg; translate: 0.5px 0; }
 }
 
 @keyframes m-tilt {
   0%, 100% { rotate: 0deg; }
-  22%, 75% { rotate: -5deg; }
-  50% { rotate: -6deg; }
+  30%, 70% { rotate: -2.2deg; }
 }
 
 @keyframes m-lean {
-  0%, 100% { translate: 0 0; scale: 1; }
-  25%, 75% { translate: 0 -5px; scale: 1.035; }
+  0%, 100% { translate: 0 0; }
+  30%, 70% { translate: 0 -3px; }
 }
 
 @keyframes m-shake {
   0%, 100% { rotate: 0deg; }
-  16% { rotate: -2.5deg; }
-  34% { rotate: 2.5deg; }
-  52% { rotate: -2deg; }
-  70% { rotate: 1.5deg; }
-  86% { rotate: -0.6deg; }
+  20% { rotate: -1.1deg; }
+  45% { rotate: 1deg; }
+  70% { rotate: -0.6deg; }
+  88% { rotate: 0.2deg; }
 }
 
 @keyframes m-nod {
   0%, 100% { translate: 0 0; rotate: 0deg; }
-  20%, 60% { translate: 0 6px; rotate: 0.8deg; }
-  40%, 80% { translate: 0 -1px; rotate: 0deg; }
+  25%, 65% { translate: 0 3px; rotate: 0.4deg; }
+  45% { translate: 0 0; rotate: 0deg; }
 }
 
 @keyframes m-squish {
-  0%, 100% { scale: 1; }
-  18%, 54% { scale: 1.04 0.95; }
-  36%, 72% { scale: 0.97 1.03; }
-  88% { scale: 1.01 0.99; }
+  0%, 100% { translate: 0 0; }
+  25%, 65% { translate: 0 2px; }
+  45%, 85% { translate: 0 -2px; }
 }
 
 @keyframes m-shiver {
   0%, 100% { translate: 0 0; }
-  10%, 30%, 50%, 70%, 90% { translate: -2px 0; }
-  20%, 40%, 60%, 80% { translate: 2px 0; }
+  12%, 37%, 62%, 87% { translate: -1px 0; }
+  25%, 50%, 75% { translate: 1px 0; }
 }
 
 @keyframes m-dizzy {
   0%, 100% { rotate: 0deg; translate: 0 0; }
-  20% { rotate: 4deg; translate: 5px -3px; }
-  40% { rotate: -4deg; translate: -5px -1px; }
-  60% { rotate: 3deg; translate: 4px -2px; }
-  80% { rotate: -2deg; translate: -2px 0; }
+  25% { rotate: 1.6deg; translate: 2px -1px; }
+  50% { rotate: -1.6deg; translate: -2px 0; }
+  75% { rotate: 0.8deg; translate: 1px -0.5px; }
 }
 
 @keyframes m-doze {
   0%, 100% { translate: 0 0; rotate: 0deg; }
-  55% { translate: 0 9px; rotate: 3deg; }
-  64% { translate: 0 9px; rotate: 3.5deg; }
-  72% { translate: 0 -8px; rotate: -1deg; }
-  84% { translate: 0 1px; rotate: 0deg; }
+  55%, 64% { translate: 0 4px; rotate: 1.2deg; }
+  74% { translate: 0 -3px; rotate: -0.4deg; }
+  86% { translate: 0 0; rotate: 0deg; }
 }
 
 @keyframes m-sneeze {
-  0%, 100% { translate: 0 0; rotate: 0deg; scale: 1; }
-  45% { translate: 0 -6px; rotate: -2.5deg; scale: 1.01; }
-  55% { translate: 0 7px; rotate: 1.5deg; scale: 1.02 0.96; }
-  70% { translate: 0 -2px; rotate: -0.5deg; scale: 1; }
+  0%, 100% { translate: 0 0; rotate: 0deg; }
+  45% { translate: 0 -3px; rotate: -1deg; }
+  55% { translate: 0 4px; rotate: 0.6deg; }
+  72% { translate: 0 -0.5px; rotate: 0deg; }
 }
 
 @keyframes m-stretch {
-  0%, 100% { translate: 0 0; scale: 1; }
-  35%, 60% { translate: 0 -6px; scale: 0.98 1.05; }
+  0%, 100% { translate: 0 0; }
+  35%, 62% { translate: 0 -4px; }
+}
   75% { translate: 0 1px; scale: 1.01 0.99; }
 }
 
@@ -1538,12 +1534,12 @@ html.atelier .atelier-mascot-layer.is-look {
 /* Phones get a lighter copy of the direction sheet: the mascot is drawn at
    about 240px there, so the full-size cells are wasted bytes on slow links. */
 html.atelier {
-  --mascot-look: url('mascots/deepika-directions.webp?v=20261122');
+  --mascot-look: url('mascots/deepika-directions.webp?v=20261123');
 }
 
 @media (max-width: 760px) {
   html.atelier {
-    --mascot-look: url('mascots/deepika-directions-sm.webp?v=20261122');
+    --mascot-look: url('mascots/deepika-directions-sm.webp?v=20261123');
   }
 }
 
@@ -1552,7 +1548,7 @@ html.atelier {
    has loaded (it reads the URL from --mascot-react) and sets .has-reactions
    on <html> once it has decoded. */
 html.atelier {
-  --mascot-react: url('mascots/deepika-reactions.webp?v=20261122');
+  --mascot-react: url('mascots/deepika-reactions.webp?v=20261123');
 }
 
 /* mascot.js uses the second layer for direction frames too (.is-look), and
@@ -1574,7 +1570,7 @@ html.atelier.has-reactions .atelier-mascot-layer.is-react {
 }
 
 html.atelier.has-reactions .atelier-mascot-lids {
-  background-image: url('mascots/deepika-blinks.webp?v=20261122');
+  background-image: url('mascots/deepika-blinks.webp?v=20261123');
 }
 
 html.atelier .atelier-mascot-lids {
@@ -1593,8 +1589,8 @@ html.atelier .atelier-mascot-react {
    mask with the frame. Her hair, jaw and outline always come from the frame
    underneath; an oval reached the jaw and showed a second chin. */
 html.atelier.has-reactions .atelier-mascot-face {
-  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261122');
-  mask-image: url('mascots/deepika-face-mask.png?v=20261122');
+  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261123');
+  mask-image: url('mascots/deepika-face-mask.png?v=20261123');
 }
 
 html.atelier .atelier-mascot-face {
@@ -6502,7 +6498,7 @@ html.atelier .sb-cameo-art {
 }
 
 html.atelier .sb-cameo-art.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261122');
+  background-image: url('mascots/deepika-reactions.webp?v=20261123');
 }
 
 html.atelier .sb-cameo-art.is-face {

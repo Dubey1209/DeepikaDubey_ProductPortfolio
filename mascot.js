@@ -40,9 +40,9 @@
 //   - The lean towards the cursor is a spring, not a CSS transition. Turning
 //     her head and being poked each give it a small push, so she sways into a
 //     turn and flinches from a poke instead of only changing frame.
-//   - She tilts only while moving, from the spring's velocity, and at rest
-//     her offset is snapped to the device pixel grid. A raster that is left
-//     rotated, scaled or at a fractional offset is resampled and looks soft.
+//   - She tilts only while moving, from the spring's velocity, and only by
+//     a degree. Every move pivots at her neck and stays small; swung from
+//     the bottom edge she rocked like a cut-out pinned at the base.
 //
 // The markup works without this script: CSS shows the centre direction frame.
 
@@ -516,15 +516,15 @@
 
   // ---- lean spring ----------------------------------------------------------
   //
-  // Slightly under-damped, so she arrives with a hint of follow-through rather
-  // than stopping dead like a tween.
+  // Critically damped: she eases into a lean and settles without the little
+  // bounce back an under-damped spring gave, which read as a toy on a spring.
 
-  var STIFFNESS = 70;
+  var STIFFNESS = 38;
   var DAMPING = 13;
-  var SHIFT_X = 7;
-  var SHIFT_Y = 4;
-  var TILT = 0.0045;
-  var MAX_TILT = 2.2;
+  var SHIFT_X = 5;
+  var SHIFT_Y = 3;
+  var TILT = 0.003;
+  var MAX_TILT = 1;
 
   var pos = { x: 0, y: 0 };
   var vel = { x: 0, y: 0 };
@@ -547,18 +547,20 @@
   // A push to the spring's velocity: the sway of a head turn, a flinch.
   function nudge(x, y) {
     if (reducedMotion) return;
-    vel.x += x;
-    vel.y += y;
+    vel.x += x * 0.45;
+    vel.y += y * 0.45;
     wakeSpring();
   }
 
   // Standing still she still breathes and sways a touch, on slow incommensurate
   // waves so it never repeats like a loop; perfectly motionless between
   // gestures she read as a cut-out.
+  // Breathing is slow (a breath every ~4.5s) and mostly a rise and fall; the
+  // side-to-side drift is slower still and barely there.
   function sway(t) {
     return {
-      x: 0.11 * Math.sin(t / 2300) + 0.05 * Math.sin(t / 1370 + 1.3),
-      y: 0.16 * Math.sin(t / 1900) + 0.04 * Math.sin(t / 830),
+      x: 0.05 * Math.sin(t / 3900) + 0.025 * Math.sin(t / 2700 + 1.3),
+      y: 0.13 * Math.sin(t / 720) + 0.03 * Math.sin(t / 1900 + 0.7),
     };
   }
 
@@ -587,28 +589,15 @@
       springOn = false;
       return;
     }
-    // The sway never stops, so keep the picture on the pixel grid and only
-    // rotate it for a real turn; otherwise she would be resampled and soft.
-    // The tilt eases out of a dead zone instead of switching on at its edge,
-    // which showed as a small snap of the head at the start of every turn.
-    var grid = window.devicePixelRatio || 1;
+    // Moved by fractions of a pixel, smoothly. Snapping to the pixel grid
+    // kept her sharp but made every breath a one-pixel jump, which read as
+    // a machine ticking.
     var lean = Math.abs(tilt) < TILT_DEAD ? 0 : tilt - Math.sign(tilt) * TILT_DEAD;
-    snapX = snapTo(px, snapX, grid);
-    snapY = snapTo(py, snapY, grid);
-    setLean(snapX, snapY, lean);
+    setLean(px, py, lean);
     requestAnimationFrame(stepSpring);
   }
 
-  // Rounding to the grid with a little hysteresis: plain rounding flicked
-  // between two pixels whenever the offset hovered near a half, which read as
-  // a one-pixel shiver.
-  var TILT_DEAD = 0.3;
-  var snapX = 0;
-  var snapY = 0;
-  function snapTo(raw, last, grid) {
-    if (Math.abs(raw - last) < 0.7 / grid) return last;
-    return Math.round(raw * grid) / grid;
-  }
+  var TILT_DEAD = 0.15;
 
   // ---- speech bubble --------------------------------------------------------
   //
