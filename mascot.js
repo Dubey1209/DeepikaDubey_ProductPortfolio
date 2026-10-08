@@ -87,10 +87,12 @@
   var GASP = 3;
   var GIGGLE = 4;
   var SHY = 5;
-  // Cell 6 (star eyes) read as blurry, oversized sparkles, so her "excited"
-  // moments use the open grin instead.
+  // Cell 6 was star eyes, which read as blurry, oversized sparkles, so her
+  // "excited" moments use the open grin and the cell holds her angry pout.
   var STARRY = GRIN;
+  var ANGRY = 6;
   var THINKING = 7;
+  var UNIMPRESSED = 8;
   var CENTRE = 4;
   // Reactions whose drawing reaches outside the face (her hand), so they
   // replace the whole figure rather than only the face.
@@ -509,8 +511,9 @@
     if (index === wantLook) return;
     wantLook = index;
     // Where the cursor is comes first: a face she is pulling lets go the
-    // moment it points somewhere else, and she turns straight to it.
-    if (reacting >= 0 && index !== CENTRE && pointer) {
+    // moment it points somewhere else, and she turns straight to it. Except
+    // when she is angry: she keeps glaring at you until it passes.
+    if (reacting >= 0 && reacting !== ANGRY && index !== CENTRE && pointer) {
       if (reactAuto) {
         momentTimers.forEach(clearTimeout);
         momentTimers = [];
@@ -1073,32 +1076,70 @@
     hair: {
       face: GRIN,
       lines: [
-        'psst… I love oiling my hair',
-        'hair oiling is my favourite self-care ritual',
-        'I love my long hair, be gentle!',
-        'fun fact: my hair is wavy by default',
-        [THINKING, 'some days I want straight hair… the waves win'],
-        [WINK, 'wavy hair, straight thinking'],
-        [GASP, 'not the hair! it’s in production'],
-        [GASP, 'hey! that took three iterations'],
-        [GASP, 'careful, it’s a stable release'],
-        'long hair, long roadmap, both well kept',
-        'my waves have their own personality',
-        [WINK, 'oiled, combed, shipped'],
-        [WINK, 'straight hair is my side project'],
-        'these waves don’t follow a template',
-        [GASP, 'low-maintenance hair? never heard of it'],
-        'every wave is a happy accident',
-        'oiled hair, calm mind, clear priorities',
-        [WINK, 'I tried straight hair once. waves filed a bug'],
-        'long hair, don’t care… okay, I care a lot',
-        [GASP, 'hey! no tangles, I just oiled it'],
-        'my waves iterate every single morning',
-        [SHY, 'aww, you like my hair? me too'],
-        [THINKING, 'straight or wavy… let’s A/B test it'],
-        'hair oiling night = my favourite ritual',
-        [GASP, 'careful! that’s years of patient growth'],
-        'these waves came free with the product',
+        [GASP, 'careful! fresh champi, still settling in'],
+        [GASP, 'nooo, I literally just detangled these'],
+        'oil night tonight, shine all week',
+        [WINK, 'coconut oil is my love language'],
+        [SHY, 'aww, you like them? they like you too'],
+        [THINKING, 'sometimes I think, short hair? then I see these waves. never.'],
+        [THINKING, 'what if I cut them short… how would I even look?'],
+        [THINKING, 'a bob cut, maybe? …my hair just said no'],
+        [GIGGLE, 'humidity: 90%. my hair: 300%'],
+        [GIGGLE, 'every wave has a mood. today it’s dramatic'],
+        'one touch, one tangle. choose wisely',
+        [WINK, 'yes, they’re real. no, I won’t share my oil'],
+        [GASP, 'gently! these waves took years of patience'],
+        'my hair has more volume than my playlist',
+        [GIGGLE, 'good hair day? every day. (that’s a lie)'],
+        [SHY, 'oiled, combed and slightly in love with them'],
+        [THINKING, 'short hair would save so much shampoo… still no'],
+        [WINK, 'the waves are natural. the shine is oil.'],
+        [GIGGLE, 'they curl up when they’re shy, like me'],
+        'a little oil, a lot of love. that’s the routine',
+      ],
+    },
+    // The third touch of her hair in a row: she minds, nicely.
+    hairAgain: {
+      face: UNIMPRESSED,
+      lines: [
+        'great. now that’s one more oil session',
+        'I can feel a knot forming. thanks.',
+        [GASP, 'stop! the comb is all the way in my room'],
+        'fine, ruffle them. you’re oiling them later',
+      ],
+    },
+    // Fourth to sixth: properly angry, a little more each time.
+    hairAngry0: {
+      face: ANGRY,
+      lines: [
+        'okay, now I’m angry. hmph!',
+        'that’s it. I’m officially annoyed',
+        'I said tangle ho jayenge! did anyone listen? no.',
+      ],
+    },
+    hairAngry1: {
+      face: ANGRY,
+      lines: [
+        'do you know how long detangling takes?!',
+        'one more touch and you’re doing my champi',
+        'these waves are not a stress ball!',
+      ],
+    },
+    hairAngry2: {
+      face: ANGRY,
+      lines: [
+        'one more and I’m cutting them short! …kidding. never.',
+        'that’s it, I’m tying a bun. no more fun for you',
+        'I’m telling my coconut oil about you',
+      ],
+    },
+    // After that she gives up being angry.
+    hairCalm: {
+      face: SHY,
+      lines: [
+        'okay fine, I can’t stay angry. they forgive you',
+        [GIGGLE, 'hmph… they do look good messy though'],
+        'truce? you bring the oil, I bring the comb',
       ],
     },
     ear: {
@@ -1365,7 +1406,6 @@
   // faces; it is the sequence, the move and the effect that make each one
   // its own expression. Dealt like the lines, every one before any repeats.
   // steps: [face, ms]; move: a class on her box (see .is-m-* in atelier.css).
-  var UNIMPRESSED = 8;
   var MOMENTS = [
     { id: 'hum', steps: [[GIGGLE, 900], [BLINK, 900], [GIGGLE, 700]], move: 'dance', fx: 'note', line: 'la la la… don’t mind me' },
     { id: 'aha', steps: [[THINKING, 1000], [GASP, 260], [GRIN, 1300]], move: 'hop', fx: 'bulb', at: 1000, line: 'ooh! I just had an idea' },
@@ -1487,6 +1527,35 @@
 
   var streak = 0;
   var lastPokeAt = 0;
+  var hairStreak = 0;
+  var lastHairAt = 0;
+
+  // Touching her hair always gets an answer, a ruffle and a little oiled shine.
+  // Keep at it and she minds, then gets properly angry, then forgives you.
+  function hairTouch(t, side) {
+    hairStreak = t - lastHairAt < 4000 ? hairStreak + 1 : 1;
+    lastHairAt = t;
+    momentTimers.forEach(clearTimeout);
+    momentTimers = [];
+
+    var line;
+    if (hairStreak === 1) line = pickLine('hair', SPOTS.hair);
+    else if (hairStreak === 2) line = { face: GASP, text: 'baar baar mat chhedo, tangle ho jayenge!' };
+    else if (hairStreak === 3) line = pickLine('hairAgain', SPOTS.hairAgain);
+    else if (hairStreak <= 6) line = pickLine('hairAngry' + (hairStreak - 4), SPOTS['hairAngry' + (hairStreak - 4)]);
+    else {
+      line = pickLine('hairCalm', SPOTS.hairCalm);
+      hairStreak = 0;
+    }
+    var angry = line.face === ANGRY;
+    var hold = holdFor(line.text) + (angry ? 600 : 0);
+    // Angry is worth turning round to glare at you for, wherever the cursor is.
+    react(line.face, hold, false, angry);
+    say(line.text, hold);
+    gust(hairStreak === 1 ? 8 : angry ? 16 : 12, side);
+    if (hairStreak === 1) burst('spark');
+    if (angry) burst('bang');
+  }
 
   function poke(e) {
     var t = now();
@@ -1499,11 +1568,18 @@
     var step = streak >= 5 ? TEASE[teaseStep] : SPOTS[spot];
 
     // A small flinch away from the finger.
+    var away = Math.random() < 0.5 ? -1 : 1;
     if (e && typeof e.clientX === 'number') {
       var rect = el.getBoundingClientRect();
-      var away = e.clientX < rect.left + rect.width / 2 ? 1 : -1;
+      away = e.clientX < rect.left + rect.width / 2 ? 1 : -1;
       nudge(away * 0.7, -0.35);
       jiggleEarrings(away * 44);
+    }
+
+    if (spot === 'hair') {
+      streak = 0;
+      hairTouch(t, away);
+      return;
     }
 
     if (streak < 5 && Math.random() < 0.5) {
@@ -2089,7 +2165,7 @@
     };
   }
 
-  function gust() {
+  function gust(power, side) {
     if (!breeze || breeze.running || !visible) return;
     var rect = el.getBoundingClientRect();
     breeze.image.setAttribute('width', rect.width);
@@ -2097,10 +2173,10 @@
     breeze.running = true;
     el.classList.add('is-breezy');
 
-    var DURATION = 2600;
+    var DURATION = power ? 1500 : 2600;
     var start = performance.now();
-    var strength = 7 + Math.random() * 5;
-    var dir = Math.random() < 0.5 ? -1 : 1;
+    var strength = power || 7 + Math.random() * 5;
+    var dir = side || (Math.random() < 0.5 ? -1 : 1);
 
     function step(t) {
       var p = (t - start) / DURATION;
