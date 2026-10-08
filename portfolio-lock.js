@@ -48,7 +48,7 @@ class PortfolioLock {
         plate.textContent = first || 'guest';
         plate.classList.toggle('is-empty', !first);
         if (first && !had) {
-          porch.say('Ooh, that sounds like the passcode…', 2200);
+          porch.say('Ooh, spelling the passcode…', 2200);
           plate.parentElement.classList.remove('is-stamp');
           void plate.offsetWidth;
           plate.parentElement.classList.add('is-stamp');
@@ -191,7 +191,7 @@ class PortfolioLock {
         pts.push([a + a * Math.sign(c) * Math.abs(c) ** (2 / n), b + b * Math.sign(s) * Math.abs(s) ** (2 / n)]);
         if (i) lens.push(lens[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
       }
-      const count = Math.max(7, Math.round(lens[steps] / 34));
+      const count = Math.max(8, Math.round(lens[steps] / 24));
       const step = lens[steps] / count;
       const marks = [];
       for (let k = 0, j = 0; k < count; k++) {
@@ -212,7 +212,7 @@ class PortfolioLock {
       const w = bubble.offsetWidth, h = bubble.offsetHeight;
       const centred = getComputedStyle(bubble).getPropertyValue('--tail').trim() === 'centre';
       const x = centred ? w * 0.5 : w * 0.8;
-      const spots = [[x, h + 13, 5.5], [x + (centred ? 0 : 10), h + 26, 3.4]];
+      const spots = [[x, h + 10, 4], [x + (centred ? 0 : 7), h + 19, 2.5]];
       parts[0].forEach((p) => p.setAttribute('d', cloudPath(w, h)));
       parts.slice(1).forEach((pair, i) => pair.forEach((c) => {
         c.setAttribute('cx', spots[i][0].toFixed(1));
@@ -277,7 +277,7 @@ class PortfolioLock {
           } else {
             go();
           }
-          say(dark ? 'Lights out! Cosy night mode, on.' : 'Good morning, sunshine!', 2400);
+          say(dark ? 'Lights out. Shh, the stars are shy.' : 'Who turned on the sun?!', 2400);
           setTimeout(() => {
             porch.classList.remove('is-rising');
             flipping = false;
@@ -289,12 +289,13 @@ class PortfolioLock {
     // A knock opens the door a crack; she peeks out, teases and shuts it
     // again, because the only thing that opens it is a name.
     const quips = [
-      'Knock knock! Who’s there? …that’s my line. Name, please.',
-      'Great knock. Very confident. But this door only opens for a name.',
-      'Knuckles: 10/10. Name: still missing.',
-      'Ooh, a visitor! The passcode’s your name, by the way.',
-      'Stranger danger! Kidding. Tell me your name though.',
-      'Knocking won’t work, I’m a modern door. Type your name.'
+      'Who’s there? Wait, that’s my line.',
+      'Knock: 10/10. Name: missing.',
+      'I open for names. And snacks.',
+      'Shh, I’m in my pyjamas. Name first!',
+      'Knocking? In this economy? Type your name.',
+      'Door’s shy. Tell it your name.',
+      'Ouch, my door! Name please.'
     ];
     let quipAt = Math.floor(Math.random() * quips.length);
     let knocking = false;
@@ -310,7 +311,7 @@ class PortfolioLock {
         porch.classList.add('is-ajar');
         const name = input?.value.trim().split(/\s+/)[0];
         flash(4, 1400);
-        say(name ? `Oh hey, ${name}! Hit “Come in” and I’m all yours.` : quips[quipAt++ % quips.length]);
+        say(name ? `${name}! Psst, hit “Come in”. I’m ready.` : quips[quipAt++ % quips.length]);
       }, 650);
       setTimeout(() => {
         porch.classList.remove('is-ajar');
@@ -337,7 +338,7 @@ class PortfolioLock {
     const name = nameInput?.value.trim() || '';
     if (!name) {
       this.porch?.flash(3, 900);
-      this.porch?.say('Locked! The passcode is your name. Any name. Yours, ideally.');
+      this.porch?.say('Empty name? Bold. Still locked.');
       nameInput?.focus();
       return;
     }
@@ -349,7 +350,7 @@ class PortfolioLock {
 
     this.porch?.flash(1, 3000);
     this.porch?.walk(8);
-    this.porch?.say(`Passcode accepted. Welcome in, ${name.split(/\s+/)[0]}!`, 2000);
+    this.porch?.say(`Welcome in, ${name.split(/\s+/)[0]}! Shoes optional.`, 2000);
     btn.disabled = true;
     btnText.style.display = 'none';
     btnLoader.style.display = 'inline';
