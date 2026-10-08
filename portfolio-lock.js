@@ -33,6 +33,7 @@ class PortfolioLock {
     const input = document.getElementById('visitor-name');
     const sub = document.getElementById('lock-subtitle');
     const plate = document.getElementById('lock-plate-name');
+    this.dressPorch(sub);
     const idle = sub?.textContent || '';
     const porch = this.bindPorch(input);
     this.porch = porch;
@@ -42,7 +43,7 @@ class PortfolioLock {
       const first = input.value.trim().split(/\s+/)[0].slice(0, 18);
       form.classList.toggle('has-name', !!first);
       document.getElementById('portfolio-lock')?.style.setProperty('--glow', Math.min(first.length / 6, 1).toFixed(2));
-      if (sub) sub.textContent = first ? `Hi, ${first}! Lovely to meet you. Shall we?` : idle;
+      if (sub) sub.textContent = first ? `Hi, ${first}! Lovely to meet you.` : idle;
       if (plate) {
         plate.textContent = first || 'guest';
         plate.classList.toggle('is-empty', !first);
@@ -61,6 +62,28 @@ class PortfolioLock {
       e.preventDefault();
       this.handleSubmit(e);
     });
+  }
+
+  // Every visit reads a little differently: the greeting follows the clock,
+  // the welcome line and the knock are picked at random.
+  dressPorch(sub) {
+    const pick = (list) => list[Math.floor(Math.random() * list.length)];
+    const h = new Date().getHours();
+    const hello = document.getElementById('lock-hello');
+    if (hello) {
+      hello.textContent = h >= 5 && h < 12 ? 'Good morning' : h < 17 && h >= 12 ? 'Good afternoon' : h >= 17 && h < 22 ? 'Good evening' : 'Up late too?';
+    }
+    if (sub) {
+      sub.textContent = pick([
+        'Come on in. I’ll show you around.',
+        'Pull up a chair. I’ll show you around.',
+        'So glad you found the place. Come in.',
+        'Kick off your shoes. Stay a while.',
+        'You made it. Come on in.'
+      ]);
+    }
+    const knock = document.querySelector('.lock-knock');
+    if (knock) knock.textContent = pick(['knock knock', 'tap tap', 'ding dong', 'anyone home?']);
   }
 
   // She looks out of the door's window: eyes follow the pointer (or the
