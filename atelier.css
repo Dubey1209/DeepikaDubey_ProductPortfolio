@@ -1454,12 +1454,12 @@ html.atelier .atelier-mascot.is-m-stretch :is(.atelier-mascot-layer, .atelier-ma
    scaling the picture continuously kept it permanently resampled and soft. */
 html.atelier .atelier-mascot-look,
 html.atelier .atelier-mascot-layer.is-look {
-  background-image: url('mascots/deepika-directions.webp?v=20261113');
+  background-image: url('mascots/deepika-directions.webp?v=20261114');
 }
 
 html.atelier .atelier-mascot-react,
 html.atelier .atelier-mascot-layer.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261113');
+  background-image: url('mascots/deepika-reactions.webp?v=20261114');
 }
 
 html.atelier .atelier-mascot-react {
@@ -1474,8 +1474,8 @@ html.atelier .atelier-mascot-react {
    underneath; an oval reached the jaw and showed a second chin. */
 html.atelier .atelier-mascot-face {
   opacity: 0;
-  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261113');
-  mask-image: url('mascots/deepika-face-mask.png?v=20261113');
+  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261114');
+  mask-image: url('mascots/deepika-face-mask.png?v=20261114');
   -webkit-mask-size: 300% 300%;
   mask-size: 300% 300%;
   -webkit-mask-repeat: no-repeat;
@@ -3937,12 +3937,12 @@ html.atelier .lock-face {
   top: 6%;
   width: 128%;
   aspect-ratio: 680 / 800;
-  background: url('mascots/deepika-directions.webp?v=20261113') no-repeat 50% 50% / 300% 300%;
+  background: url('mascots/deepika-directions.webp?v=20261114') no-repeat 50% 50% / 300% 300%;
   transition: translate 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 html.atelier .lock-face.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261113');
+  background-image: url('mascots/deepika-reactions.webp?v=20261114');
   opacity: 0;
   transition: opacity 0.14s ease;
 }
@@ -4188,44 +4188,80 @@ html.atelier .lock-sky i {
 }
 
 html.atelier .lock-sun {
-  top: 1.2rem;
+  top: 2.2rem;
   right: 4.2rem;
-  width: 2.6rem;
+  width: 2.5rem;
   aspect-ratio: 1;
-  border: 1.5px solid var(--ink);
   border-radius: 50%;
-  background: radial-gradient(circle at 40% 38%, #ffe6a3, #f4b54a 70%);
-  box-shadow: 0 0 0 0.5rem color-mix(in srgb, #f4b54a 18%, transparent), 0 0 2.4rem 0.6rem color-mix(in srgb, #f4b54a 35%, transparent);
-  animation: lockSun 5s ease-in-out infinite alternate;
+  background: radial-gradient(circle at 50% 50%, #fffdf2 0 22%, #fff2b8 40%, #ffd66b 68%, #f7a83a 100%);
+  box-shadow:
+    0 0 0.35rem 0.1rem #fff4c4,
+    0 0 1rem 0.3rem color-mix(in srgb, #ffc94d 60%, transparent),
+    0 0 1.8rem 0.6rem color-mix(in srgb, #ffb03a 22%, transparent);
+  animation: lockSun 4s ease-in-out infinite alternate;
+}
+
+html.atelier .lock-sun::before {
+  content: '';
+  position: absolute;
+  inset: -1.6rem;
+  border-radius: 50%;
+  background: repeating-conic-gradient(from 0deg, color-mix(in srgb, #ffe08a 55%, transparent) 0 4deg, transparent 4deg 15deg);
+  -webkit-mask-image: radial-gradient(circle, transparent 32%, #000 40%, transparent 72%);
+  mask-image: radial-gradient(circle, transparent 32%, #000 40%, transparent 72%);
+  filter: blur(2px);
+  opacity: 0.7;
+  animation: lockRays 60s linear infinite;
 }
 
 @keyframes lockSun {
-  to { box-shadow: 0 0 0 0.85rem color-mix(in srgb, #f4b54a 10%, transparent), 0 0 3rem 1rem color-mix(in srgb, #f4b54a 28%, transparent); }
+  to {
+    box-shadow:
+      0 0 0.45rem 0.15rem #fff4c4,
+      0 0 1.2rem 0.4rem color-mix(in srgb, #ffc94d 68%, transparent),
+      0 0 2.1rem 0.8rem color-mix(in srgb, #ffb03a 20%, transparent);
+  }
 }
 
+@keyframes lockRays {
+  to { rotate: 1turn; }
+}
+
+/* Soft cumulus: a flat-bottomed base with two domed puffs, lit from
+   above and shaded underneath, no outline. */
 html.atelier .lock-cloud {
-  top: 2.4rem;
+  top: 2.6rem;
   left: 0;
-  width: 3.4rem;
-  height: 1.1rem;
-  border: 1.5px solid var(--ink);
-  border-radius: 999px;
-  background: var(--card);
+  width: 4.6rem;
+  height: 1.35rem;
+  border-radius: 1rem 1rem 0.7rem 0.7rem;
+  background: linear-gradient(#ffffff 10%, #f1f3f7 60%, #d9dfe9);
+  filter: drop-shadow(0 0.35rem 0.5rem rgba(90, 100, 125, 0.16));
+  opacity: 0.95;
   animation: lockDrift 38s linear infinite;
   animation-delay: -9s;
 }
 
-html.atelier .lock-cloud::before {
+html.atelier .lock-cloud::before,
+html.atelier .lock-cloud::after {
   content: '';
   position: absolute;
-  left: 0.7rem;
-  bottom: 0.35rem;
-  width: 1.5rem;
-  height: 1.5rem;
-  border: 1.5px solid var(--ink);
   border-radius: 50%;
-  background: var(--card);
-  clip-path: inset(-2px -2px 45% -2px);
+  background: radial-gradient(circle at 45% 30%, #ffffff 35%, #f2f4f8 65%, #e2e7ef);
+}
+
+html.atelier .lock-cloud::before {
+  left: 0.8rem;
+  bottom: 0.45rem;
+  width: 2.2rem;
+  height: 2rem;
+}
+
+html.atelier .lock-cloud::after {
+  left: 2.35rem;
+  bottom: 0.4rem;
+  width: 1.6rem;
+  height: 1.45rem;
 }
 
 html.atelier .lock-cloud.is-b {
@@ -6316,14 +6352,14 @@ html.atelier .sb-cameo-art {
   top: 11%;
   width: 120%;
   aspect-ratio: 680 / 800;
-  background-image: url('mascots/deepika-directions.webp?v=20261113');
+  background-image: url('mascots/deepika-directions.webp?v=20261114');
   background-repeat: no-repeat;
   background-size: 300% 300%;
   background-position: 50% 50%;
 }
 
 html.atelier .sb-cameo-art.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261113');
+  background-image: url('mascots/deepika-reactions.webp?v=20261114');
 }
 
 html.atelier .sb-cameo-art.is-face {
