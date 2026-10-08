@@ -539,12 +539,27 @@
     var d = cloudPath(w, h, text);
     cloudShade.setAttribute('d', d);
     cloudLine.setAttribute('d', d);
-    // Two small puffs trail down towards her head, like a thought: down-left
-    // from a cloud beside her, down-right where the page opens it to her left.
-    var right = getComputedStyle(el).getPropertyValue('--cloud-tail').trim() === 'right';
-    var spots = right
-      ? [[w * 0.83, h + 15, 5.5], [w * 0.83 + 11, h + 28, 3.4]]
-      : [[w * 0.17, h + 15, 5.5], [w * 0.17 - 11, h + 28, 3.4]];
+    // Two small puffs trail from the cloud's edge towards the top of her
+    // head, like a thought, wherever the page puts the cloud; when the cloud
+    // already sits on her head there's no gap to bridge and they hide. Rects
+    // are divided by the cloud's own scale so the pop-in doesn't skew them.
+    var box = el.getBoundingClientRect(), at = cloud.getBoundingClientRect();
+    var k = at.width / w || 1;
+    var cx = w / 2, cy = h / 2;
+    var leftOfHer = at.left + at.width / 2 < box.left + box.width / 2;
+    var hx = box.left + box.width * (leftOfHer ? 0.42 : 0.58);
+    var vx = (hx - at.left) / k - cx;
+    var vy = ((box.top + box.height * 0.14) - at.top) / k - cy;
+    var len = Math.hypot(vx, vy) || 1;
+    vx /= len; vy /= len;
+    var edge = 1 / Math.pow(Math.pow(Math.abs(vx) / cx, 3.2) + Math.pow(Math.abs(vy) / cy, 3.2), 1 / 3.2);
+    var room = Math.max(0, len - edge);
+    var near = Math.min(12, room * 0.35), far = Math.min(25, room * 0.75);
+    var show = room > 10;
+    var spots = [
+      [cx + vx * (edge + near), cy + vy * (edge + near), show ? 5.5 : 0],
+      [cx + vx * (edge + far), cy + vy * (edge + far), show ? 3.4 : 0]
+    ];
     puffs.forEach(function (puff, i) {
       Array.prototype.forEach.call(puff.childNodes, function (circle) {
         circle.setAttribute('cx', spots[i][0].toFixed(1));
