@@ -1,17 +1,49 @@
 class PortfolioLock {
   constructor() {
     this.sessionKey = 'portfolio_unlocked';
+    this.ownerKey = 'portfolio_owner';
     this.init();
   }
 
   init() {
-    if (sessionStorage.getItem(this.sessionKey) === 'true') {
+    // ?guest forgets the owner, to see the door the way visitors do.
+    if (/[?&]guest\b/.test(location.search)) {
+      try { localStorage.removeItem(this.ownerKey); } catch { /* private mode */ }
+      sessionStorage.removeItem(this.sessionKey);
+    }
+    if (sessionStorage.getItem(this.sessionKey) === 'true' || this.isOwnerDevice()) {
       this.unlockInstant();
       return;
     }
     document.body.classList.add('portfolio-is-locked');
     this.bindForm();
     this.focusNameInput();
+  }
+
+  // The owner's passphrase, typed where the name goes, opens the door without
+  // announcing a visitor and is remembered on this device. Only its hash
+  // lives here (case and spaces ignored).
+  isOwnerDevice() {
+    try { return localStorage.getItem(this.ownerKey) === PortfolioLock.OWNER; } catch { return false; }
+  }
+
+  async isOwnerCode(value) {
+    const text = value.toLowerCase().replace(/\s+/g, '');
+    if (!text || !window.crypto?.subtle) return false;
+    const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+    const hex = [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('');
+    return hex === PortfolioLock.OWNER;
+  }
+
+  async letOwnerIn() {
+    if (this.opening) return;
+    this.opening = true;
+    try { localStorage.setItem(this.ownerKey, PortfolioLock.OWNER); } catch { /* private mode */ }
+    sessionStorage.setItem(this.sessionKey, 'true');
+    this.porch?.flash(1, 3000);
+    this.porch?.walk(8);
+    this.porch?.say('Oh, it’s you! Welcome home, Deepika.', 2000);
+    await this.playUnlock('Deepika');
   }
 
   focusNameInput() {
@@ -39,6 +71,11 @@ class PortfolioLock {
     plate?.classList.add('is-empty');
     let had = false;
     input?.addEventListener('input', () => {
+      // The key is never echoed on the door.
+      if (input.type === 'password') {
+        porch.walk(Math.min(input.value.length, 8));
+        return;
+      }
       const first = input.value.trim().split(/\s+/)[0].slice(0, 18);
       form.classList.toggle('has-name', !!first);
       document.getElementById('portfolio-lock')?.style.setProperty('--glow', Math.min(first.length / 6, 1).toFixed(2));
@@ -56,6 +93,25 @@ class PortfolioLock {
       porch.walk(first.length);
       if (!!first !== had) porch.hold(first ? 2 : null);
       had = !!first;
+    });
+
+    const owner = document.getElementById('lock-owner');
+    const label = form.querySelector('.lock-input-label');
+    const guest = { label: label?.textContent, placeholder: input?.placeholder };
+    owner?.addEventListener('click', () => {
+      const on = owner.getAttribute('aria-pressed') !== 'true';
+      owner.setAttribute('aria-pressed', String(on));
+      owner.textContent = on ? 'Just visiting' : 'I live here';
+      if (label) label.textContent = on ? 'Your house key' : guest.label;
+      if (input) {
+        input.type = on ? 'password' : 'text';
+        input.placeholder = on ? 'Secret code, then knock' : guest.placeholder;
+        input.autocomplete = on ? 'off' : 'given-name';
+        input.value = '';
+        input.dispatchEvent(new Event('input'));
+        input.focus({ preventScroll: true });
+      }
+      porch.say(on ? 'Oh? Prove it. Whisper the code.' : 'Welcome, guest!', 2200);
     });
 
     form.addEventListener('submit', (e) => {
@@ -278,8 +334,13 @@ class PortfolioLock {
     ];
     let quipAt = Math.floor(Math.random() * quips.length);
     let knocking = false;
-    porch.addEventListener('click', () => {
+    porch.addEventListener('click', async () => {
       if (knocking || porch.closest('.is-opening')) return;
+      if (await this.isOwnerCode(input?.value || '')) {
+        porch.classList.add('has-knocked', 'is-knocking', 'is-ajar');
+        this.letOwnerIn();
+        return;
+      }
       knocking = true;
       porch.classList.add('has-knocked');
       porch.classList.remove('is-knocking');
@@ -288,9 +349,11 @@ class PortfolioLock {
       flash(3, 700);
       setTimeout(() => {
         porch.classList.add('is-ajar');
-        const name = input?.value.trim().split(/\s+/)[0];
+        const keyed = input?.type === 'password';
+        const name = keyed ? '' : input?.value.trim().split(/\s+/)[0];
         flash(4, 1400);
-        say(name ? `${name}! Psst, hit “Come in”. I’m ready.` : quips[quipAt++ % quips.length]);
+        if (keyed) say(input.value ? 'Hmm, that’s not the key.' : 'Code first, then knock.');
+        else say(name ? `${name}! Psst, hit “Come in”. I’m ready.` : quips[quipAt++ % quips.length]);
       }, 650);
       setTimeout(() => {
         porch.classList.remove('is-ajar');
@@ -319,6 +382,16 @@ class PortfolioLock {
       this.porch?.flash(3, 900);
       this.porch?.say('Empty name? Bold. Still locked.');
       nameInput?.focus();
+      return;
+    }
+    if (await this.isOwnerCode(name)) {
+      this.letOwnerIn();
+      return;
+    }
+    if (nameInput?.type === 'password') {
+      this.porch?.flash(3, 900);
+      this.porch?.say('Hmm, that’s not the key.');
+      nameInput.select();
       return;
     }
 
@@ -433,6 +506,8 @@ class PortfolioLock {
     }, 2800);
   }
 }
+
+PortfolioLock.OWNER = '5a3fbae36df4c8a09a1d211d886a3130c660012ea3086425846d5b1d84e1eac8';
 
 // Deferred, so the document is parsed by now; starting here rather than on
 // DOMContentLoaded means the lock (or the site) doesn't wait for the
