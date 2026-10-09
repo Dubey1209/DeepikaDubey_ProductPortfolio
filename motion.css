@@ -247,9 +247,14 @@ html.has-fx-cursor.fx-text .fx-cursor-ball {
   will-change: auto;
 }
 
+/* Room below the line for descenders: at the title's 0.92 line-height the
+   tail of the "p" in Deepika hung out of the box and was clipped. The
+   negative margin keeps the layout where it was. */
 .hero-line {
   display: block;
   overflow: hidden;
+  padding-bottom: 0.2em;
+  margin-bottom: -0.2em;
 }
 
 .hero-line .fx-ch {
@@ -328,7 +333,7 @@ html.has-fx-cursor.fx-text .fx-cursor-ball {
 }
 
 @keyframes fxCharIn {
-  from { transform: translate3d(0, 115%, 0); }
+  from { transform: translate3d(0, 140%, 0); }
   to { transform: translate3d(0, 0, 0); }
 }
 

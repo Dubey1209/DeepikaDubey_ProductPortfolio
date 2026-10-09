@@ -769,11 +769,11 @@
       }, 0.18);
     }
 
-    tl.fromTo(line1, { yPercent: 120 }, {
+    tl.fromTo(line1, { yPercent: 140 }, {
       yPercent: 0, duration: 1.2, stagger: 0.06
     }, 0.12);
 
-    tl.fromTo(line2, { yPercent: 120 }, {
+    tl.fromTo(line2, { yPercent: 140 }, {
       yPercent: 0, duration: 1.25, stagger: 0.03
     }, 0.32);
 
