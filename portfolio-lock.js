@@ -40,7 +40,7 @@ class PortfolioLock {
     this.opening = true;
     try { localStorage.setItem(this.ownerKey, PortfolioLock.OWNER); } catch { /* private mode */ }
     sessionStorage.setItem(this.sessionKey, 'true');
-    this.porch?.flash(1, 3000);
+    this.porch?.peek(3000);
     this.porch?.walk(8);
     this.porch?.say('Oh, it’s you! Welcome home, Deepika.', 2000);
     await this.playUnlock('Deepika');
@@ -91,7 +91,7 @@ class PortfolioLock {
         }
       }
       porch.walk(first.length);
-      if (!!first !== had) porch.hold(first ? 2 : null);
+      if (!!first !== had) porch.light(!!first);
       had = !!first;
     });
 
@@ -122,64 +122,23 @@ class PortfolioLock {
 
   // Every visit reads a little differently: the greeting follows the clock,
   // the welcome line and the knock are picked at random.
-  // She looks out of the door's window: eyes follow the pointer (or the
-  // form while it has focus), she blinks, grins once a name is in, gasps at
-  // an empty knock and winks as the door opens. Cells are 3x3; row 0 looks
-  // up, column 0 to the left.
+  // Someone is home behind the curtained window, but never seen here: a
+  // name draws the curtains back, a knock makes one twitch. The face is
+  // saved for the hero, once the door opens.
   bindPorch(input) {
-    const quiet = { hold() {}, flash() {}, walk() {}, say() {} };
+    const quiet = { light() {}, peek() {}, walk() {}, say() {} };
     const porch = document.querySelector('.lock-porch');
-    const win = porch?.querySelector('.lock-window');
-    const look = win?.querySelector('.is-look');
-    const react = win?.querySelector('.is-react');
-    if (!porch || !look || !react) return quiet;
+    if (!porch?.querySelector('.lock-window')) return quiet;
 
-    const cell = (n) => `${(n % 3) * 50}% ${Math.floor(n / 3) * 50}%`;
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    let held = null;
-    let flashUntil = 0;
-    let gazeCell = 4;
-
-    const show = (n) => {
-      if (n == null || !document.documentElement.classList.contains('has-reactions')) {
-        win.classList.remove('is-face-on');
-        return;
-      }
-      react.style.backgroundPosition = cell(n);
-      win.classList.add('is-face-on');
+    let peekTimer = 0;
+    const peek = (ms) => {
+      clearTimeout(peekTimer);
+      porch.classList.remove('is-peek');
+      void porch.offsetWidth;
+      porch.classList.add('is-peek');
+      peekTimer = setTimeout(() => porch.classList.remove('is-peek'), ms);
     };
-    const gaze = (n) => {
-      if (n === gazeCell) return;
-      gazeCell = n;
-      look.style.backgroundPosition = cell(n);
-    };
-    const toward = (x, y) => {
-      const r = win.getBoundingClientRect();
-      const dx = x - (r.left + r.width / 2);
-      const dy = y - (r.top + r.height / 2);
-      const col = dx < -70 ? 0 : dx > 70 ? 2 : 1;
-      const row = dy < -70 ? 0 : dy > 70 ? 2 : 1;
-      gaze(row * 3 + col);
-    };
-
-    document.addEventListener('pointermove', (e) => {
-      if (document.activeElement !== input) toward(e.clientX, e.clientY);
-    }, { passive: true });
-    input?.addEventListener('focus', () => {
-      const r = input.getBoundingClientRect();
-      toward(r.left + Math.min(r.width, 160), r.top + r.height / 2);
-    });
-
-    if (!reduce) {
-      const blink = () => {
-        if (Date.now() > flashUntil && document.body.classList.contains('portfolio-is-locked')) {
-          show(0);
-          setTimeout(() => { if (Date.now() > flashUntil) show(held); }, 140);
-        }
-        setTimeout(blink, 2600 + Math.random() * 2600);
-      };
-      setTimeout(blink, 1800);
-    }
 
     // Footprints walk up to the mat, one per letter typed.
     const stepsBox = porch.querySelector('.lock-steps');
@@ -192,14 +151,8 @@ class PortfolioLock {
     }
     const walk = (n) => steps.forEach((s, i) => s.classList.toggle('is-on', i < n));
 
-    const flash = (n, ms) => {
-      flashUntil = Date.now() + ms;
-      show(n);
-      setTimeout(() => { if (Date.now() >= flashUntil) show(held); }, ms);
-    };
-
     // Speech bubble by the window: the same inked cloud the site's mascot
-    // talks in, with two small puffs trailing toward her.
+    // talks in, with two small puffs trailing toward the window.
     const bubble = porch.querySelector('.lock-say');
     const NS = 'http://www.w3.org/2000/svg';
     const svg = document.createElementNS(NS, 'svg');
@@ -299,7 +252,7 @@ class PortfolioLock {
         root.style.setProperty('--vt-x', `${e.clientX}px`);
         root.style.setProperty('--vt-y', `${e.clientY}px`);
         porch.classList.add('is-setting');
-        flash(dark ? 0 : 2, 1600);
+        peek(1600);
         setTimeout(() => {
           const go = () => {
             setDark(dark);
@@ -346,12 +299,12 @@ class PortfolioLock {
       porch.classList.remove('is-knocking');
       void porch.offsetWidth;
       porch.classList.add('is-knocking');
-      flash(3, 700);
+      peek(700);
       setTimeout(() => {
         porch.classList.add('is-ajar');
         const keyed = input?.type === 'password';
         const name = keyed ? '' : input?.value.trim().split(/\s+/)[0];
-        flash(4, 1400);
+        peek(1400);
         if (keyed) say(input.value ? 'Hmm, that’s not the key.' : 'Code first, then knock.');
         else say(name ? `${name}! Psst, hit “Come in”. I’m ready.` : quips[quipAt++ % quips.length]);
       }, 650);
@@ -365,12 +318,10 @@ class PortfolioLock {
     return {
       walk,
       say,
-      hold(n) {
-        held = n;
-        porch.classList.toggle('is-lit', n != null);
-        if (Date.now() > flashUntil) show(n);
+      light(on) {
+        porch.classList.toggle('is-lit', on);
       },
-      flash
+      peek
     };
   }
 
@@ -379,7 +330,7 @@ class PortfolioLock {
     const nameInput = document.getElementById('visitor-name');
     const name = nameInput?.value.trim() || '';
     if (!name) {
-      this.porch?.flash(3, 900);
+      this.porch?.peek(900);
       this.porch?.say('Empty name? Bold. Still locked.');
       nameInput?.focus();
       return;
@@ -389,7 +340,7 @@ class PortfolioLock {
       return;
     }
     if (nameInput?.type === 'password') {
-      this.porch?.flash(3, 900);
+      this.porch?.peek(900);
       this.porch?.say('Hmm, that’s not the key.');
       nameInput.select();
       return;
@@ -400,7 +351,7 @@ class PortfolioLock {
     const btnLoader = btn?.querySelector('.btn-loader');
     if (!btn || !btnText || !btnLoader) return;
 
-    this.porch?.flash(1, 3000);
+    this.porch?.peek(3000);
     this.porch?.walk(8);
     this.porch?.say(`Welcome in, ${name.split(/\s+/)[0]}! Shoes optional.`, 2000);
     btn.disabled = true;

@@ -1640,12 +1640,12 @@ html.atelier .atelier-mascot-layer.is-look {
 /* Phones get a lighter copy of the direction sheet: the mascot is drawn at
    about 240px there, so the full-size cells are wasted bytes on slow links. */
 html.atelier {
-  --mascot-look: url('mascots/deepika-directions.webp?v=20261155');
+  --mascot-look: url('mascots/deepika-directions.webp?v=20261156');
 }
 
 @media (max-width: 760px) {
   html.atelier {
-    --mascot-look: url('mascots/deepika-directions-sm.webp?v=20261155');
+    --mascot-look: url('mascots/deepika-directions-sm.webp?v=20261156');
   }
 }
 
@@ -1654,7 +1654,7 @@ html.atelier {
    has loaded (it reads the URL from --mascot-react) and sets .has-reactions
    on <html> once it has decoded. */
 html.atelier {
-  --mascot-react: url('mascots/deepika-reactions.webp?v=20261155');
+  --mascot-react: url('mascots/deepika-reactions.webp?v=20261156');
 }
 
 /* mascot.js uses the second layer for direction frames too (.is-look), and
@@ -1676,7 +1676,7 @@ html.atelier.has-reactions .atelier-mascot-layer.is-react {
 }
 
 html.atelier.has-reactions .atelier-mascot-lids {
-  background-image: url('mascots/deepika-blinks.webp?v=20261155');
+  background-image: url('mascots/deepika-blinks.webp?v=20261156');
 }
 
 html.atelier .atelier-mascot-lids {
@@ -1702,12 +1702,12 @@ html.atelier .atelier-mascot.has-earrings .atelier-mascot-layer.is-look > .ateli
 
 html.atelier .atelier-mascot-ear.is-cover {
   inset: 0;
-  background-image: url('mascots/deepika-earcover.webp?v=20261155');
+  background-image: url('mascots/deepika-earcover.webp?v=20261156');
   background-size: 300% 300%;
 }
 
 html.atelier .atelier-mascot-ear.is-drop {
-  background-image: url('mascots/deepika-eardrops.webp?v=20261155');
+  background-image: url('mascots/deepika-eardrops.webp?v=20261156');
 }
 
 html.atelier .atelier-mascot-ear.is-left {
@@ -1729,8 +1729,8 @@ html.atelier .atelier-mascot-react {
    mask with the frame. Her hair, jaw and outline always come from the frame
    underneath; an oval reached the jaw and showed a second chin. */
 html.atelier.has-reactions .atelier-mascot-face {
-  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261155');
-  mask-image: url('mascots/deepika-face-mask.png?v=20261155');
+  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261156');
+  mask-image: url('mascots/deepika-face-mask.png?v=20261156');
 }
 
 html.atelier .atelier-mascot-face {
@@ -4445,30 +4445,103 @@ html.atelier .lock-window {
   border-radius: 50%;
   background:
     radial-gradient(70% 60% at 50% 45%, #fff1c9, var(--light) 60%, #f0b860);
-  box-shadow: 0 0 0 1.5px var(--ink), inset 0 0 0 1.5px rgba(0, 0, 0, 0.12);
+  box-shadow:
+    0 0 0 1.5px var(--ink),
+    inset 0 0 0 1.5px rgba(0, 0, 0, 0.12),
+    0 0 calc(var(--glow, 0) * 1.6rem) calc(var(--glow, 0) * 0.3rem) rgba(255, 196, 102, 0.55);
+  transition: box-shadow 0.4s ease;
 }
 
-html.atelier .lock-face {
+/* Someone is home, but the door only shows the curtains: the face is kept
+   for the hero, so opening the door is the reveal. */
+html.atelier .lock-window::after {
+  content: '';
   position: absolute;
-  left: -14%;
-  top: 6%;
-  width: 128%;
-  aspect-ratio: 680 / 800;
-  background: var(--mascot-look) no-repeat 50% 50% / 300% 300%;
-  transition: translate 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 2;
+  top: 17%;
+  left: 4%;
+  right: 4%;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--door-deep);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.18);
 }
 
-html.atelier.has-reactions .lock-face.is-react {
-  background-image: var(--mascot-react);
+html.atelier .lock-bulb {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 1.5px;
+  height: 46%;
+  translate: -50% 0;
+  background: #3b2a1a;
+  transform-origin: 50% 0;
 }
 
-html.atelier .lock-face.is-react {
-  opacity: 0;
-  transition: opacity 0.14s ease;
+html.atelier .lock-bulb::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: max(0.5rem, 26%);
+  aspect-ratio: 1;
+  translate: -50% -20%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #fffaf0, #ffe3a3 60%, #f3b75a);
+  box-shadow: 0 0 calc(0.5rem + var(--glow, 0) * 1rem) calc(0.15rem + var(--glow, 0) * 0.35rem) rgba(255, 210, 120, 0.75);
+  transition: box-shadow 0.4s ease;
 }
 
-html.atelier .lock-window.is-face-on .lock-face.is-react {
-  opacity: 1;
+html.atelier .lock-curtain {
+  position: absolute;
+  z-index: 1;
+  top: 17%;
+  bottom: 0;
+  left: 0;
+  width: 51%;
+  border-radius: 0 0 40% 0 / 0 0 12% 0;
+  background:
+    repeating-linear-gradient(90deg, rgba(140, 86, 34, 0.16) 0 2px, transparent 2px 6px, rgba(255, 255, 255, 0.22) 6px 7px, transparent 7px 9px),
+    linear-gradient(180deg, #fcecc8, #efd29a);
+  box-shadow: inset -2px 0 3px rgba(120, 70, 20, 0.18);
+  transform-origin: 0 0;
+  transition: scale 0.7s cubic-bezier(0.34, 1.3, 0.5, 1);
+}
+
+html.atelier .lock-curtain.is-r {
+  left: auto;
+  right: 0;
+  border-radius: 0 0 0 40% / 0 0 0 12%;
+  box-shadow: inset 2px 0 3px rgba(120, 70, 20, 0.18);
+  transform-origin: 100% 0;
+}
+
+html.atelier body.dark-theme .lock-curtain {
+  background:
+    repeating-linear-gradient(90deg, rgba(110, 60, 20, 0.2) 0 2px, transparent 2px 6px, rgba(255, 240, 200, 0.18) 6px 7px, transparent 7px 9px),
+    linear-gradient(180deg, #f4d18e, #e2ab5a);
+}
+
+/* A name in the box draws the curtains back a little. */
+html.atelier .lock-porch.is-lit .lock-curtain {
+  scale: 0.72 1;
+}
+
+/* A knock: one curtain twitches aside, the bulb sways, nobody shows. */
+html.atelier .lock-porch.is-peek .lock-curtain.is-r {
+  scale: 0.4 1;
+  transition-duration: 0.35s;
+}
+
+html.atelier .lock-porch.is-peek .lock-bulb {
+  animation: lockSway 1.4s ease-in-out;
+}
+
+@keyframes lockSway {
+  20% { rotate: 9deg; }
+  45% { rotate: -6deg; }
+  70% { rotate: 3deg; }
+  100% { rotate: 0deg; }
 }
 
 html.atelier .lock-plate {
@@ -4770,79 +4843,12 @@ html.atelier .lock-cloud.is-b {
   to { translate: 36rem 0; }
 }
 
-/* Distant swallows: a small body with two tapered wings that beat from
-   the shoulder, in a hazy slate rather than an outline. */
-html.atelier .lock-bird {
-  top: 3.6rem;
-  left: 0;
-  width: 1.5rem;
-  height: 0.7rem;
-  background: radial-gradient(ellipse 0.16rem 0.12rem at 50% 62%, #3b404b 96%, transparent);
-  animation: lockFly 16s linear infinite;
-}
-
-html.atelier .lock-bird::before,
-html.atelier .lock-bird::after {
-  content: '';
-  position: absolute;
-  top: 0.08rem;
-  width: 0.72rem;
-  height: 0.32rem;
-  background: #3b404b;
-  -webkit-mask: var(--wing) center / 100% 100% no-repeat;
-  mask: var(--wing) center / 100% 100% no-repeat;
-}
-
-html.atelier .lock-bird::before {
-  --wing: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 10'%3E%3Cpath d='M24 7C18 2 10 0 0 2c8 1 13 4 17 8 3-1 5-2 7-3z'/%3E%3C/svg%3E");
-  right: 50%;
-  transform-origin: 100% 70%;
-  animation: lockFlapL 0.42s ease-in-out infinite alternate;
-}
-
-html.atelier .lock-bird::after {
-  --wing: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 10'%3E%3Cpath d='M0 7c6-5 14-7 24-5-8 1-13 4-17 8-3-1-5-2-7-3z'/%3E%3C/svg%3E");
-  left: 50%;
-  transform-origin: 0 70%;
-  animation: lockFlapR 0.42s ease-in-out infinite alternate;
-}
-
-html.atelier .lock-bird.is-b {
-  top: 4.3rem;
-  scale: 0.7;
-  opacity: 0.8;
-  animation-delay: -0.6s;
-}
-
-html.atelier .lock-bird.is-b::before,
-html.atelier .lock-bird.is-b::after {
-  animation-duration: 0.36s;
-}
-
-@keyframes lockFly {
-  0% { translate: -3rem 0.6rem; }
-  50% { translate: 17rem -0.6rem; }
-  70%, 100% { translate: 36rem 0.4rem; }
-}
-
-@keyframes lockFlapL {
-  from { rotate: 22deg; }
-  to { rotate: -26deg; }
-}
-
-@keyframes lockFlapR {
-  from { rotate: -22deg; }
-  to { rotate: 26deg; }
-}
-
-html.atelier .lock-moon,
-html.atelier .lock-shoot {
+html.atelier .lock-moon {
   display: none !important;
 }
 
 html.atelier body.dark-theme .lock-sun,
-html.atelier body.dark-theme .lock-cloud,
-html.atelier body.dark-theme .lock-bird {
+html.atelier body.dark-theme .lock-cloud {
   display: none !important;
 }
 
@@ -4958,61 +4964,6 @@ html.is-sky-flip::view-transition-new(root) {
 @keyframes lockSkyWash {
   from { clip-path: circle(0 at var(--vt-x, 50%) var(--vt-y, 30%)); }
   to { clip-path: circle(150vmax at var(--vt-x, 50%) var(--vt-y, 30%)); }
-}
-
-html.atelier body.dark-theme .lock-shoot {
-  display: block !important;
-  top: 1.4rem;
-  left: 20%;
-  width: 4.5rem;
-  height: 1.5px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, transparent, #fff6dc);
-  rotate: 20deg;
-  opacity: 0;
-  animation: lockShoot 9s ease-in 2.5s infinite;
-}
-
-@keyframes lockShoot {
-  0% { opacity: 0; translate: 0 0; }
-  2% { opacity: 1; }
-  9% { opacity: 0; translate: 9rem 3.3rem; }
-  100% { opacity: 0; translate: 9rem 3.3rem; }
-}
-
-html.atelier .lock-flies {
-  display: none;
-}
-
-html.atelier body.dark-theme .lock-flies {
-  position: absolute;
-  right: -4.4rem;
-  bottom: 2.6rem;
-  display: block;
-  width: 4rem;
-  height: 4rem;
-  pointer-events: none;
-}
-
-html.atelier .lock-flies i {
-  position: absolute;
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: #ffe48a;
-  box-shadow: 0 0 6px 2px rgba(255, 220, 120, 0.6);
-  animation: lockFly1 6s ease-in-out infinite;
-}
-
-html.atelier .lock-flies i:nth-child(1) { left: 20%; top: 30%; }
-html.atelier .lock-flies i:nth-child(2) { left: 70%; top: 55%; animation-duration: 7.5s; animation-delay: -2s; }
-html.atelier .lock-flies i:nth-child(3) { left: 45%; top: 10%; animation-duration: 8.5s; animation-delay: -4s; }
-
-@keyframes lockFly1 {
-  0%, 100% { translate: 0 0; opacity: 0.2; }
-  25% { translate: 0.8rem -0.6rem; opacity: 1; }
-  50% { translate: -0.4rem -1.2rem; opacity: 0.4; }
-  75% { translate: -0.9rem -0.3rem; opacity: 1; }
 }
 
 /* Footprints up to the mat, one per letter. */
@@ -5202,7 +5153,11 @@ html.atelier .portfolio-lock.is-opening .lock-frame::after {
 
 
   html.atelier .lock-knock {
+    width: min(5.6rem, calc(50vw - 6.4rem));
     font-size: 0.85rem;
+    line-height: 1.15;
+    white-space: normal;
+    text-align: right;
   }
 
   html.atelier .lock-say {
@@ -5264,10 +5219,6 @@ html.atelier .portfolio-lock.is-opening .lock-frame::after {
   html.atelier .lock-cloud.is-b {
     top: 3.4rem;
     scale: 0.55;
-  }
-
-  html.atelier .lock-bird {
-    top: 2.2rem;
   }
 
   html.atelier .portfolio-lock {
@@ -6908,7 +6859,7 @@ html.atelier .sb-cameo-art {
 }
 
 html.atelier .sb-cameo-art.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261155');
+  background-image: url('mascots/deepika-reactions.webp?v=20261156');
 }
 
 html.atelier .sb-cameo-art.is-face {
