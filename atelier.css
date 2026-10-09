@@ -1640,12 +1640,12 @@ html.atelier .atelier-mascot-layer.is-look {
 /* Phones get a lighter copy of the direction sheet: the mascot is drawn at
    about 240px there, so the full-size cells are wasted bytes on slow links. */
 html.atelier {
-  --mascot-look: url('mascots/deepika-directions.webp?v=20261156');
+  --mascot-look: url('mascots/deepika-directions.webp?v=20261157');
 }
 
 @media (max-width: 760px) {
   html.atelier {
-    --mascot-look: url('mascots/deepika-directions-sm.webp?v=20261156');
+    --mascot-look: url('mascots/deepika-directions-sm.webp?v=20261157');
   }
 }
 
@@ -1654,7 +1654,7 @@ html.atelier {
    has loaded (it reads the URL from --mascot-react) and sets .has-reactions
    on <html> once it has decoded. */
 html.atelier {
-  --mascot-react: url('mascots/deepika-reactions.webp?v=20261156');
+  --mascot-react: url('mascots/deepika-reactions.webp?v=20261157');
 }
 
 /* mascot.js uses the second layer for direction frames too (.is-look), and
@@ -1676,7 +1676,7 @@ html.atelier.has-reactions .atelier-mascot-layer.is-react {
 }
 
 html.atelier.has-reactions .atelier-mascot-lids {
-  background-image: url('mascots/deepika-blinks.webp?v=20261156');
+  background-image: url('mascots/deepika-blinks.webp?v=20261157');
 }
 
 html.atelier .atelier-mascot-lids {
@@ -1702,12 +1702,12 @@ html.atelier .atelier-mascot.has-earrings .atelier-mascot-layer.is-look > .ateli
 
 html.atelier .atelier-mascot-ear.is-cover {
   inset: 0;
-  background-image: url('mascots/deepika-earcover.webp?v=20261156');
+  background-image: url('mascots/deepika-earcover.webp?v=20261157');
   background-size: 300% 300%;
 }
 
 html.atelier .atelier-mascot-ear.is-drop {
-  background-image: url('mascots/deepika-eardrops.webp?v=20261156');
+  background-image: url('mascots/deepika-eardrops.webp?v=20261157');
 }
 
 html.atelier .atelier-mascot-ear.is-left {
@@ -1729,8 +1729,8 @@ html.atelier .atelier-mascot-react {
    mask with the frame. Her hair, jaw and outline always come from the frame
    underneath; an oval reached the jaw and showed a second chin. */
 html.atelier.has-reactions .atelier-mascot-face {
-  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261156');
-  mask-image: url('mascots/deepika-face-mask.png?v=20261156');
+  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261157');
+  mask-image: url('mascots/deepika-face-mask.png?v=20261157');
 }
 
 html.atelier .atelier-mascot-face {
@@ -6859,7 +6859,7 @@ html.atelier .sb-cameo-art {
 }
 
 html.atelier .sb-cameo-art.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261156');
+  background-image: url('mascots/deepika-reactions.webp?v=20261157');
 }
 
 html.atelier .sb-cameo-art.is-face {
@@ -7007,12 +7007,12 @@ html.atelier .case-reader-sheet {
   left: 0;
   right: 0;
   bottom: 0;
-  width: min(100%, 74rem);
-  height: min(93vh, 64rem);
-  height: min(93dvh, 64rem);
+  width: min(100%, 76rem);
+  height: min(95vh, 66rem);
+  height: min(95dvh, 66rem);
   margin: 0 auto;
   display: grid;
-  grid-template-rows: auto auto 1fr auto;
+  grid-template-rows: auto 1fr auto;
   background: var(--card);
   border: 1.5px solid var(--ink);
   border-bottom: 0;
@@ -7021,20 +7021,26 @@ html.atelier .case-reader-sheet {
   will-change: transform;
 }
 
-/* Fixed rows: with the tabs hidden, the stage would slide into their auto
-   row and collapse. */
+/* Fixed rows, so the stage always gets the height that is left. */
 html.atelier .case-reader-head { grid-row: 1; }
-html.atelier .case-reader-views { grid-row: 2; }
-html.atelier .case-reader-stage { grid-row: 3; }
-html.atelier .case-reader-foot { grid-row: 4; }
+html.atelier .case-reader-stage { grid-row: 2; }
+html.atelier .case-reader-foot { grid-row: 3; }
+
+/* The page's buttons carry a bottom margin; nothing in here wants it. */
+html.atelier .case-reader button {
+  margin: 0;
+  min-height: 0;
+  font-family: var(--sans);
+  line-height: 1;
+}
 
 /* ---- header ---- */
 html.atelier .case-reader-head {
   position: relative;
   display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-  padding: 1.7rem 1.5rem 0.9rem;
+  align-items: center;
+  gap: 0.9rem 1.25rem;
+  padding: 1.6rem 1.5rem 1rem;
   cursor: grab;
   touch-action: none;
   user-select: none;
@@ -7069,76 +7075,100 @@ html.atelier .case-reader-heading {
 
 html.atelier .case-reader-kicker {
   display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0.7rem;
-  margin: 0 0 0.35rem !important;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+  margin: 0 0 0.5rem !important;
   font-family: var(--sans);
-  font-size: 0.7rem !important;
+  font-size: 0.68rem !important;
   font-weight: 600;
   letter-spacing: 0.14em !important;
   text-transform: uppercase;
+  white-space: nowrap;
   color: var(--muted) !important;
 }
 
-html.atelier .case-reader-count {
-  color: var(--spin);
-  font-variant-numeric: tabular-nums;
+html.atelier .case-reader-cat {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* What you are looking at, in that kind's own colour. */
+html.atelier .case-reader-stamp {
+  --tag: var(--spin);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+  flex-shrink: 0;
+  padding: 0.3rem 0.65rem 0.3rem 0.55rem;
+  border-radius: 99px;
+  background: color-mix(in srgb, var(--tag) 13%, transparent);
+  color: var(--tag);
+  letter-spacing: 0.12em;
+}
+
+html.atelier .case-reader-stamp::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+html.atelier .case-reader[data-kind="site"] .case-reader-stamp { --tag: #1f9d55; }
+html.atelier .case-reader[data-kind="figma"] .case-reader-stamp { --tag: #8b3dff; }
+html.atelier .case-reader[data-kind="repo"] .case-reader-stamp { --tag: var(--accent); }
+html.atelier .case-reader[data-kind="repo"] .case-reader-stamp::before { border-radius: 2px; }
+html.atelier body.dark-theme .case-reader[data-kind="site"] .case-reader-stamp { --tag: #4cd07d; }
+html.atelier body.dark-theme .case-reader[data-kind="figma"] .case-reader-stamp { --tag: #b98bff; }
+
+/* A live site breathes. */
+html.atelier .case-reader[data-kind="site"] .case-reader-stamp::before {
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--tag) 55%, transparent);
+  animation: case-reader-live 1.8s ease-out infinite;
+}
+
+@keyframes case-reader-live {
+  70%, 100% { box-shadow: 0 0 0 6px transparent; }
+}
+
+html.atelier .case-reader-stamp.is-stamped {
+  animation: case-reader-tag 0.45s cubic-bezier(0.3, 1.5, 0.5, 1) both;
+}
+
+@keyframes case-reader-tag {
+  from { opacity: 0; transform: translateY(4px) scale(0.85); }
 }
 
 html.atelier .case-reader-title {
   margin: 0 !important;
+  overflow: hidden;
   font-family: var(--serif) !important;
-  font-size: clamp(1.25rem, 2.4vw, 1.75rem) !important;
+  font-size: clamp(1.2rem, 2vw, 1.6rem) !important;
   font-weight: 600 !important;
   line-height: 1.15 !important;
-  color: var(--ink) !important;
   text-align: left !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink) !important;
 }
 
 html.atelier .case-reader-hook {
-  margin: 0.35rem 0 0 !important;
+  margin: 0.3rem 0 0 !important;
+  overflow: hidden;
   font-family: var(--serif);
   font-style: italic;
-  font-size: 0.98rem !important;
+  font-size: 0.95rem !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   color: var(--spin) !important;
-}
-
-/* A rubber stamp that says what this is, thumped on each time it changes. */
-html.atelier .case-reader-stamp {
-  align-self: center;
-  flex-shrink: 0;
-  padding: 0.28rem 0.7rem 0.22rem;
-  border: 2px solid var(--spin);
-  border-radius: 7px;
-  font-family: var(--sans);
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--spin);
-  opacity: 0.85;
-  transform: rotate(-9deg);
-  mix-blend-mode: multiply;
-}
-
-html.atelier body.dark-theme .case-reader-stamp,
-html.atelier.dark-theme .case-reader-stamp { mix-blend-mode: normal; }
-
-html.atelier .case-reader-stamp.is-stamped {
-  animation: case-reader-stamp 0.55s cubic-bezier(0.3, 1.5, 0.5, 1) both;
-}
-
-@keyframes case-reader-stamp {
-  0% { opacity: 0; transform: scale(2.4) rotate(-22deg); }
-  55% { opacity: 0.95; transform: scale(0.92) rotate(-7deg); }
-  100% { opacity: 0.85; transform: scale(1) rotate(-9deg); }
 }
 
 html.atelier .case-reader-tools {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.5rem;
   flex-shrink: 0;
 }
 
@@ -7146,36 +7176,43 @@ html.atelier .case-reader-out,
 html.atelier .case-reader-pill {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.5rem 0.95rem;
-  border: 1.5px solid var(--line);
+  gap: 0.45rem;
+  height: 42px;
+  padding: 0 1.1rem;
+  border: 1.5px solid var(--ink);
   border-radius: 99px;
-  font-size: 0.82rem;
-  font-weight: 500;
-  color: var(--muted) !important;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--ink) !important;
   text-decoration: none !important;
   white-space: nowrap;
-  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  transition: color 0.2s ease, background 0.2s ease, transform 0.25s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+html.atelier .case-reader-out span[aria-hidden] {
+  transition: transform 0.25s cubic-bezier(0.3, 1.6, 0.5, 1);
 }
 
 html.atelier .case-reader-out:hover,
 html.atelier .case-reader-out:focus-visible,
 html.atelier .case-reader-pill:hover {
-  color: var(--ink) !important;
-  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--card) !important;
 }
+
+html.atelier .case-reader-out:hover span[aria-hidden] { transform: translate(2px, -2px); }
 
 html.atelier .case-reader-close {
   width: 42px;
   height: 42px;
   display: grid;
   place-items: center;
+  padding: 0;
   border: 1.5px solid var(--ink);
   border-radius: 50%;
   background: var(--card);
   color: var(--ink);
   font-size: 1.5rem;
-  line-height: 1;
   transition: transform 0.3s cubic-bezier(0.3, 1.6, 0.5, 1), background 0.2s ease, color 0.2s ease;
 }
 
@@ -7186,12 +7223,15 @@ html.atelier .case-reader-close:focus-visible {
   color: var(--card);
 }
 
-/* ---- view tabs (live / code, design / prototype) ---- */
+/* ---- view tabs (live / code, design / prototype): a segmented switch ---- */
 html.atelier .case-reader-views {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  padding: 0 1.5rem 0.9rem;
+  display: inline-flex;
+  flex-shrink: 0;
+  gap: 2px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 99px;
+  background: color-mix(in srgb, var(--ink) 5%, transparent);
 }
 
 html.atelier .case-reader-views[hidden] { display: none; }
@@ -7199,34 +7239,35 @@ html.atelier .case-reader-views[hidden] { display: none; }
 html.atelier .case-reader-view {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
-  padding: 0.42rem 0.95rem;
-  border: 1.5px solid var(--line);
+  height: 34px;
+  padding: 0 1rem;
+  border: 0;
   border-radius: 99px;
   background: transparent;
-  font-family: var(--sans);
   font-size: 0.84rem;
-  font-weight: 500;
+  font-weight: 600;
+  white-space: nowrap;
   color: var(--muted);
-  transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease, transform 0.25s cubic-bezier(0.3, 1.6, 0.5, 1);
+  transition: background 0.25s ease, color 0.25s ease;
 }
 
-html.atelier .case-reader-view:hover { color: var(--ink); border-color: var(--ink); transform: translateY(-1px); }
+html.atelier .case-reader-view:hover { color: var(--ink); }
 
 html.atelier .case-reader-view[aria-selected="true"] {
   background: var(--ink);
-  border-color: var(--ink);
   color: var(--card);
 }
 
 html.atelier .case-reader-view-dot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background: var(--spin);
 }
 
-html.atelier .case-reader-view.is-site .case-reader-view-dot { background: #28c840; box-shadow: 0 0 0 3px rgba(40, 200, 64, 0.2); }
+html.atelier .case-reader-view.is-site .case-reader-view-dot { background: #28c840; }
 html.atelier .case-reader-view.is-figma .case-reader-view-dot { background: #a259ff; }
 html.atelier .case-reader-view.is-repo .case-reader-view-dot { background: currentColor; border-radius: 2px; }
 
@@ -7276,6 +7317,7 @@ html.atelier .case-reader-devices button {
   place-items: center;
   width: 30px;
   height: 30px;
+  padding: 0;
   border: 0;
   border-radius: 8px;
   background: none;
@@ -7789,9 +7831,9 @@ html.atelier .case-reader-repo-miss-big {
 
 /* ---- footer ---- */
 html.atelier .case-reader-foot {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
-  justify-content: space-between;
   gap: 1rem;
   padding: 0.85rem 1.25rem;
   padding-bottom: calc(0.85rem + env(safe-area-inset-bottom, 0px));
@@ -7802,34 +7844,82 @@ html.atelier .case-reader-foot.is-solo { visibility: hidden; }
 html.atelier .case-reader-step {
   display: inline-flex;
   align-items: center;
-  gap: 0.55rem;
-  max-width: 40%;
-  padding: 0.45rem 0.4rem;
-  border: 0;
+  gap: 0.75rem;
+  justify-self: start;
+  max-width: 100%;
+  min-width: 0;
+  padding: 0.45rem 1rem 0.45rem 0.45rem;
+  border: 1.5px solid transparent;
+  border-radius: 99px;
   background: none;
-  font-family: var(--serif);
-  font-style: italic;
-  font-size: 1rem;
+  color: var(--ink);
+  text-align: left;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+html.atelier .case-reader-step.is-next {
+  justify-self: end;
+  padding: 0.45rem 0.45rem 0.45rem 1rem;
+  text-align: right;
+}
+
+html.atelier .case-reader-step-arrow {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border: 1.5px solid var(--ink);
+  border-radius: 50%;
+  font-size: 0.95rem;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.3s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+html.atelier .case-reader-step-text {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+html.atelier .case-reader-step-label {
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
   color: var(--muted);
-  transition: color 0.2s ease;
 }
 
 html.atelier .case-reader-step-name {
   overflow: hidden;
+  font-family: var(--serif);
+  font-size: 1rem;
+  font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-html.atelier .case-reader-step span[aria-hidden] {
-  font-style: normal;
-  transition: transform 0.25s cubic-bezier(0.3, 1.6, 0.5, 1);
+html.atelier .case-reader-step:hover,
+html.atelier .case-reader-step:focus-visible { border-color: var(--line); background: color-mix(in srgb, var(--ink) 4%, transparent); }
+
+html.atelier .case-reader-step:hover .case-reader-step-arrow,
+html.atelier .case-reader-step:focus-visible .case-reader-step-arrow { background: var(--ink); color: var(--card); transform: translateX(-3px); }
+
+html.atelier .case-reader-step.is-next:hover .case-reader-step-arrow,
+html.atelier .case-reader-step.is-next:focus-visible .case-reader-step-arrow { transform: translateX(3px); }
+
+html.atelier .case-reader-where {
+  display: grid;
+  justify-items: center;
+  gap: 0.45rem;
 }
 
-html.atelier .case-reader-step:hover,
-html.atelier .case-reader-step:focus-visible { color: var(--ink); }
-
-html.atelier .case-reader-step:hover span[aria-hidden] { transform: translateX(-4px); }
-html.atelier .case-reader-step.is-next:hover span[aria-hidden] { transform: translateX(4px); }
+html.atelier .case-reader-count {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
 
 html.atelier .case-reader-dots { display: flex; gap: 6px; }
 
@@ -7848,6 +7938,38 @@ html.atelier .case-reader-dots i.is-on {
   background: var(--spin);
 }
 
+html.atelier .case-reader-keys {
+  font-size: 0.7rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+html.atelier .case-reader-keys kbd {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.35rem;
+  height: 1.25rem;
+  margin-right: 0.15rem;
+  padding: 0 0.3rem;
+  border: 1px solid var(--line);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  font-family: var(--sans);
+  font-size: 0.66rem;
+  color: var(--ink);
+}
+
+@media (hover: none) {
+  html.atelier .case-reader-keys { display: none; }
+}
+
+/* Mid widths: the tabs drop under the title rather than squeezing it. */
+@media (max-width: 1040px) {
+  html.atelier .case-reader-head { flex-wrap: wrap; }
+  html.atelier .case-reader-heading { flex-basis: calc(100% - 15rem); }
+  html.atelier .case-reader-views { order: 3; }
+}
+
 @media (max-width: 640px) {
   html.atelier .case-reader-sheet {
     height: 94vh;
@@ -7855,14 +7977,16 @@ html.atelier .case-reader-dots i.is-on {
     border-radius: 20px 20px 0 0;
   }
 
-  html.atelier .case-reader-head { padding: 1.5rem 1rem 0.75rem; gap: 0.6rem; }
-  html.atelier .case-reader-stamp { display: none; }
-  html.atelier .case-reader-views { padding: 0 1rem 0.75rem; }
+  html.atelier .case-reader-head { padding: 1.5rem 1rem 0.8rem; gap: 0.75rem 0.6rem; align-items: flex-start; }
+  html.atelier .case-reader-heading { flex-basis: 0; }
+  html.atelier .case-reader-title { font-size: 1.2rem !important; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  html.atelier .case-reader-hook { font-size: 0.86rem !important; }
 
-  html.atelier .case-reader-out { padding: 0.45rem 0.7rem; }
+  html.atelier .case-reader-views { width: 100%; }
+  html.atelier .case-reader-view { flex: 1; padding: 0 0.6rem; }
+
+  html.atelier .case-reader-out { width: 42px; padding: 0; justify-content: center; }
   html.atelier .case-reader-out-label { display: none; }
-
-  html.atelier .case-reader-hook { font-size: 0.88rem !important; }
 
   html.atelier .case-reader-stage,
   html.atelier .case-reader[data-kind="site"] .case-reader-stage,
@@ -7875,14 +7999,19 @@ html.atelier .case-reader-dots i.is-on {
   html.atelier .case-reader-lights,
   html.atelier .case-reader-devices { display: none; }
 
-  html.atelier .case-reader-dots { display: none; }
-  html.atelier .case-reader-step { max-width: 48%; font-size: 0.92rem; }
+  html.atelier .case-reader-foot { gap: 0.5rem; padding-left: 0.6rem; padding-right: 0.6rem; }
+  html.atelier .case-reader-dots,
+  html.atelier .case-reader-keys { display: none; }
+  html.atelier .case-reader-step { gap: 0.5rem; padding-right: 0.6rem; }
+  html.atelier .case-reader-step.is-next { padding-left: 0.6rem; }
+  html.atelier .case-reader-step-name { font-size: 0.9rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   html.atelier .case-reader-paper,
   html.atelier .case-reader-paper i,
   html.atelier .case-reader-stamp.is-stamped,
+  html.atelier .case-reader[data-kind="site"] .case-reader-stamp::before,
   html.atelier .case-reader-repo-bar i,
   html.atelier .case-reader::backdrop { animation: none; }
 }

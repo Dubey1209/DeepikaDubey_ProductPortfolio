@@ -27,16 +27,16 @@
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="preload" as="font" type="font/woff2" href="fonts/fraunces-latin.woff2" crossorigin>
   <link rel="preload" as="font" type="font/woff2" href="fonts/outfit-latin.woff2" crossorigin>
-  <link rel="preload" as="image" href="mascots/deepika-directions.webp?v=20261156" media="(min-width: 761px)" fetchpriority="high">
-  <link rel="preload" as="image" href="mascots/deepika-directions-sm.webp?v=20261156" media="(max-width: 760px)" fetchpriority="high">
+  <link rel="preload" as="image" href="mascots/deepika-directions.webp?v=20261157" media="(min-width: 761px)" fetchpriority="high">
+  <link rel="preload" as="image" href="mascots/deepika-directions-sm.webp?v=20261157" media="(max-width: 760px)" fetchpriority="high">
   <!-- One shared version token for every local asset. Bump it in both HTML
        files whenever any CSS or JS changes. Per-asset tokens drifted out of
        sync previously, which can serve new CSS against old JavaScript. -->
-  <link rel="stylesheet" href="base.css?v=20261156">
-  <link rel="stylesheet" href="atelier.css?v=20261156">
-  <link rel="stylesheet" href="motion.css?v=20261156">
+  <link rel="stylesheet" href="base.css?v=20261157">
+  <link rel="stylesheet" href="atelier.css?v=20261157">
+  <link rel="stylesheet" href="motion.css?v=20261157">
   <noscript><style>.fx-ch>span{transform:none!important}.home-kicker,.home-subtitle,.home-desc,.home-btns,.home-rotate,.hero-rule{opacity:1!important}.home-photo{filter:none!important;transform:rotate(-3.5deg)!important}</style></noscript>
-  <script src="portfolio-lock.js?v=20261156" defer></script>
+  <script src="portfolio-lock.js?v=20261157" defer></script>
 </head>
 <body>
     <script>
@@ -1209,17 +1209,16 @@
       <header class="case-reader-head">
         <span class="case-reader-grip" aria-hidden="true"></span>
         <div class="case-reader-heading">
-          <p class="case-reader-kicker"><span class="case-reader-count"></span><span class="case-reader-cat"></span></p>
+          <p class="case-reader-kicker"><span class="case-reader-stamp"></span><span class="case-reader-cat"></span></p>
           <h3 id="case-reader-title" class="case-reader-title"></h3>
           <p class="case-reader-hook"></p>
         </div>
-        <span class="case-reader-stamp" aria-hidden="true"></span>
+        <div class="case-reader-views" role="tablist" aria-label="Ways to see this project"></div>
         <div class="case-reader-tools">
           <a class="case-reader-out" href="#" target="_blank" rel="noopener"><span class="case-reader-out-label">Open</span><span aria-hidden="true">↗</span></a>
           <button type="button" class="case-reader-close" data-case-close aria-label="Close">&times;</button>
         </div>
       </header>
-      <div class="case-reader-views" role="tablist" aria-label="Ways to see this project"></div>
       <div class="case-reader-stage">
         <div class="case-reader-chrome">
           <span class="case-reader-lights" aria-hidden="true"><i></i><i></i><i></i></span>
@@ -1251,9 +1250,19 @@
         </div>
       </div>
       <footer class="case-reader-foot">
-        <button type="button" class="case-reader-step" data-case-step="-1"><span aria-hidden="true">←</span><span class="case-reader-step-name"></span></button>
-        <span class="case-reader-dots" aria-hidden="true"></span>
-        <button type="button" class="case-reader-step is-next" data-case-step="1"><span class="case-reader-step-name"></span><span aria-hidden="true">→</span></button>
+        <button type="button" class="case-reader-step" data-case-step="-1">
+          <span class="case-reader-step-arrow" aria-hidden="true">←</span>
+          <span class="case-reader-step-text"><span class="case-reader-step-label">Previous</span><span class="case-reader-step-name"></span></span>
+        </button>
+        <div class="case-reader-where">
+          <span class="case-reader-count"></span>
+          <span class="case-reader-dots" aria-hidden="true"></span>
+          <span class="case-reader-keys" aria-hidden="true"><kbd>←</kbd><kbd>→</kbd> to browse · <kbd>Esc</kbd> to close</span>
+        </div>
+        <button type="button" class="case-reader-step is-next" data-case-step="1">
+          <span class="case-reader-step-text"><span class="case-reader-step-label">Next</span><span class="case-reader-step-name"></span></span>
+          <span class="case-reader-step-arrow" aria-hidden="true">→</span>
+        </button>
       </footer>
     </div>
   </dialog>
@@ -1429,12 +1438,12 @@
   <script src="vendor/gsap.min.js" defer></script>
   <script src="vendor/ScrollTrigger.min.js" defer></script>
   <script src="vendor/lenis.min.js" defer></script>
-  <script src="contact-form.js?v=20261156" defer></script>
-  <script src="theme-toggle.js?v=20261156" defer></script>
-  <script src="tap-sound.js?v=20261156" defer></script>
-  <script src="script.js?v=20261156" defer></script>
-  <script src="viewer.js?v=20261156" defer></script>
-  <script src="motion.js?v=20261156" defer></script>
-  <script src="mascot.js?v=20261156" defer></script>
+  <script src="contact-form.js?v=20261157" defer></script>
+  <script src="theme-toggle.js?v=20261157" defer></script>
+  <script src="tap-sound.js?v=20261157" defer></script>
+  <script src="script.js?v=20261157" defer></script>
+  <script src="viewer.js?v=20261157" defer></script>
+  <script src="motion.js?v=20261157" defer></script>
+  <script src="mascot.js?v=20261157" defer></script>
 </body>
 </html>

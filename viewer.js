@@ -39,10 +39,10 @@
   // ---- what a link is -------------------------------------------------------
 
   var KINDS = {
-    doc: { stamp: 'Case file', out: 'Open in Drive', wait: ['Unfolding the case study…', 'Pulling it from the filing cabinet…', 'Dusting off the research notes…', 'Lining up the metrics…', 'Straightening the sticky notes…'] },
-    site: { stamp: 'Live', out: 'Open site', wait: ['Booting it up…', 'Waking the server, it was napping…', 'Fetching pixels…', 'Polishing the buttons…', 'Almost there, promise…'] },
+    doc: { stamp: 'Case study', out: 'Open in Drive', wait: ['Unfolding the case study…', 'Pulling it from the filing cabinet…', 'Dusting off the research notes…', 'Lining up the metrics…', 'Straightening the sticky notes…'] },
+    site: { stamp: 'Live site', out: 'Open site', wait: ['Booting it up…', 'Waking the server, it was napping…', 'Fetching pixels…', 'Polishing the buttons…', 'Almost there, promise…'] },
     figma: { stamp: 'Figma', out: 'Open in Figma', wait: ['Unrolling the canvas…', 'Sharpening the pencils…', 'Nudging frames 1px left…', 'Naming layers properly (finally)…'] },
-    repo: { stamp: 'Source', out: 'Open on GitHub', wait: ['Fetching the repo…', 'Counting the commits…', 'Reading the README…', 'Untangling the branches…'] },
+    repo: { stamp: 'Code', out: 'Open on GitHub', wait: ['Fetching the repo…', 'Counting the commits…', 'Reading the README…', 'Untangling the branches…'] },
   };
 
   function viewOf(href) {
@@ -315,7 +315,7 @@
   function readme(src, key) {
     if (!src) return '<p class="case-reader-repo-empty">No README yet. The code speaks for itself.</p>';
     var doc = new DOMParser().parseFromString(src, 'text/html');
-    doc.querySelectorAll('script, style, iframe, object, embed, form, link, meta, base, input, button').forEach(function (n) { n.remove(); });
+    doc.querySelectorAll('script, style, iframe, object, embed, form, link, meta, base, input, button, a.anchor').forEach(function (n) { n.remove(); });
     doc.body.querySelectorAll('*').forEach(function (n) {
       Array.prototype.slice.call(n.attributes).forEach(function (at) {
         if (/^on/i.test(at.name) || /^\s*javascript:/i.test(at.value)) n.removeAttribute(at.name);
