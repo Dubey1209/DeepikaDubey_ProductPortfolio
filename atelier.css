@@ -1637,12 +1637,12 @@ html.atelier .atelier-mascot-layer.is-look {
 /* Phones get a lighter copy of the direction sheet: the mascot is drawn at
    about 240px there, so the full-size cells are wasted bytes on slow links. */
 html.atelier {
-  --mascot-look: url('mascots/deepika-directions.webp?v=20261152');
+  --mascot-look: url('mascots/deepika-directions.webp?v=20261153');
 }
 
 @media (max-width: 760px) {
   html.atelier {
-    --mascot-look: url('mascots/deepika-directions-sm.webp?v=20261152');
+    --mascot-look: url('mascots/deepika-directions-sm.webp?v=20261153');
   }
 }
 
@@ -1651,7 +1651,7 @@ html.atelier {
    has loaded (it reads the URL from --mascot-react) and sets .has-reactions
    on <html> once it has decoded. */
 html.atelier {
-  --mascot-react: url('mascots/deepika-reactions.webp?v=20261152');
+  --mascot-react: url('mascots/deepika-reactions.webp?v=20261153');
 }
 
 /* mascot.js uses the second layer for direction frames too (.is-look), and
@@ -1673,7 +1673,7 @@ html.atelier.has-reactions .atelier-mascot-layer.is-react {
 }
 
 html.atelier.has-reactions .atelier-mascot-lids {
-  background-image: url('mascots/deepika-blinks.webp?v=20261152');
+  background-image: url('mascots/deepika-blinks.webp?v=20261153');
 }
 
 html.atelier .atelier-mascot-lids {
@@ -1699,12 +1699,12 @@ html.atelier .atelier-mascot.has-earrings .atelier-mascot-layer.is-look > .ateli
 
 html.atelier .atelier-mascot-ear.is-cover {
   inset: 0;
-  background-image: url('mascots/deepika-earcover.webp?v=20261152');
+  background-image: url('mascots/deepika-earcover.webp?v=20261153');
   background-size: 300% 300%;
 }
 
 html.atelier .atelier-mascot-ear.is-drop {
-  background-image: url('mascots/deepika-eardrops.webp?v=20261152');
+  background-image: url('mascots/deepika-eardrops.webp?v=20261153');
 }
 
 html.atelier .atelier-mascot-ear.is-left {
@@ -1726,8 +1726,8 @@ html.atelier .atelier-mascot-react {
    mask with the frame. Her hair, jaw and outline always come from the frame
    underneath; an oval reached the jaw and showed a second chin. */
 html.atelier.has-reactions .atelier-mascot-face {
-  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261152');
-  mask-image: url('mascots/deepika-face-mask.png?v=20261152');
+  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261153');
+  mask-image: url('mascots/deepika-face-mask.png?v=20261153');
 }
 
 html.atelier .atelier-mascot-face {
@@ -6904,7 +6904,7 @@ html.atelier .sb-cameo-art {
 }
 
 html.atelier .sb-cameo-art.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261152');
+  background-image: url('mascots/deepika-reactions.webp?v=20261153');
 }
 
 html.atelier .sb-cameo-art.is-face {
@@ -7015,3 +7015,413 @@ html.atelier .story-book {
   }
 }
 
+
+/* ---- Case study reader ----------------------------------------------------
+   A bottom sheet over the page with the case study (Drive's preview) inside,
+   so reading one never leaves the portfolio. */
+html.atelier .case-reader {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  overflow: hidden;
+  color: var(--ink);
+}
+
+html.atelier .case-reader::backdrop {
+  background: rgba(18, 14, 10, 0.5);
+  animation: case-reader-dim 0.45s ease both;
+}
+
+html.atelier .case-reader.is-closing::backdrop {
+  animation: case-reader-undim 0.36s ease both;
+}
+
+@keyframes case-reader-dim { from { opacity: 0; } }
+@keyframes case-reader-undim { to { opacity: 0; } }
+
+html.atelier .case-reader-sheet {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: min(100%, 70rem);
+  height: min(92vh, 62rem);
+  height: min(92dvh, 62rem);
+  margin: 0 auto;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  background: var(--card);
+  border: 1.5px solid var(--ink);
+  border-bottom: 0;
+  border-radius: 24px 24px 0 0;
+  box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.28);
+  will-change: transform;
+}
+
+html.atelier .case-reader-head {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.6rem 1.5rem 1rem;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+html.atelier .case-reader.is-dragging .case-reader-head {
+  cursor: grabbing;
+}
+
+html.atelier .case-reader-grip {
+  position: absolute;
+  top: 0.6rem;
+  left: 50%;
+  width: 46px;
+  height: 5px;
+  margin-left: -23px;
+  border-radius: 99px;
+  background: var(--ink);
+  opacity: 0.18;
+  transition: opacity 0.2s ease, width 0.2s ease, margin 0.2s ease;
+}
+
+html.atelier .case-reader-head:hover .case-reader-grip,
+html.atelier .case-reader.is-dragging .case-reader-grip {
+  opacity: 0.4;
+  width: 60px;
+  margin-left: -30px;
+}
+
+html.atelier .case-reader-heading {
+  min-width: 0;
+}
+
+html.atelier .case-reader-kicker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.7rem;
+  margin: 0 0 0.35rem !important;
+  font-family: var(--sans);
+  font-size: 0.7rem !important;
+  font-weight: 600;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase;
+  color: var(--muted) !important;
+}
+
+html.atelier .case-reader-count {
+  color: var(--spin);
+  font-variant-numeric: tabular-nums;
+}
+
+html.atelier .case-reader-title {
+  margin: 0 !important;
+  font-family: var(--serif) !important;
+  font-size: clamp(1.25rem, 2.4vw, 1.7rem) !important;
+  font-weight: 600 !important;
+  line-height: 1.15 !important;
+  color: var(--ink) !important;
+  text-align: left !important;
+}
+
+html.atelier .case-reader-hook {
+  margin: 0.35rem 0 0 !important;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 0.98rem !important;
+  color: var(--spin) !important;
+}
+
+html.atelier .case-reader-tools {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-shrink: 0;
+}
+
+html.atelier .case-reader-out {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.5rem 0.9rem;
+  border: 1.5px solid var(--line);
+  border-radius: 99px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--muted) !important;
+  text-decoration: none !important;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+html.atelier .case-reader-out:hover,
+html.atelier .case-reader-out:focus-visible {
+  color: var(--ink) !important;
+  border-color: var(--ink);
+}
+
+html.atelier .case-reader-close {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border: 1.5px solid var(--ink);
+  border-radius: 50%;
+  background: var(--card);
+  color: var(--ink);
+  font-size: 1.5rem;
+  line-height: 1;
+  transition: transform 0.25s cubic-bezier(0.3, 1.6, 0.5, 1), background 0.2s ease, color 0.2s ease;
+}
+
+html.atelier .case-reader-close:hover,
+html.atelier .case-reader-close:focus-visible {
+  transform: rotate(90deg);
+  background: var(--ink);
+  color: var(--card);
+}
+
+html.atelier .case-reader-stage {
+  position: relative;
+  margin: 0 1.25rem;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--paper);
+  min-height: 0;
+}
+
+html.atelier .case-reader-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #fff;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+html.atelier .case-reader-stage.is-ready .case-reader-frame {
+  opacity: 1;
+}
+
+/* While Drive warms up: a sheet of paper, its lines being written in. */
+html.atelier .case-reader-wait {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.4rem;
+  transition: opacity 0.35s ease;
+}
+
+html.atelier .case-reader-stage.is-ready .case-reader-wait {
+  opacity: 0;
+  pointer-events: none;
+}
+
+html.atelier .case-reader-paper {
+  position: relative;
+  width: 132px;
+  height: 168px;
+  padding: 26px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  background: var(--card);
+  border: 1.5px solid var(--ink);
+  border-radius: 6px 22px 6px 6px;
+  box-shadow: 6px 8px 0 var(--ink);
+  animation: case-reader-bob 2.4s ease-in-out infinite;
+}
+
+html.atelier .case-reader-paper::before {
+  content: '';
+  position: absolute;
+  top: -1.5px;
+  right: -1.5px;
+  width: 22px;
+  height: 22px;
+  border-left: 1.5px solid var(--ink);
+  border-bottom: 1.5px solid var(--ink);
+  border-radius: 0 0 0 6px;
+  background: var(--paper);
+}
+
+html.atelier .case-reader-paper i {
+  display: block;
+  height: 6px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--line) 0 40%, color-mix(in srgb, var(--spin) 55%, transparent) 50%, var(--line) 60% 100%);
+  background-size: 250% 100%;
+  animation: case-reader-ink 1.6s ease-in-out infinite;
+}
+
+html.atelier .case-reader-paper i:nth-child(1) { width: 62%; height: 9px; }
+html.atelier .case-reader-paper i:nth-child(2) { width: 100%; animation-delay: 0.12s; }
+html.atelier .case-reader-paper i:nth-child(3) { width: 88%; animation-delay: 0.24s; }
+html.atelier .case-reader-paper i:nth-child(4) { width: 95%; animation-delay: 0.36s; }
+html.atelier .case-reader-paper i:nth-child(5) { width: 70%; animation-delay: 0.48s; }
+html.atelier .case-reader-paper i:nth-child(6) { width: 40%; margin-top: auto; animation-delay: 0.6s; }
+
+@keyframes case-reader-bob {
+  0%, 100% { transform: rotate(-3deg) translateY(0); }
+  50% { transform: rotate(-1deg) translateY(-6px); }
+}
+
+@keyframes case-reader-ink {
+  from { background-position: 100% 0; }
+  to { background-position: -50% 0; }
+}
+
+html.atelier .case-reader-wait-line {
+  margin: 0 !important;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1rem !important;
+  color: var(--muted) !important;
+}
+
+html.atelier .case-reader-slow {
+  position: absolute;
+  left: 50%;
+  bottom: 1rem;
+  translate: -50% 0;
+  margin: 0 !important;
+  padding: 0.5rem 0.6rem 0.5rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 99px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  font-size: 0.85rem !important;
+  color: var(--muted) !important;
+  white-space: nowrap;
+}
+
+html.atelier .case-reader-slow[hidden] {
+  display: none;
+}
+
+html.atelier .case-reader-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1.25rem;
+  padding-bottom: calc(0.85rem + env(safe-area-inset-bottom, 0px));
+}
+
+html.atelier .case-reader-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  max-width: 40%;
+  padding: 0.45rem 0.4rem;
+  border: 0;
+  background: none;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1rem;
+  color: var(--muted);
+  transition: color 0.2s ease;
+}
+
+html.atelier .case-reader-step-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+html.atelier .case-reader-step span[aria-hidden] {
+  font-style: normal;
+  transition: transform 0.25s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+html.atelier .case-reader-step:hover,
+html.atelier .case-reader-step:focus-visible {
+  color: var(--ink);
+}
+
+html.atelier .case-reader-step:hover span[aria-hidden] { transform: translateX(-4px); }
+html.atelier .case-reader-step.is-next:hover span[aria-hidden] { transform: translateX(4px); }
+
+html.atelier .case-reader-dots {
+  display: flex;
+  gap: 6px;
+}
+
+html.atelier .case-reader-dots i {
+  width: 6px;
+  height: 6px;
+  border-radius: 99px;
+  background: var(--ink);
+  opacity: 0.2;
+  transition: width 0.35s cubic-bezier(0.3, 1.4, 0.5, 1), opacity 0.25s ease, background 0.25s ease;
+}
+
+html.atelier .case-reader-dots i.is-on {
+  width: 20px;
+  opacity: 1;
+  background: var(--spin);
+}
+
+@media (max-width: 640px) {
+  html.atelier .case-reader-sheet {
+    height: 94vh;
+    height: 94dvh;
+    border-radius: 20px 20px 0 0;
+  }
+
+  html.atelier .case-reader-head {
+    padding: 1.5rem 1rem 0.8rem;
+  }
+
+  html.atelier .case-reader-out {
+    padding: 0.45rem 0.7rem;
+    font-size: 0;
+    gap: 0;
+  }
+
+  html.atelier .case-reader-out span {
+    font-size: 0.95rem;
+  }
+
+  html.atelier .case-reader-hook {
+    font-size: 0.88rem !important;
+  }
+
+  html.atelier .case-reader-stage {
+    margin: 0 0.6rem;
+  }
+
+  html.atelier .case-reader-dots {
+    display: none;
+  }
+
+  html.atelier .case-reader-step {
+    max-width: 48%;
+    font-size: 0.92rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.atelier .case-reader-paper,
+  html.atelier .case-reader-paper i,
+  html.atelier .case-reader::backdrop {
+    animation: none;
+  }
+}

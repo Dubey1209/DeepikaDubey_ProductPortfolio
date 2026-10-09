@@ -488,6 +488,236 @@ function initExperienceShowcase() {
   });
 })();
 
+// Case studies live as documents in Drive. Opening Drive took visitors off
+// the site, and they seldom came back, so the document opens here in a bottom
+// sheet instead: Drive's own preview inside, the page still behind it, the
+// next case study a tap away. Back, Escape, the backdrop and a drag down on
+// the header all close it. Ctrl/Cmd-click still opens Drive in a tab.
+(function () {
+  var reader = document.getElementById('case-reader');
+  if (!reader || typeof reader.showModal !== 'function') return;
+  var html = document.documentElement;
+  var sheet = reader.querySelector('.case-reader-sheet');
+  var head = reader.querySelector('.case-reader-head');
+  var stage = reader.querySelector('.case-reader-stage');
+  var frame = reader.querySelector('.case-reader-frame');
+  var waitLine = reader.querySelector('.case-reader-wait-line');
+  var slow = reader.querySelector('.case-reader-slow');
+  var outs = reader.querySelectorAll('.case-reader-out');
+  var dots = reader.querySelector('.case-reader-dots');
+  var steps = reader.querySelectorAll('[data-case-step]');
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var canAnimate = !reduce && typeof sheet.animate === 'function';
+  var DRIVE = /drive\.google\.com\/file\/d\/([\w-]+)/;
+
+  var cases = Array.prototype.slice.call(document.querySelectorAll('.project-card')).map(function (card) {
+    var link = card.querySelector('.project-buttons a[href*="drive.google.com/file/d/"]');
+    var m = link && DRIVE.exec(link.href);
+    if (!m) return null;
+    var text = function (sel) {
+      var n = card.querySelector(sel);
+      return n ? n.textContent.replace(/\s+/g, ' ').trim() : '';
+    };
+    return {
+      id: m[1],
+      href: link.href,
+      title: text('.case-study-title, .project-title'),
+      hook: text('.project-hook'),
+      cat: text('.project-category'),
+      tag: text('.project-tag'),
+    };
+  }).filter(Boolean);
+  if (!cases.length) return;
+
+  dots.innerHTML = cases.map(function () { return '<i></i>'; }).join('');
+
+  var WAIT = [
+    'Unfolding the case study…',
+    'Pulling it from the filing cabinet…',
+    'Dusting off the research notes…',
+    'Lining up the metrics…',
+    'Straightening the sticky notes…',
+  ];
+  var at = 0;
+  var waitTimer = 0;
+  var slowTimer = 0;
+  var pushed = false;
+  var closing = false;
+  var lastFocus = null;
+
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function short(c) { return c.cat.split('|')[0].trim() || c.title; }
+
+  function show(i) {
+    at = (i + cases.length) % cases.length;
+    var c = cases[at];
+    reader.querySelector('.case-reader-title').textContent = c.title;
+    reader.querySelector('.case-reader-hook').textContent = c.hook;
+    reader.querySelector('.case-reader-cat').textContent = c.cat.replace(/\s*\|\s*/, ' · ');
+    reader.querySelector('.case-reader-count').textContent = pad(at + 1) + ' / ' + pad(cases.length);
+    outs.forEach(function (a) { a.href = c.href; });
+    Array.prototype.forEach.call(dots.children, function (d, k) { d.classList.toggle('is-on', k === at); });
+    steps[0].querySelector('.case-reader-step-name').textContent = short(cases[(at - 1 + cases.length) % cases.length]);
+    steps[1].querySelector('.case-reader-step-name').textContent = short(cases[(at + 1) % cases.length]);
+
+    stage.classList.remove('is-ready');
+    slow.hidden = true;
+    var w = 0;
+    waitLine.textContent = WAIT[0];
+    clearInterval(waitTimer);
+    waitTimer = setInterval(function () { waitLine.textContent = WAIT[++w % WAIT.length]; }, 1500);
+    clearTimeout(slowTimer);
+    slowTimer = setTimeout(function () { slow.hidden = false; }, 9000);
+    frame.src = 'https://drive.google.com/file/d/' + c.id + '/preview';
+    if (canAnimate && reader.open) {
+      head.querySelector('.case-reader-heading').animate([
+        { opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' },
+      ], { duration: 320, easing: 'ease-out' });
+    }
+  }
+
+  frame.addEventListener('load', function () {
+    if (!reader.open || closing) return;
+    clearInterval(waitTimer);
+    clearTimeout(slowTimer);
+    slow.hidden = true;
+    stage.classList.add('is-ready');
+  });
+
+  // The custom cursor can't follow into Drive's frame, so it bows out there.
+  frame.addEventListener('mouseenter', function () { html.classList.add('fx-text'); });
+  frame.addEventListener('mouseleave', function () { html.classList.remove('fx-text'); });
+
+  function carryCursor(host) {
+    document.querySelectorAll('.fx-cursor').forEach(function (c) { host.appendChild(c); });
+  }
+
+  function open(i) {
+    lastFocus = document.activeElement;
+    show(i);
+    if (reader.open) return;
+    reader.showModal();
+    carryCursor(reader);
+    html.classList.add('is-dialog-open');
+    if (window.atelierLenis) window.atelierLenis.stop();
+    // Back closes the sheet rather than leaving the page.
+    history.pushState({ caseReader: true }, '');
+    pushed = true;
+    if (canAnimate) {
+      sheet.animate([{ transform: 'translateY(100%)' }, { transform: 'none' }], {
+        duration: 620, easing: 'cubic-bezier(0.2, 0.9, 0.25, 1)',
+      });
+    }
+    reader.querySelector('.case-reader-close').focus({ preventScroll: true });
+  }
+
+  function close() {
+    if (!reader.open || closing) return;
+    closing = true;
+    clearInterval(waitTimer);
+    clearTimeout(slowTimer);
+    if (pushed) {
+      pushed = false;
+      history.back();
+    }
+    var done = false;
+    var end = function () {
+      if (done) return;
+      done = true;
+      closing = false;
+      reader.close();
+    };
+    if (!canAnimate) return end();
+    reader.classList.add('is-closing');
+    var from = getComputedStyle(sheet).transform;
+    sheet.getAnimations().forEach(function (a) { a.cancel(); });
+    sheet.animate([
+      { transform: from === 'none' ? 'none' : from },
+      { transform: 'translateY(100%)' },
+    ], { duration: 360, easing: 'cubic-bezier(0.5, 0, 0.75, 0)', fill: 'forwards' }).onfinish = end;
+    setTimeout(end, 420);
+  }
+
+  reader.addEventListener('close', function () {
+    reader.classList.remove('is-closing');
+    sheet.getAnimations().forEach(function (a) { a.cancel(); });
+    sheet.style.transform = '';
+    frame.removeAttribute('src');
+    html.classList.remove('is-dialog-open', 'fx-text');
+    carryCursor(document.body);
+    if (window.atelierLenis) window.atelierLenis.start();
+    if (lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll: true });
+  });
+
+  reader.addEventListener('cancel', function (e) {
+    e.preventDefault();
+    close();
+  });
+
+  reader.addEventListener('click', function (e) {
+    if (e.target === reader || e.target.closest('[data-case-close]')) return close();
+    var step = e.target.closest('[data-case-step]');
+    if (step) show(at + Number(step.getAttribute('data-case-step')));
+  });
+
+  reader.addEventListener('keydown', function (e) {
+    if (e.target.closest('a, button') && (e.key === 'Enter' || e.key === ' ')) return;
+    if (e.key === 'ArrowRight') show(at + 1);
+    if (e.key === 'ArrowLeft') show(at - 1);
+  });
+
+  window.addEventListener('popstate', function () {
+    if (!reader.open) return;
+    pushed = false;
+    close();
+  });
+
+  // Drag the header down to put it away, as on a phone.
+  var drag = null;
+  head.addEventListener('pointerdown', function (e) {
+    if (e.button !== 0 || e.target.closest('a, button')) return;
+    drag = { y: e.clientY, t: performance.now(), dy: 0 };
+    head.setPointerCapture(e.pointerId);
+    sheet.getAnimations().forEach(function (a) { a.cancel(); });
+    reader.classList.add('is-dragging');
+  });
+  head.addEventListener('pointermove', function (e) {
+    if (!drag) return;
+    drag.dy = Math.max(0, e.clientY - drag.y);
+    sheet.style.transform = 'translateY(' + drag.dy + 'px)';
+  });
+  function release() {
+    if (!drag) return;
+    var d = drag;
+    drag = null;
+    reader.classList.remove('is-dragging');
+    var speed = d.dy / Math.max(1, performance.now() - d.t);
+    if (d.dy > sheet.offsetHeight * 0.22 || (speed > 0.5 && d.dy > 40)) return close();
+    sheet.style.transform = '';
+    if (canAnimate && d.dy) {
+      sheet.animate([{ transform: 'translateY(' + d.dy + 'px)' }, { transform: 'none' }], {
+        duration: 320, easing: 'cubic-bezier(0.2, 0.9, 0.25, 1)',
+      });
+    }
+  }
+  head.addEventListener('pointerup', release);
+  head.addEventListener('pointercancel', release);
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href*="drive.google.com/file/d/"]');
+    if (!a || !a.closest('.project-card, .work-modal')) return;
+    var m = DRIVE.exec(a.href);
+    var i = -1;
+    for (var k = 0; m && k < cases.length; k++) if (cases[k].id === m[1]) i = k;
+    if (i < 0) return;
+    e.preventDefault();
+    var modal = a.closest('.work-modal');
+    if (modal) modal.querySelector('[data-work-close]').click();
+    open(i);
+  });
+})();
+
 (function () {
   var pile = document.getElementById('cert-pile');
   var index = document.getElementById('cert-index');
