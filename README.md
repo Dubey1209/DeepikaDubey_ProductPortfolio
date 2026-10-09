@@ -60,7 +60,7 @@ All scripts are `defer`red. Third-party libraries come from the jsDelivr CDN.
 | `script.js` | Mobile nav drawer, dropdowns, smooth anchor scrolling, the experience accordion (whose content is hardcoded in this file), the work-detail modal, and the certificate stack. |
 | `theme-toggle.js` | Toggles `.dark-theme` on `<body>`, persisted to `localStorage`. An inline script at the top of `<body>` applies the saved theme early to avoid a flash. |
 | `motion.js` | GSAP + ScrollTrigger + Lenis scroll animations. |
-| `contact-form.js` | Contact form via EmailJS. The SDK is lazy-loaded on first focus of the form rather than on page load. |
+| `contact-form.js` | Contact form via FormSubmit, falling back to EmailJS if it fails. The EmailJS SDK is loaded only for that fallback. |
 | `mascot.js` | `index.html` only. The cartoon in the hero: looks towards the cursor, reacts when clicked, blinks. See [About mascot](#about-mascot). |
 | `story-book.js` | Flip-book behaviour on `my-story.html`, using page-flip. |
 
@@ -446,7 +446,9 @@ site but is kept as the source photo.
 Client-side identifiers are, by design, public — but they are abusable, so they
 are listed here for awareness rather than treated as secrets:
 
-- **EmailJS** (`contact-form.js`) — public key, service ID, and template ID.
+- **FormSubmit** (`contact-form.js`) — the receiving address (or its alias).
+  When it fails, the form falls back to **EmailJS** (public key, service ID,
+  and template ID).
 - **Formcarry** (`portfolio-lock.js`) — visitor-notification endpoint.
 
 Neither is a credential leak, but both can be submitted to by anyone. Enable
