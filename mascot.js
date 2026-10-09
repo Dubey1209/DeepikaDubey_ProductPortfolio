@@ -198,9 +198,18 @@
   // Only once both sheets have decoded: the cover alone would take her
   // earrings off. Still, they would never move, so reduced motion keeps the
   // drawn ones.
+  // A third body layer, so a turn that arrives mid-fade never repaints a
+  // frame that is still showing (see Pair). Before layerB in the DOM: at an
+  // equal z-index the face and lids, which come later, stay on top.
+  var layerC = document.createElement('span');
+  layerC.className = 'atelier-mascot-layer';
+  layerC.setAttribute('aria-hidden', 'true');
+  el.insertBefore(layerC, layerB);
+
   if (!reducedMotion) {
     dressEarrings(layerA);
     dressEarrings(layerB);
+    dressEarrings(layerC);
     var earSheets = [layerA.earrings.cover, layerA.earrings.drops[0]].map(function (span) {
       var match = /url\(["']?([^"')]+)["']?\)/.exec(getComputedStyle(span).backgroundImage);
       if (!match) return Promise.reject();
@@ -213,105 +222,124 @@
     }, function () {});
   }
 
-  // A pair of layers that cross-fades between frames. `key` is the frame
-  // showing, or '' when the pair is hidden.
-  function Pair(a, b, z, key) {
-    this.front = a;
-    this.back = b;
+  // Layers that cross-fade between frames. `key` is the frame showing, or ''
+  // when hidden.
+  //
+  // A change never jumps. It used to: a new frame finished the running fade
+  // on the spot, so a second poke mid-fade snapped one face off and the next
+  // on in a single frame (measured 0.99 -> 0 and 0 -> 1 between two frames).
+  // Now every fade starts from where the layers are at that moment, and the
+  // new frame is painted on whichever layer is least visible, so nothing that
+  // can be seen is ever repainted. Faces get three layers: with two, a third
+  // expression arriving mid-fade still had to repaint one that showed.
+  function Pair(layers, z, key) {
+    this.layers = layers;
+    this.front = layers[0];
     this.z = z;
     this.key = key;
     this.running = null;
-    this.next = null;
-    a.style.opacity = key ? '1' : '0';
-    b.style.opacity = '0';
+    layers.forEach(function (layer, i) {
+      layer.style.opacity = key && i === 0 ? '1' : '0';
+    });
   }
 
-  // A new frame never waits for the last fade: that queue is what made her
-  // trail the cursor. The running fade is jumped to its end (it is short,
-  // so the jump does not show) and the new one starts from there.
-  Pair.prototype.settle = function () {
+  // Stop the running fade where it is, keeping what is on screen.
+  Pair.prototype.freeze = function () {
     var running = this.running;
     if (!running) return;
     this.running = null;
-    this.next = null;
+    var now = this.layers.map(function (layer) {
+      return getComputedStyle(layer).opacity;
+    });
     running.forEach(function (a) {
-      a.finish();
+      a.cancel();
+    });
+    this.layers.forEach(function (layer, i) {
+      layer.style.opacity = now[i];
     });
   };
 
   Pair.prototype.show = function (sheet, index, ms) {
     var key = sheet + ':' + index;
-    if (key === this.key && !this.running) return;
-    this.settle();
     if (key === this.key) return;
-    var incoming = this.back;
-    var outgoing = this.key ? this.front : null;
-    this.back = this.front;
+    this.freeze();
+    var self = this;
+    var incoming = null;
+    this.layers.forEach(function (layer) {
+      if (layer === self.front && self.key) return;
+      if (!incoming || +layer.style.opacity < +incoming.style.opacity) incoming = layer;
+    });
+    var previous = this.key ? this.front : null;
     this.front = incoming;
     this.key = key;
     paint(incoming, sheet, index);
-    incoming.style.zIndex = String(this.z + 1);
-    this.back.style.zIndex = String(this.z);
-    this.fade(incoming, outgoing, ms);
+    // Newest on top, the one it replaces just below, anything older beneath.
+    this.layers.forEach(function (layer) {
+      layer.style.zIndex = String(layer === incoming ? self.z + 2 : layer === previous ? self.z + 1 : self.z);
+    });
+    this.fade(incoming, ms);
   };
 
   Pair.prototype.hide = function (ms) {
-    this.settle();
+    this.freeze();
     if (!this.key) return;
     this.key = '';
-    this.fade(null, this.front, ms);
+    this.fade(null, ms);
   };
 
-  // The incoming frame rises over the first ~60% of the time and the outgoing
-  // one falls over the last ~60%, so in the middle both are nearly opaque: no
-  // dip in density, and no edge left to vanish at the end.
-  Pair.prototype.fade = function (incoming, outgoing, ms) {
-    if (incoming) incoming.style.opacity = '1';
-    if (outgoing) outgoing.style.opacity = '0';
-    if (reducedMotion || !ms || typeof el.animate !== 'function') return;
-
-    var both = incoming && outgoing;
-    var span = both ? ms * 0.62 : ms;
+  // The incoming frame rises over the first ~60% of the time and the others
+  // fall over the last ~60%, so in the middle the old one is still there
+  // under the new: no dip in density showing the frame beneath, and no edge
+  // left to vanish at the end.
+  Pair.prototype.fade = function (incoming, ms) {
+    var outgoing = this.layers.filter(function (layer) {
+      return layer !== incoming && +layer.style.opacity > 0.001;
+    });
+    var animate = !reducedMotion && ms && typeof el.animate === 'function';
     var anims = [];
+    var swap = incoming && outgoing.length;
+    // One expression into another goes the way a face does: the old one
+    // relaxes first and the new one forms as it goes, passing through her
+    // plain face (the frame beneath) instead of a double exposure of two
+    // mouths and two pairs of eyes.
+    var through = swap && this.through;
+    var span = swap ? ms * 0.62 : ms;
+    var inSpan = through ? ms * 0.7 : span;
     if (incoming) {
-      anims.push(
-        incoming.animate([{ opacity: 0 }, { opacity: 1 }], {
-          duration: span,
+      var from = +incoming.style.opacity || 0;
+      incoming.style.opacity = '1';
+      if (animate && from < 1) {
+        anims.push(incoming.animate([{ opacity: from }, { opacity: 1 }], {
+          duration: inSpan * (1 - from),
+          delay: through ? ms - inSpan : 0,
           easing: 'cubic-bezier(0.3, 0, 0.2, 1)',
-        })
-      );
-    }
-    if (outgoing) {
-      anims.push(
-        outgoing.animate([{ opacity: 1 }, { opacity: 0 }], {
-          duration: span,
-          delay: both ? ms - span : 0,
-          easing: 'cubic-bezier(0.45, 0, 0.6, 1)',
           fill: 'backwards',
-        })
-      );
+        }));
+      }
     }
+    outgoing.forEach(function (layer) {
+      var from = +layer.style.opacity;
+      layer.style.opacity = '0';
+      if (!animate) return;
+      anims.push(layer.animate([{ opacity: from }, { opacity: 0 }], {
+        duration: through ? ms * 0.55 : span,
+        delay: incoming && !through ? ms - span : 0,
+        easing: 'cubic-bezier(0.45, 0, 0.6, 1)',
+        fill: 'backwards',
+      }));
+    });
+    if (!anims.length) return;
 
     var self = this;
     this.running = anims;
-    var done = function () {
-      if (self.running !== anims) return;
-      self.running = null;
-      var next = self.next;
-      self.next = null;
-      if (!next) return;
-      if (next.key) self.show(next.sheet, next.index, next.ms);
-      else self.hide(next.ms);
-    };
-    Promise.all(
-      anims.map(function (a) {
-        return a.finished;
-      })
-    ).then(done, done);
+    Promise.all(anims.map(function (a) { return a.finished; })).then(function () {
+      if (self.running === anims) self.running = null;
+    }, function () {});
   };
 
-  var body = new Pair(layerA, layerB, 1, 'look:' + CENTRE);
-  var face = new Pair(makeLayer(), makeLayer(), 3, '');
+  var body = new Pair([layerA, layerB, layerC], 1, 'look:' + CENTRE);
+  var face = new Pair([makeLayer(), makeLayer(), makeLayer()], 3, '');
+  face.through = true;
   paint(layerA, 'look', CENTRE);
 
   // ---- reactions ------------------------------------------------------------
@@ -369,10 +397,13 @@
   // visitor for, wherever the cursor is.
   function react(index, ms, auto, force) {
     if (!force && cursorAside()) {
-      if (reacting >= 0) endReaction(TURN_MS);
+      if (reacting >= 0) endReaction(LET_GO_MS);
       if (index !== BLINK) heldReaction(index, ms);
       return;
     }
+    // A new feeling moves her a little: the head lifts as it arrives. A face
+    // changing on a perfectly still head read as a slide being swapped.
+    if (index !== BLINK && reacting !== index) nudge(0, -0.16);
     reacting = index;
     reactAuto = !!auto;
     clearTimeout(faceDelay);
@@ -404,6 +435,9 @@
   function endReaction(ms) {
     clearTimeout(reactTimer);
     clearTimeout(faceDelay);
+    // And settles as it passes.
+    if (reacting > BLINK) nudge(0, 0.08);
+    letGoUntil = Date.now() + (ms || FACE_OUT_MS);
     reacting = -1;
     reactAuto = false;
     face.hide(ms || FACE_OUT_MS);
@@ -497,6 +531,11 @@
   // the middle, in two fast steps, or both heads showed at once.
   var TURN_MS = 120;
   var STEP_MS = 80;
+  // Letting go of an expression to follow the cursor. At TURN_MS the face
+  // snapped off (0.86 -> 0.44 between two frames); a feeling fades slower
+  // than a glance moves.
+  var LET_GO_MS = 300;
+  var letGoUntil = 0;
 
   function axis(current, v) {
     if (current === 0) return v < -LEAVE ? 0 : v > ENTER ? 2 : 1;
@@ -513,12 +552,12 @@
     // Where the cursor is comes first: a face she is pulling lets go the
     // moment it points somewhere else, and she turns straight to it. Except
     // when she is angry: she keeps glaring at you until it passes.
+    // The rest of a moment goes too: its next beat brought the face back
+    // after she had turned away.
     if (reacting >= 0 && reacting !== ANGRY && index !== CENTRE && pointer) {
-      if (reactAuto) {
-        momentTimers.forEach(clearTimeout);
-        momentTimers = [];
-      }
-      endReaction(TURN_MS);
+      momentTimers.forEach(clearTimeout);
+      momentTimers = [];
+      endReaction(LET_GO_MS);
       return;
     }
     clearTimeout(lookTimer);
@@ -536,7 +575,9 @@
     var turnY = across ? Math.sign(dr) : dr;
     lookIndex = (r + turnY) * 3 + c + turnX;
     if (reacting < 0) {
-      body.show('look', lookIndex, across ? STEP_MS : TURN_MS);
+      // A glance doesn't cut short an expression still fading off her.
+      var easing = letGoUntil - Date.now();
+      body.show('look', lookIndex, Math.max(across ? STEP_MS : TURN_MS, easing));
       // The head leads with a slight dip, and the body follows through.
       nudge(Math.sign(turnX) * 0.32, Math.sign(turnY) * 0.18 + 0.1);
       // The earrings are left behind by the turn and swing after it.
