@@ -45,52 +45,163 @@ html.has-fx-motion .contact-section {
   z-index: 100000;
 }
 
+/* A sparkle, the glint that twinkles around the mascot, turning slowly under
+   the pointer with two small glints in orbit and a warm glow trailing behind.
+   Over a link it opens up and the orbit widens; a click throws a ring of tiny
+   glints; moving sheds a shimmer. */
 .fx-cursor-dot {
-  width: 8px;
-  height: 8px;
-  margin: -4px 0 0 -4px;
-  border-radius: 50%;
-  background: var(--spin, #c45c26);
+  width: 19px;
+  height: 19px;
+  margin: -9.5px 0 0 -9.5px;
+  color: var(--spin, #c45c26);
   opacity: 0;
+  transition: opacity 0.2s ease;
 }
 
+.fx-cursor-dot svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+}
+
+.fx-cursor-dot > svg {
+  animation: fx-star-turn 7s linear infinite;
+  transition: scale 0.5s cubic-bezier(0.34, 1.7, 0.5, 1), filter 0.3s ease;
+  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--spin, #c45c26) 45%, transparent));
+}
+
+.fx-orbit {
+  --orbit: 17px;
+  position: absolute;
+  inset: 0;
+  animation: fx-star-turn 3.2s linear infinite;
+}
+
+.fx-orbit.is-far {
+  --orbit: 14px;
+  animation-duration: 4.8s;
+  animation-direction: reverse;
+}
+
+.fx-orbit svg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  translate: 0 calc(var(--orbit) * -1);
+  opacity: 0.85;
+  transition: translate 0.5s cubic-bezier(0.34, 1.6, 0.5, 1), opacity 0.3s ease;
+}
+
+.fx-orbit.is-far svg {
+  width: 4.5px;
+  height: 4.5px;
+  margin: -2.25px 0 0 -2.25px;
+  opacity: 0.65;
+}
+
+@keyframes fx-star-turn {
+  to { rotate: 360deg; }
+}
+
+html.has-fx-cursor.fx-on .fx-cursor-dot {
+  opacity: 1;
+}
+
+/* Opens up only a little: any bigger and it covered the link's text. The
+   orbit widens instead. */
+html.has-fx-cursor.fx-pointer .fx-cursor-dot > svg {
+  scale: 1.25;
+  animation-duration: 2.4s;
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--spin, #c45c26) 65%, transparent));
+}
+
+html.has-fx-cursor.fx-pointer .fx-orbit {
+  --orbit: 25px;
+  animation-duration: 1.6s;
+}
+
+html.has-fx-cursor.fx-pointer .fx-orbit.is-far {
+  --orbit: 21px;
+  animation-duration: 2.2s;
+}
+
+html.has-fx-cursor.fx-press .fx-cursor-dot > svg {
+  scale: 0.75;
+}
+
+html.has-fx-cursor.fx-press .fx-orbit {
+  --orbit: 8px;
+}
+
+/* The warm glow that trails a beat behind the sparkle; over a card it
+   becomes the "view" disc. Sized rather than scaled: GSAP owns this
+   element's transform and folds a CSS `scale` into it, which left the layer
+   stuck at zero. */
 .fx-cursor-ball {
-  width: 28px;
-  height: 28px;
-  margin: -14px 0 0 -14px;
+  width: 56px;
+  height: 56px;
+  margin: -28px 0 0 -28px;
   border-radius: 50%;
-  border: 1.5px solid var(--ink, #1a1713);
-  background: transparent;
+  background: radial-gradient(circle, color-mix(in srgb, var(--spin, #c45c26) 26%, transparent) 0%, transparent 68%);
   opacity: 0;
   will-change: transform;
-  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-    height 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-    margin 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: width 0.45s cubic-bezier(0.34, 1.4, 0.5, 1),
+    height 0.45s cubic-bezier(0.34, 1.4, 0.5, 1),
+    margin 0.45s cubic-bezier(0.34, 1.4, 0.5, 1),
+    opacity 0.25s ease;
 }
 
-html.has-fx-cursor.fx-on .fx-cursor-dot,
 html.has-fx-cursor.fx-on .fx-cursor-ball {
   opacity: 1;
 }
 
 html.has-fx-cursor.fx-pointer .fx-cursor-ball {
-  width: 52px;
-  height: 52px;
-  margin: -26px 0 0 -26px;
-  border-color: var(--spin, #c45c26);
+  width: 84px;
+  height: 84px;
+  margin: -42px 0 0 -42px;
 }
 
-/* A filling button is its own hover feedback: the ring melts into a dot. */
-html.has-fx-cursor.fx-on-fill .fx-cursor-ball {
-  width: 10px;
-  height: 10px;
-  margin: -5px 0 0 -5px;
-  border-color: var(--spin, #c45c26);
-  background: var(--spin, #c45c26);
-}
-
-html.has-fx-cursor.fx-on-fill .fx-cursor-dot {
+html.has-fx-cursor.fx-text .fx-cursor-ball {
   opacity: 0;
+}
+
+.fx-spark {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 99999;
+  width: var(--s);
+  height: var(--s);
+  margin: calc(var(--s) / -2) 0 0 calc(var(--s) / -2);
+  color: var(--spin, #c45c26);
+  pointer-events: none;
+  animation: fx-spark-fade 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.fx-spark svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+}
+
+@keyframes fx-spark-fade {
+  from {
+    opacity: 0.9;
+    transform: translate(var(--x), var(--y)) scale(0.4) rotate(0deg);
+  }
+  35% {
+    opacity: 1;
+    transform: translate(calc(var(--x) + var(--dx) * 0.6), calc(var(--y) + var(--dy) * 0.6)) scale(1) rotate(calc(var(--r) * 0.4));
+  }
+  to {
+    opacity: 0;
+    transform: translate(calc(var(--x) + var(--dx)), calc(var(--y) + var(--dy))) scale(0.2) rotate(var(--r));
+  }
 }
 
 html.has-fx-cursor.fx-text .fx-cursor-dot,
@@ -615,24 +726,36 @@ html.atelier .atelier-skill-card:hover .fx-spot {
   opacity: 1;
 }
 
-html.has-fx-cursor.fx-view .fx-cursor-ball {
-  width: 78px;
-  height: 78px;
-  margin: -39px 0 0 -39px;
+html.has-fx-cursor.fx-on.fx-view .fx-cursor-ball {
+  width: 84px;
+  height: 84px;
+  margin: -42px 0 0 -42px;
   background: var(--ink);
-  border-color: var(--ink);
+  opacity: 1;
+  mix-blend-mode: normal;
   display: grid;
   place-items: center;
 }
 
+html.has-fx-cursor.fx-view .fx-cursor-dot {
+  opacity: 0;
+}
+
 html.has-fx-cursor.fx-view .fx-cursor-label {
   display: block;
-  font-family: var(--sans, 'Outfit', sans-serif);
-  font-size: 0.68rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font-family: var(--serif, 'Fraunces', serif);
+  font-size: 1.05rem;
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: 0;
+  white-space: nowrap;
   color: var(--paper);
+}
+
+html.has-fx-cursor.fx-view .fx-cursor-label span {
+  display: inline-block;
+  font-style: normal;
+  color: var(--spin, #c45c26);
 }
 
 .fx-cursor-label {

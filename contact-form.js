@@ -36,6 +36,8 @@
   function sendWithFormSubmit(fields) {
     return fetch(FORMSUBMIT_URL, {
       method: 'POST',
+      // Lets the send finish even if the visitor leaves after being thanked.
+      keepalive: true,
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       body: JSON.stringify({
         _subject: 'Portfolio message from ' + fields.name,
@@ -101,17 +103,38 @@
           return sendWithEmailJs(fields);
         });
 
+      // FormSubmit can take several seconds to answer. Past a short wait the
+      // visitor is thanked right away and the send finishes in the background;
+      // if it then fails, the error replaces the thanks and the message is put
+      // back in the form so nothing is lost.
+      let thanked = false;
+      function thank() {
+        if (thanked) return;
+        thanked = true;
+        formStatus.innerHTML =
+          '<div class="success-message">Message sent. I will get back to you soon.</div>';
+        form.reset();
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnText;
+        formStatus.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      const early = setTimeout(thank, 2500);
+
       sending
         .then(function () {
-          formStatus.innerHTML =
-            '<div class="success-message">Message sent. I will get back to you soon.</div>';
-          form.reset();
+          clearTimeout(early);
+          thank();
         })
         .catch(function () {
+          clearTimeout(early);
+          if (thanked) {
+            document.getElementById('name').value = fields.name;
+            document.getElementById('email').value = fields.email;
+            document.getElementById('company').value = fields.company === 'Not provided' ? '' : fields.company;
+            document.getElementById('message').value = fields.message;
+          }
           formStatus.innerHTML =
             '<div class="error-message">Oops! Something went wrong. Please try again or email me directly at <a href="mailto:dubeydeepika1209@gmail.com">dubeydeepika1209@gmail.com</a></div>';
-        })
-        .finally(function () {
           submitBtn.disabled = false;
           submitBtn.innerHTML = originalBtnText;
           formStatus.scrollIntoView({ behavior: 'smooth', block: 'center' });

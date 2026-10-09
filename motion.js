@@ -98,15 +98,19 @@
   if (hoverOk) {
     html.classList.add('has-fx-cursor');
 
+    // A four-point sparkle, the same glint that twinkles around the mascot.
+    var STAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C12.9 7.2 16.8 11.1 24 12 16.8 12.9 12.9 16.8 12 24 11.1 16.8 7.2 12.9 0 12 7.2 11.1 11.1 7.2 12 0Z"/></svg>';
     var dot = document.createElement('div');
     dot.className = 'fx-cursor fx-cursor-dot';
     dot.setAttribute('aria-hidden', 'true');
+    // Two small glints orbit the main one.
+    dot.innerHTML = STAR + '<span class="fx-orbit">' + STAR + '</span><span class="fx-orbit is-far">' + STAR + '</span>';
     var ball = document.createElement('div');
     ball.className = 'fx-cursor fx-cursor-ball';
     ball.setAttribute('aria-hidden', 'true');
     var view = document.createElement('span');
     view.className = 'fx-cursor-label';
-    view.textContent = 'View';
+    view.innerHTML = 'view <span aria-hidden="true">&#8599;</span>';
     ball.appendChild(view);
     document.body.appendChild(dot);
     document.body.appendChild(ball);
@@ -119,14 +123,55 @@
     if (gsap && gsap.quickTo) {
       moveDot = gsap.quickTo(dot, 'x', { duration: 0.16, ease: 'power3.out' });
       gsap.quickTo(dot, 'y', { duration: 0.16, ease: 'power3.out' });
-      moveBallX = gsap.quickTo(ball, 'x', { duration: 0.55, ease: 'power3.out' });
-      moveBallY = gsap.quickTo(ball, 'y', { duration: 0.55, ease: 'power3.out' });
+      moveBallX = gsap.quickTo(ball, 'x', { duration: 0.3, ease: 'power3.out' });
+      moveBallY = gsap.quickTo(ball, 'y', { duration: 0.3, ease: 'power3.out' });
     }
+    // Tiny glints shed along the way and on a click. Few and short-lived, so
+    // the trail reads as a shimmer rather than confetti.
+    var liveSparks = 0;
+    var sparkX = mx;
+    var sparkY = my;
+    function spark(x, y, dx, dy, size, life) {
+      if (liveSparks > 22) return;
+      var s = document.createElement('span');
+      s.className = 'fx-spark';
+      s.setAttribute('aria-hidden', 'true');
+      s.innerHTML = STAR;
+      s.style.cssText = '--x:' + x + 'px;--y:' + y + 'px;--dx:' + dx + 'px;--dy:' + dy + 'px;--s:' + size +
+        'px;--r:' + Math.round(Math.random() * 180 - 90) + 'deg;animation-duration:' + life + 'ms';
+      (dot.parentNode || document.body).appendChild(s);
+      liveSparks += 1;
+      s.addEventListener('animationend', function () {
+        s.remove();
+        liveSparks -= 1;
+      });
+    }
+    function quiet() {
+      return html.classList.contains('fx-text') || html.classList.contains('fx-view');
+    }
+
+    document.addEventListener('mousedown', function (e) {
+      html.classList.add('fx-press');
+      if (quiet()) return;
+      var turn = Math.random() * 60;
+      for (var i = 0; i < 6; i += 1) {
+        var a = (turn + i * 60) * Math.PI / 180;
+        var d = 24 + Math.random() * 14;
+        spark(e.clientX, e.clientY, Math.cos(a) * d, Math.sin(a) * d, 8 + Math.random() * 4, 620);
+      }
+    });
+    document.addEventListener('mouseup', function () { html.classList.remove('fx-press'); });
 
     document.addEventListener('mousemove', function (e) {
       mx = e.clientX;
       my = e.clientY;
       html.classList.add('fx-on');
+      var gap = Math.abs(mx - sparkX) + Math.abs(my - sparkY);
+      if (gap > 30) {
+        sparkX = mx;
+        sparkY = my;
+        if (!quiet()) spark(mx + Math.random() * 10 - 5, my + Math.random() * 10 - 5, Math.random() * 14 - 7, -8 - Math.random() * 12, 5 + Math.random() * 5, 800);
+      }
       if (moveBallX) {
         gsap.set(dot, { x: mx, y: my });
         moveBallX(mx);
