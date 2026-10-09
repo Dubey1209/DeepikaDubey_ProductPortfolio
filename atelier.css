@@ -1628,12 +1628,12 @@ html.atelier .atelier-mascot-layer.is-look {
 /* Phones get a lighter copy of the direction sheet: the mascot is drawn at
    about 240px there, so the full-size cells are wasted bytes on slow links. */
 html.atelier {
-  --mascot-look: url('mascots/deepika-directions.webp?v=20261149');
+  --mascot-look: url('mascots/deepika-directions.webp?v=20261150');
 }
 
 @media (max-width: 760px) {
   html.atelier {
-    --mascot-look: url('mascots/deepika-directions-sm.webp?v=20261149');
+    --mascot-look: url('mascots/deepika-directions-sm.webp?v=20261150');
   }
 }
 
@@ -1642,7 +1642,7 @@ html.atelier {
    has loaded (it reads the URL from --mascot-react) and sets .has-reactions
    on <html> once it has decoded. */
 html.atelier {
-  --mascot-react: url('mascots/deepika-reactions.webp?v=20261149');
+  --mascot-react: url('mascots/deepika-reactions.webp?v=20261150');
 }
 
 /* mascot.js uses the second layer for direction frames too (.is-look), and
@@ -1664,7 +1664,7 @@ html.atelier.has-reactions .atelier-mascot-layer.is-react {
 }
 
 html.atelier.has-reactions .atelier-mascot-lids {
-  background-image: url('mascots/deepika-blinks.webp?v=20261149');
+  background-image: url('mascots/deepika-blinks.webp?v=20261150');
 }
 
 html.atelier .atelier-mascot-lids {
@@ -1690,12 +1690,12 @@ html.atelier .atelier-mascot.has-earrings .atelier-mascot-layer.is-look > .ateli
 
 html.atelier .atelier-mascot-ear.is-cover {
   inset: 0;
-  background-image: url('mascots/deepika-earcover.webp?v=20261149');
+  background-image: url('mascots/deepika-earcover.webp?v=20261150');
   background-size: 300% 300%;
 }
 
 html.atelier .atelier-mascot-ear.is-drop {
-  background-image: url('mascots/deepika-eardrops.webp?v=20261149');
+  background-image: url('mascots/deepika-eardrops.webp?v=20261150');
 }
 
 html.atelier .atelier-mascot-ear.is-left {
@@ -1717,8 +1717,8 @@ html.atelier .atelier-mascot-react {
    mask with the frame. Her hair, jaw and outline always come from the frame
    underneath; an oval reached the jaw and showed a second chin. */
 html.atelier.has-reactions .atelier-mascot-face {
-  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261149');
-  mask-image: url('mascots/deepika-face-mask.png?v=20261149');
+  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261150');
+  mask-image: url('mascots/deepika-face-mask.png?v=20261150');
 }
 
 html.atelier .atelier-mascot-face {
@@ -6895,7 +6895,7 @@ html.atelier .sb-cameo-art {
 }
 
 html.atelier .sb-cameo-art.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261149');
+  background-image: url('mascots/deepika-reactions.webp?v=20261150');
 }
 
 html.atelier .sb-cameo-art.is-face {
