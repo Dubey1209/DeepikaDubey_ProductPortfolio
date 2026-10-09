@@ -449,7 +449,7 @@ are listed here for awareness rather than treated as secrets:
 - **FormSubmit** (`contact-form.js`) — the receiving address (or its alias).
   When it fails, the form falls back to **EmailJS** (public key, service ID,
   and template ID).
-- **Formcarry** (`portfolio-lock.js`) — visitor-notification endpoint.
+- **FormSubmit** (`portfolio-lock.js`) — visitor notification when someone unlocks the site, sent in the background so the door never waits; **Formcarry** is only the fallback (its free plan has a monthly cap).
 
 Neither is a credential leak, but both can be submitted to by anyone. Enable
 rate limiting / CAPTCHA in the respective dashboards.

@@ -408,7 +408,9 @@ class PortfolioLock {
     btnLoader.style.display = 'inline';
 
     try {
-      await this.sendVisitorData(name);
+      // The note to the owner goes in the background; the door never waits
+      // on an email service.
+      this.sendVisitorData(name);
       sessionStorage.setItem(this.sessionKey, 'true');
       await this.playUnlock(name);
     } catch {
@@ -419,7 +421,28 @@ class PortfolioLock {
     }
   }
 
+  // FormSubmit first: free with no monthly cap (the contact form uses it too).
+  // Formcarry's free plan ran low, so it is only the fallback now.
   async sendVisitorData(name) {
+    const when = new Date().toLocaleString();
+    try {
+      const res = await fetch('https://formsubmit.co/ajax/dubeydeepika1209@gmail.com', {
+        method: 'POST',
+        keepalive: true,
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          _subject: `New portfolio visitor: ${name}`,
+          _template: 'table',
+          _captcha: 'false',
+          name,
+          message: `Portfolio visitor: ${name} - ${when}`,
+        }),
+      });
+      const result = await res.json().catch(() => ({}));
+      if (res.ok && String(result.success) === 'true') return;
+    } catch {
+      /* fall through to Formcarry */
+    }
     try {
       const res = await fetch('https://formcarry.com/s/stV_oddEgaZ', {
         method: 'POST',
