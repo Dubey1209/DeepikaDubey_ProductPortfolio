@@ -18,7 +18,9 @@
       var el = document.documentElement;
       var max = el.scrollHeight - el.clientHeight;
       var y = el.scrollTop;
-      el.style.setProperty('--scroll-p', max > 0 ? String(y / max) : '0');
+      // On the bar itself: a custom property on <html> restyled all ~1500
+      // elements every scroll frame (about 10ms of a 16ms frame).
+      progress.style.transform = 'scaleX(' + (max > 0 ? y / max : 0) + ')';
       if (y > 90 && y > lastY + 6) document.body.classList.add('nav-away');
       else if (y < lastY - 6 || y < 48) document.body.classList.remove('nav-away');
       lastY = y;
@@ -831,7 +833,9 @@
     var LenisCtor = window.Lenis || (window.lenis && window.lenis.Lenis);
     if (typeof LenisCtor !== 'function' || html.dataset.fxLenis) return;
     html.dataset.fxLenis = '1';
-    var lenis = new LenisCtor({ duration: 1.25, smoothWheel: true, wheelMultiplier: 0.95 });
+    // lerp rather than a fixed 1.25s glide: the page answers the wheel at
+    // once and eases out, instead of trailing it.
+    var lenis = new LenisCtor({ lerp: 0.14, smoothWheel: true, wheelMultiplier: 1 });
     // Dialogs pause it, so the page doesn't glide along behind them.
     window.atelierLenis = lenis;
     var ST = window.ScrollTrigger;

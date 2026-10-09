@@ -16,7 +16,7 @@ html.lenis.lenis-smooth {
   z-index: 10050;
   height: 3px;
   width: 100%;
-  transform: scaleX(var(--scroll-p, 0));
+  transform: scaleX(0);
   transform-origin: left center;
   pointer-events: none;
   background: var(--spin, #c45c26);
