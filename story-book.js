@@ -26,6 +26,12 @@
       return { width: pageW, height: h, spread: true, stageW: pageW * 2 };
     }
     var pad = vw < 700 ? 44 : 40;
+    // Phones: a taller page holds more lines, so the story takes fewer turns.
+    if (vw < 700) {
+      var pw = Math.max(240, Math.min(avail - pad, 400));
+      var ph = Math.round(Math.max(320, Math.min(vh - chrome, pw / 0.6, 600)));
+      return { width: pw, height: ph, spread: false, stageW: pw };
+    }
     var w = Math.round(h * 0.72);
     if (w > avail - pad) {
       w = Math.max(240, avail - pad);
@@ -41,6 +47,9 @@
 
   var flip = null;
   var autoTimer = null;
+  // Pages turn on their own only on a desktop pointer, and only until the
+  // reader takes over; on a phone the reader sets the pace.
+  var autoOk = window.matchMedia('(hover: hover) and (pointer: fine)').matches && window.innerWidth >= 700;
   var hovered = false;
   var turning = false;
   var pageMeta = [];
@@ -587,16 +596,20 @@
   function paintStatus() {
     if (!flip) return;
     wakeMoods();
-    var meta = pageMeta[flip.getCurrentPageIndex()] || {};
-    if (meta.kind === 'cover') status.textContent = 'Cover';
-    else if (meta.kind === 'index') status.textContent = 'Contents';
-    else if (meta.kind === 'act') status.textContent = 'Act II';
-    else if (meta.kind === 'end') status.textContent = 'The end';
-    else if (meta.kind === 'opener') status.textContent = 'Chapter ' + chapters[meta.ch].num;
+    var at = flip.getCurrentPageIndex();
+    var meta = pageMeta[at] || {};
+    var label;
+    if (meta.kind === 'cover') label = 'Cover';
+    else if (meta.kind === 'index') label = 'Contents';
+    else if (meta.kind === 'act') label = 'Act II';
+    else if (meta.kind === 'end') label = 'The end';
+    else if (meta.kind === 'opener') label = 'Chapter ' + chapters[meta.ch].num;
     else {
       var ch = chapters[meta.ch];
-      status.textContent = 'Chapter ' + ch.num + ' · ' + ch.title;
+      label = 'Chapter ' + ch.num + ' · ' + ch.title;
     }
+    // Numbered like the folios printed on the pages: the cover is unnumbered.
+    status.textContent = at > 0 ? label + ' — page ' + at + ' of ' + (flip.getPageCount() - 1) : label;
   }
 
   function stopAuto() {
@@ -644,6 +657,7 @@
 
   function armAuto() {
     stopAuto();
+    if (!autoOk) return;
     var last = isLastPage();
     autoTimer = window.setTimeout(function () {
       if (!flip || turning || document.hidden || !bookInView()) {
@@ -670,6 +684,7 @@
 
   function step(dir) {
     if (!flip || turning) return;
+    autoOk = false;
     var i = flip.getCurrentPageIndex();
     var n = flip.getPageCount();
     if (dir === 'next' && (i >= n - 1 || isLastPage())) return;
@@ -698,6 +713,7 @@
     var max = flip.getPageCount() - 1;
     var target = Math.max(0, Math.min(index, max));
     if (target === flip.getCurrentPageIndex()) return;
+    autoOk = false;
     stopAuto();
     if (reduce) flip.turnToPage(target);
     else flip.flip(target, 'bottom');
@@ -723,6 +739,7 @@
     flip.on('changeState', function (e) {
       var state = e && e.data;
       turning = state === 'flipping' || state === 'user_fold';
+      if (state === 'user_fold') autoOk = false;
       if (turning) stopAuto();
       if (state === 'read') armAuto();
     });

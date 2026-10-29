@@ -10,6 +10,8 @@ function toggleMenu() {
   isMenuOpen = !isMenuOpen;
   navLinks.classList.toggle('open', isMenuOpen);
   document.body.style.overflow = isMenuOpen ? 'hidden' : '';
+  document.body.classList.toggle('menu-open', isMenuOpen);
+  if (window.atelierLenis) window.atelierLenis[isMenuOpen ? 'stop' : 'start']();
 
   if (drawerOverlay) {
     drawerOverlay.classList.toggle('visible', isMenuOpen);
@@ -30,10 +32,13 @@ function toggleMenu() {
 }
 
 function closeMenu() {
+  const wasOpen = isMenuOpen;
   isMenuOpen = false;
   if (!navLinks) return;
   navLinks.classList.remove('open');
   document.body.style.overflow = '';
+  document.body.classList.remove('menu-open');
+  if (wasOpen && window.atelierLenis) window.atelierLenis.start();
 
   if (drawerOverlay) {
     drawerOverlay.classList.remove('visible');
@@ -138,6 +143,24 @@ window.addEventListener('resize', () => {
   }, 250);
 });
 
+// One scroller: while Lenis runs, a native smooth scroll fights its own
+// interpolation and stutters. Lenis ignores scroll-margin, so it is passed
+// in as the offset.
+function atelierScrollTo(target) {
+  const lenis = window.atelierLenis;
+  if (target === 0) {
+    if (lenis) lenis.scrollTo(0);
+    else window.scrollTo({ top: 0, behavior: 'smooth' });
+    return;
+  }
+  if (lenis) {
+    const margin = parseFloat(getComputedStyle(target).scrollMarginTop) || 0;
+    lenis.scrollTo(target, { offset: -margin });
+  } else {
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   document.body.classList.add('page-loaded');
 
@@ -149,9 +172,27 @@ document.addEventListener('DOMContentLoaded', () => {
       const target = document.querySelector(targetId);
       if (!target) return;
       e.preventDefault();
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      atelierScrollTo(target);
     });
   });
+
+  // The back-to-top button appears only once there is somewhere to go back
+  // to, and steps aside while the menu drawer is open.
+  const topBtn = document.querySelector('.scroll-top-btn');
+  if (topBtn) {
+    topBtn.addEventListener('click', () => atelierScrollTo(0));
+    let topTicking = false;
+    const syncTopBtn = () => {
+      topTicking = false;
+      topBtn.classList.toggle('is-shown', window.scrollY > window.innerHeight * 0.9);
+    };
+    window.addEventListener('scroll', () => {
+      if (topTicking) return;
+      topTicking = true;
+      requestAnimationFrame(syncTopBtn);
+    }, { passive: true });
+    syncTopBtn();
+  }
 });
 
 const experienceOrder = ['zyra', 'tnumber', 'thatha', 'sdc-si'];
@@ -332,10 +373,31 @@ function initExperienceShowcase() {
   var lastFocus = null;
 
   function closeWorkModal() {
+    if (!modal.classList.contains('is-open')) return;
     modal.classList.remove('is-open');
     modal.setAttribute('hidden', '');
     document.body.classList.remove('work-modal-open');
-    if (lastFocus && lastFocus.focus) lastFocus.focus();
+    if (window.atelierLenis) window.atelierLenis.start();
+    if (lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll: true });
+  }
+
+  // Tab and Shift+Tab cycle inside the sheet while it is open.
+  function trapFocus(e) {
+    if (e.key !== 'Tab' || !modal.classList.contains('is-open')) return;
+    var focusable = Array.prototype.filter.call(
+      modal.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'),
+      function (el) { return el.offsetParent !== null; }
+    );
+    if (!focusable.length) return;
+    var first = focusable[0];
+    var last = focusable[focusable.length - 1];
+    if (e.shiftKey && (document.activeElement === first || !modal.contains(document.activeElement))) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && (document.activeElement === last || !modal.contains(document.activeElement))) {
+      e.preventDefault();
+      first.focus();
+    }
   }
 
   function openWorkModal(card) {
@@ -355,6 +417,7 @@ function initExperienceShowcase() {
     modal.removeAttribute('hidden');
     modal.classList.add('is-open');
     document.body.classList.add('work-modal-open');
+    if (window.atelierLenis) window.atelierLenis.stop();
     var closeBtn = modal.querySelector('.work-modal-close');
     if (closeBtn) closeBtn.focus();
   }
@@ -374,6 +437,7 @@ function initExperienceShowcase() {
 
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && modal.classList.contains('is-open')) closeWorkModal();
+    trapFocus(e);
   });
 })();
 

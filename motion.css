@@ -48,11 +48,12 @@ html.has-fx-motion .contact-section {
 /* A sparkle, the glint that twinkles around the mascot, turning slowly under
    the pointer with two small glints in orbit and a warm glow trailing behind.
    Over a link it opens up and the orbit widens; a click throws a ring of tiny
-   glints; moving sheds a shimmer. */
+   glints; moving sheds a shimmer. The native cursor stays: the sparkle rides
+   just below-right of its tip rather than replacing it. */
 .fx-cursor-dot {
   width: 19px;
   height: 19px;
-  margin: -9.5px 0 0 -9.5px;
+  margin: 10px 0 0 8px;
   color: var(--spin, #c45c26);
   opacity: 0;
   transition: opacity 0.2s ease;
@@ -207,20 +208,6 @@ html.has-fx-cursor.fx-text .fx-cursor-ball {
 html.has-fx-cursor.fx-text .fx-cursor-dot,
 html.has-fx-cursor.fx-text .fx-cursor-ball {
   opacity: 0;
-}
-
-@media (hover: hover) and (min-width: 900px) {
-  html.has-fx-cursor,
-  html.has-fx-cursor * {
-    cursor: none !important;
-  }
-
-  html.has-fx-cursor input,
-  html.has-fx-cursor textarea,
-  html.has-fx-cursor select,
-  html.has-fx-cursor [contenteditable="true"] {
-    cursor: text !important;
-  }
 }
 
 /* —— Split chars —— */

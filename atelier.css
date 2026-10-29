@@ -1633,12 +1633,12 @@ html.atelier .atelier-mascot-layer.is-look {
 /* Phones get a lighter copy of the direction sheet: the mascot is drawn at
    about 240px there, so the full-size cells are wasted bytes on slow links. */
 html.atelier {
-  --mascot-look: url('mascots/deepika-directions.webp?v=20261159');
+  --mascot-look: url('mascots/deepika-directions.webp?v=20261160');
 }
 
 @media (max-width: 760px) {
   html.atelier {
-    --mascot-look: url('mascots/deepika-directions-sm.webp?v=20261159');
+    --mascot-look: url('mascots/deepika-directions-sm.webp?v=20261160');
   }
 }
 
@@ -1647,7 +1647,7 @@ html.atelier {
    has loaded (it reads the URL from --mascot-react) and sets .has-reactions
    on <html> once it has decoded. */
 html.atelier {
-  --mascot-react: url('mascots/deepika-reactions.webp?v=20261159');
+  --mascot-react: url('mascots/deepika-reactions.webp?v=20261160');
 }
 
 /* mascot.js uses the second layer for direction frames too (.is-look), and
@@ -1669,7 +1669,7 @@ html.atelier.has-reactions .atelier-mascot-layer.is-react {
 }
 
 html.atelier.has-reactions .atelier-mascot-lids {
-  background-image: url('mascots/deepika-blinks.webp?v=20261159');
+  background-image: url('mascots/deepika-blinks.webp?v=20261160');
 }
 
 html.atelier .atelier-mascot-lids {
@@ -1695,12 +1695,12 @@ html.atelier .atelier-mascot.has-earrings .atelier-mascot-layer.is-look > .ateli
 
 html.atelier .atelier-mascot-ear.is-cover {
   inset: 0;
-  background-image: url('mascots/deepika-earcover.webp?v=20261159');
+  background-image: url('mascots/deepika-earcover.webp?v=20261160');
   background-size: 300% 300%;
 }
 
 html.atelier .atelier-mascot-ear.is-drop {
-  background-image: url('mascots/deepika-eardrops.webp?v=20261159');
+  background-image: url('mascots/deepika-eardrops.webp?v=20261160');
 }
 
 html.atelier .atelier-mascot-ear.is-left {
@@ -1722,8 +1722,8 @@ html.atelier .atelier-mascot-react {
    mask with the frame. Her hair, jaw and outline always come from the frame
    underneath; an oval reached the jaw and showed a second chin. */
 html.atelier.has-reactions .atelier-mascot-face {
-  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261159');
-  mask-image: url('mascots/deepika-face-mask.png?v=20261159');
+  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261160');
+  mask-image: url('mascots/deepika-face-mask.png?v=20261160');
 }
 
 html.atelier .atelier-mascot-face {
@@ -6852,7 +6852,7 @@ html.atelier .sb-cameo-art {
 }
 
 html.atelier .sb-cameo-art.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261159');
+  background-image: url('mascots/deepika-reactions.webp?v=20261160');
 }
 
 html.atelier .sb-cameo-art.is-face {
@@ -8033,6 +8033,183 @@ html.atelier main .section .atelier-skills-intro .skills-title.atelier-do-lead {
 @media (max-width: 760px) {
   html.atelier main .section h2.atelier-do-lead {
     font-size: clamp(1.9rem, 8.2vw, 2.45rem) !important;
+  }
+}
+
+/* Back to top: hidden at the top of the page (script.js adds .is-shown
+   after about a screen of scrolling), and never over the open drawer. */
+html.atelier .scroll-top-btn {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  translate: 0 12px;
+  transition: opacity 0.25s ease, visibility 0.25s, translate 0.3s cubic-bezier(0.2, 0.9, 0.25, 1),
+    background 0.2s, color 0.2s;
+}
+
+html.atelier .scroll-top-btn.is-shown {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  translate: 0 0;
+}
+
+html.atelier body.menu-open .scroll-top-btn,
+html.atelier body.work-modal-open .scroll-top-btn {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Phone drawer: one scrollbar (the page is locked behind it, and the
+   drawer's own is hidden so it doesn't eat into the close button), straight
+   dividers on the rows rather than the rounded links, and rows short enough
+   that Contact and the theme toggle fit on a phone screen. */
+@media (max-width: 800px) {
+  html.atelier:has(body.menu-open),
+  html.atelier body.menu-open {
+    overflow: hidden !important;
+  }
+
+  html.atelier .nav-links,
+  html.atelier .nav-links.open {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+    padding: 4.6rem 1.4rem 1.4rem !important;
+  }
+
+  html.atelier .nav-links::-webkit-scrollbar {
+    display: none;
+  }
+
+  html.atelier body .nav-links > li {
+    padding: 0 !important;
+    border-bottom: 1px solid var(--line);
+  }
+
+  html.atelier body .nav-links > li.drawer-close-btn-li,
+  html.atelier body .nav-links > li.drawer-theme-toggle-li {
+    border-bottom: 0;
+  }
+
+  html.atelier body .nav-links > li > a {
+    padding: 0.78rem 0.55rem !important;
+    border-bottom: 0 !important;
+    border-radius: 0.6rem;
+  }
+
+  html.atelier body .nav-links > li.drawer-theme-toggle-li {
+    padding-top: 1rem !important;
+  }
+
+  html.atelier body .drawer-close-btn {
+    border-color: color-mix(in srgb, var(--ink) 30%, transparent) !important;
+  }
+}
+
+/* Phone hero: the mascot shrinks so the name and pitch start on the first
+   screen; on short phones she shrinks again. */
+@media (max-width: 760px) {
+  html.atelier .home-mascot {
+    width: 190px;
+  }
+
+  html.atelier .home-mascot .atelier-mascot {
+    max-width: 190px;
+    height: 224px;
+  }
+
+  html.atelier .home-container {
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 760px) and (max-height: 700px) {
+  html.atelier .home-mascot {
+    width: 150px;
+  }
+
+  html.atelier .home-mascot .atelier-mascot {
+    max-width: 150px;
+    height: 176px;
+  }
+}
+
+/* Phone lock screen: a smaller door, so the name field is on screen. */
+@media (max-width: 760px) {
+  html.atelier .lock-porch {
+    width: 7rem;
+    padding-bottom: 1rem;
+  }
+
+  html.atelier .lock-scene {
+    gap: 1.4rem;
+  }
+
+  html.atelier .portfolio-lock {
+    padding-top: max(4.6rem, env(safe-area-inset-top)) !important;
+  }
+}
+
+@media (max-width: 760px) and (max-height: 700px) {
+  html.atelier .lock-porch {
+    width: 5.6rem;
+  }
+}
+
+/* Phone About loop: three steps on one row, the question on its own row
+   below, so no arrow is ever left dangling at the end of a line. */
+@media (max-width: 760px) {
+  html.atelier .atelier-about-flow {
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+    justify-content: center;
+    gap: 0.8rem 1.75rem;
+  }
+
+  html.atelier .atelier-about-flow li.is-ask {
+    grid-column: 1 / -1;
+    justify-self: center;
+  }
+
+  html.atelier .atelier-about-flow li:not(:last-child)::after {
+    right: -1.38rem;
+  }
+
+  html.atelier .atelier-about-flow li:nth-child(3)::after {
+    content: none;
+  }
+}
+
+/* Phone project viewer: the key metric, the category and the previous/next
+   names wrap instead of trailing off in an ellipsis. */
+@media (max-width: 640px) {
+  html.atelier .case-reader-hook {
+    white-space: normal;
+    overflow: visible;
+    line-height: 1.35;
+  }
+
+  html.atelier .case-reader-kicker {
+    align-items: flex-start;
+    white-space: normal;
+  }
+
+  html.atelier .case-reader-cat {
+    overflow: visible;
+    line-height: 1.4;
+    padding-top: 0.25rem;
+  }
+
+  html.atelier .case-reader-step-name {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    white-space: normal;
+    font-size: 0.85rem;
+    line-height: 1.2;
   }
 }
 

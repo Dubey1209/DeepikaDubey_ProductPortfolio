@@ -402,7 +402,7 @@
     // and on every refresh. Scrubbed effects below still use ScrollTrigger.
     var watchers = {};
     function whenSeen(el, start, fn) {
-      var pct = parseFloat(String(start || '').replace('top', '')) || 88;
+      var pct = parseFloat(String(start || '').replace('top', '')) || 96;
       var w = watchers[pct];
       if (!w) {
         var calls = new Map();
@@ -421,14 +421,26 @@
       w.io.observe(el);
     }
 
+    // Already on screen when this binds: leave it be. Animating it now would
+    // show the final state first and then snap back to the start pose.
+    function onScreen(el) {
+      var r = el.getBoundingClientRect();
+      return r.top < window.innerHeight && r.bottom > 0;
+    }
+
     function fly(els, fromFn, opts) {
       opts = opts || {};
       Array.prototype.slice.call(els).forEach(function (el, i) {
         if (!el || el.dataset.fxCinema) return;
         el.dataset.fxCinema = '1';
+        if (onScreen(el)) return;
+        var from = fromFn(el, i);
+        g.set(el, { transformPerspective: 1800, transformOrigin: opts.origin || '50% 50%' });
+        // Parked in its start pose while still below the fold, so it never
+        // appears finished and then jumps.
+        g.set(el, from);
         whenSeen(el, opts.start, function () {
-          g.set(el, { transformPerspective: 1800, transformOrigin: opts.origin || '50% 50%' });
-          g.fromTo(el, fromFn(el, i), {
+          g.fromTo(el, from, {
             x: 0,
             y: 0,
             z: 0,
@@ -437,14 +449,13 @@
             rotationY: 0,
             scale: 1,
             skewX: 0,
-            filter: 'blur(0px)',
-            duration: opts.duration || 1.35,
-            delay: Math.min(i * (opts.stagger || 0.12), 0.5),
+            duration: Math.min(opts.duration || 0.9, 0.95),
+            delay: Math.min(i * (opts.stagger || 0.08), 0.3),
             ease: opts.ease || 'expo.out',
             overwrite: 'auto',
             onComplete: function () { clearT(el); }
           });
-          setTimeout(function () { clearT(el); }, 3200);
+          setTimeout(function () { clearT(el); }, 2400);
         });
       });
     }
@@ -463,15 +474,16 @@
       if (!el || el.dataset.fxCinema) return;
       maskTitle(el);
       el.dataset.fxCinema = '1';
+      if (onScreen(el)) return;
       var bits = el.querySelectorAll('.fx-title-word > span');
       g.set(el, { perspective: 800 });
       g.set(bits, { yPercent: 125 });
-      whenSeen(el, 'top 90%', function () {
+      whenSeen(el, 'top 96%', function () {
         g.fromTo(bits, { yPercent: 130, rotationX: 55 }, {
           yPercent: 0,
           rotationX: 0,
-          duration: 1.2,
-          stagger: 0.055,
+          duration: 0.9,
+          stagger: 0.045,
           ease: 'expo.out'
         });
       });
@@ -497,7 +509,7 @@
     }, { stagger: 0.14, duration: 1.15 });
 
     fly(document.querySelectorAll('.atelier-about-lede'), function () {
-      return { y: 36, filter: 'blur(10px)' };
+      return { y: 36 };
     }, { duration: 1.3 });
 
     fly(document.querySelectorAll('.atelier-about-flow li'), function () {
@@ -505,11 +517,11 @@
     }, { stagger: 0.12, duration: 0.95, ease: 'back.out(1.8)' });
 
     fly(document.querySelectorAll('.atelier-about-pull'), function () {
-      return { y: 26, filter: 'blur(8px)' };
+      return { y: 26 };
     }, { duration: 1.35 });
 
     fly(document.querySelectorAll('.atelier-about-notes li'), function (el, i) {
-      return { y: 70, rotationX: 50, filter: 'blur(8px)' };
+      return { y: 70, rotationX: 50 };
     }, { stagger: 0.16, duration: 1.35 });
 
     fly(document.querySelectorAll('.atelier-about-more-wrap'), function () {
@@ -525,16 +537,18 @@
     }, { duration: 1.22, stagger: 0.1, ease: 'expo.out' });
 
     fly(document.querySelectorAll('#technical-projects .project-card'), function () {
-      return { x: -44, y: 16, filter: 'blur(8px)' };
+      return { x: -44, y: 16 };
     }, { duration: 1.2, stagger: 0.1 });
 
     Array.prototype.slice.call(document.querySelectorAll('.atelier-skill-card')).forEach(function (card, i) {
       if (card.dataset.fxCinema) return;
       card.dataset.fxCinema = '1';
-      whenSeen(card, 'top 88%', function () {
+      if (onScreen(card)) return;
+      g.set(card, { y: 28 });
+      whenSeen(card, 'top 96%', function () {
         g.fromTo(card, { y: 28 }, {
           y: 0,
-          duration: 1.05, delay: Math.min(i * 0.1, 0.36), ease: 'expo.out',
+          duration: 0.85, delay: Math.min(i * 0.08, 0.3), ease: 'expo.out',
           onComplete: function () { clearT(card); }
         });
         var tags = card.querySelectorAll('.atelier-skill-tags li');
@@ -553,7 +567,7 @@
     }, { duration: 1.45, ease: 'expo.out' });
 
     fly(document.querySelectorAll('.atelier-edu-main'), function () {
-      return { x: -48, y: 24, filter: 'blur(8px)' };
+      return { x: -48, y: 24 };
     }, { duration: 1.3 });
 
     fly(document.querySelectorAll('.atelier-edu-stat'), function (el, i) {
@@ -567,10 +581,12 @@
     Array.prototype.slice.call(document.querySelectorAll('.atelier-exp-row')).forEach(function (row, i) {
       if (row.dataset.fxCinema) return;
       row.dataset.fxCinema = '1';
-      whenSeen(row, 'top 90%', function () {
-        g.fromTo(row, { x: -70, y: 18, filter: 'blur(6px)' }, {
-          x: 0, y: 0, filter: 'blur(0px)',
-          duration: 1.25, delay: Math.min(i * 0.1, 0.4), ease: 'expo.out',
+      if (onScreen(row)) return;
+      g.set(row, { x: -70, y: 18 });
+      whenSeen(row, 'top 96%', function () {
+        g.fromTo(row, { x: -70, y: 18 }, {
+          x: 0, y: 0,
+          duration: 0.9, delay: Math.min(i * 0.08, 0.3), ease: 'expo.out',
           onComplete: function () { clearT(row); }
         });
         var line = row.querySelector('.atelier-exp-leader');
@@ -594,11 +610,11 @@
     }, { stagger: 0.1, duration: 1.1, ease: 'expo.out' });
 
     fly(document.querySelectorAll('.atelier-contact-copy'), function () {
-      return { x: -50, y: 20, filter: 'blur(8px)' };
+      return { x: -50, y: 20 };
     }, { duration: 1.3 });
 
     fly(document.querySelectorAll('.atelier-contact-form'), function () {
-      return { y: 70, scale: 0.96, filter: 'blur(8px)' };
+      return { y: 70, scale: 0.96 };
     }, { duration: 1.35 });
 
     fly(document.querySelectorAll('.atelier-contact-links li'), function () {
@@ -651,7 +667,7 @@
     }
 
     var sub = document.querySelectorAll('.projects-subtitle, .atelier-skills-blurb');
-    fly(sub, function () { return { y: 24, filter: 'blur(8px)' }; }, { duration: 1.15 });
+    fly(sub, function () { return { y: 24 }; }, { duration: 1.15 });
 
     return true;
   }
