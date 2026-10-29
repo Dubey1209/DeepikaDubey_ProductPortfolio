@@ -13,30 +13,31 @@
   <meta property="og:url" content="https://dubey1209.github.io/DeepikaDubey_ProductPortfolio/">
   <!-- Social scrapers do not resolve relative URLs, and several do not decode
        WebP, so these stay absolute and stay JPEG. -->
-  <meta property="og:image" content="https://dubey1209.github.io/DeepikaDubey_ProductPortfolio/ProfilePhoto.jpeg">
-  <meta property="og:image:width" content="930">
-  <meta property="og:image:height" content="1114">
-  <meta property="og:image:alt" content="Deepika Dubey">
+  <meta property="og:image" content="https://dubey1209.github.io/DeepikaDubey_ProductPortfolio/og-image.jpg?v=20261161">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:alt" content="Deepika Dubey, Product Manager: illustrated portrait beside the line &quot;I turn messy user problems into products people actually finish.&quot;">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Deepika Dubey | Product Manager Portfolio">
   <meta name="twitter:description" content="Explore Deepika Dubey's journey in product management, analytics, strategy, and design. Projects, skills, certifications, and more.">
-  <meta name="twitter:image" content="https://dubey1209.github.io/DeepikaDubey_ProductPortfolio/ProfilePhoto.jpeg">
+  <meta name="twitter:image" content="https://dubey1209.github.io/DeepikaDubey_ProductPortfolio/og-image.jpg?v=20261161">
   <link rel="canonical" href="https://dubey1209.github.io/DeepikaDubey_ProductPortfolio/">
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
   <link rel="icon" type="image/png" sizes="64x64" href="favicon.png">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="preload" as="font" type="font/woff2" href="fonts/fraunces-latin.woff2" crossorigin>
   <link rel="preload" as="font" type="font/woff2" href="fonts/outfit-latin.woff2" crossorigin>
-  <link rel="preload" as="image" href="mascots/deepika-directions.webp?v=20261160" media="(min-width: 761px)" fetchpriority="high">
-  <link rel="preload" as="image" href="mascots/deepika-directions-sm.webp?v=20261160" media="(max-width: 760px)" fetchpriority="high">
+  <link rel="preload" as="image" href="mascots/deepika-directions.webp?v=20261161" media="(min-width: 761px)" fetchpriority="high">
+  <link rel="preload" as="image" href="mascots/deepika-directions-sm.webp?v=20261161" media="(max-width: 760px)" fetchpriority="high">
   <!-- One shared version token for every local asset. Bump it in both HTML
        files whenever any CSS or JS changes. Per-asset tokens drifted out of
        sync previously, which can serve new CSS against old JavaScript. -->
-  <link rel="stylesheet" href="base.css?v=20261160">
-  <link rel="stylesheet" href="atelier.css?v=20261160">
-  <link rel="stylesheet" href="motion.css?v=20261160">
+  <link rel="stylesheet" href="base.css?v=20261161">
+  <link rel="stylesheet" href="atelier.css?v=20261161">
+  <link rel="stylesheet" href="motion.css?v=20261161">
   <noscript><style>.fx-ch>span{transform:none!important}.home-kicker,.home-subtitle,.home-desc,.home-btns,.home-rotate,.hero-rule{opacity:1!important}.home-photo{filter:none!important;transform:rotate(-3.5deg)!important}</style></noscript>
-  <script src="portfolio-lock.js?v=20261160" defer></script>
+  <script src="portfolio-lock.js?v=20261161" defer></script>
 </head>
 <body>
     <script>
@@ -181,7 +182,7 @@
         <li><a href="my-story.html">Story</a></li>
         <li><a href="#contact">Contact</a></li>
         <li class="drawer-theme-toggle-li">
-          <button id="theme-toggle" aria-label="Toggle dark mode" class="theme-toggle-btn">
+          <button id="theme-toggle" type="button" aria-label="Dark mode" aria-pressed="false" class="theme-toggle-btn">
             <span class="theme-toggle-icon-wrapper">
               <span id="theme-toggle-icon">🌙</span>
             </span>
@@ -197,7 +198,7 @@
       <div class="home-left">
         <p class="home-kicker">Product Manager</p>
         <h1 class="home-title">Hey.<br>I’m Deepika.</h1>
-        <h2 class="home-subtitle">
+        <p class="home-subtitle">
           I turn messy user problems into products people
           <span class="home-rotate" aria-hidden="true">
             <span class="home-rotate-track">
@@ -215,7 +216,7 @@
             </span>
           </span>
           <span class="sr-only">actually finish.</span>
-        </h2>
+        </p>
         <p class="home-desc">Engineer brain. Product heart. Allergic to unused features.<br> I ask “should we?” before “can we?”, then I ship.</p>
         <div class="home-btns">
           <a href="https://drive.google.com/file/d/1q-BRanJfNaPcUP6-kAbtws9cPe_kCsLr/view?usp=sharing" target="_blank" rel="noopener" class="btn btn-outline">Download Resume</a>
@@ -1366,7 +1367,7 @@
 
         <form class="atelier-contact-form contact-form" id="contactForm">
           <h3>Send a note</h3>
-          <div id="form-status" class="form-status"></div>
+          <div id="form-status" class="form-status" role="status" aria-live="polite"></div>
           <div class="form-row">
             <div class="form-group">
               <label for="name">Name *</label>
@@ -1385,7 +1386,10 @@
             <label for="message">Message *</label>
             <textarea id="message" name="message" placeholder="The role, the problem, or just hello." required></textarea>
           </div>
-          <input type="checkbox" name="botcheck" tabindex="-1" autocomplete="off" aria-hidden="true" style="display: none">
+          <div class="form-trap" aria-hidden="true">
+            <label for="website">Website</label>
+            <input type="text" id="website" name="_honey" tabindex="-1" autocomplete="off">
+          </div>
           <button type="submit" class="btn btn-primary form-btn">Send message</button>
         </form>
       </div>
@@ -1442,12 +1446,12 @@
   <script src="vendor/gsap.min.js" defer></script>
   <script src="vendor/ScrollTrigger.min.js" defer></script>
   <script src="vendor/lenis.min.js" defer></script>
-  <script src="contact-form.js?v=20261160" defer></script>
-  <script src="theme-toggle.js?v=20261160" defer></script>
-  <script src="tap-sound.js?v=20261160" defer></script>
-  <script src="script.js?v=20261160" defer></script>
-  <script src="viewer.js?v=20261160" defer></script>
-  <script src="motion.js?v=20261160" defer></script>
-  <script src="mascot.js?v=20261160" defer></script>
+  <script src="contact-form.js?v=20261161" defer></script>
+  <script src="theme-toggle.js?v=20261161" defer></script>
+  <script src="tap-sound.js?v=20261161" defer></script>
+  <script src="script.js?v=20261161" defer></script>
+  <script src="viewer.js?v=20261161" defer></script>
+  <script src="motion.js?v=20261161" defer></script>
+  <script src="mascot.js?v=20261161" defer></script>
 </body>
 </html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Social card generator</title>
+  <!-- Draws og-image.jpg (1200x630). Serve the repo (npm run serve), open
+       /tools/og-card.html and use the download link. Drawn on a canvas because
+       browser screenshots of an emulated viewport come out tiled. -->
+  <style>
+    body { margin: 2rem; font-family: system-ui, sans-serif; background: #ddd; }
+    canvas { display: block; max-width: 100%; margin-bottom: 1rem; box-shadow: 0 4px 20px rgba(0,0,0,.2); }
+  </style>
+</head>
+<body>
+  <canvas id="card" width="1200" height="630"></canvas>
+  <a id="download" download="og-image.jpg">Download og-image.jpg</a>
+  <script>
+    (async function () {
+      const W = 1200, H = 630;
+      const PAPER = '#f3eee4', INK = '#1a1713', MUTED = '#6b645b', SPIN = '#c45c26', ACCENT = '#2457d6';
+
+      const fonts = [
+        new FontFace('Fraunces', "url('../fonts/fraunces-latin.woff2')", { weight: '100 900' }),
+        new FontFace('Fraunces', "url('../fonts/fraunces-italic-latin.woff2')", { weight: '100 900', style: 'italic' }),
+        new FontFace('Outfit', "url('../fonts/outfit-latin.woff2')", { weight: '100 900' }),
+      ];
+      await Promise.all(fonts.map(f => f.load().then(l => document.fonts.add(l))));
+
+      const sheet = new Image();
+      sheet.src = '../mascots/deepika-directions.webp';
+      await sheet.decode();
+
+      const c = document.getElementById('card');
+      const x = c.getContext('2d');
+
+      x.fillStyle = PAPER;
+      x.fillRect(0, 0, W, H);
+      const glow = x.createRadialGradient(950, 300, 0, 950, 300, 520);
+      glow.addColorStop(0, 'rgba(196, 92, 38, 0.12)');
+      glow.addColorStop(1, 'rgba(196, 92, 38, 0)');
+      x.fillStyle = glow;
+      x.fillRect(0, 0, W, H);
+
+      const left = 96;
+      x.textBaseline = 'alphabetic';
+
+      x.fillStyle = SPIN;
+      x.font = '600 20px Outfit';
+      x.letterSpacing = '4px';
+      x.fillText('PRODUCT MANAGER', left, 170);
+      x.letterSpacing = '0px';
+
+      x.fillStyle = INK;
+      let size = 86;
+      do {
+        x.font = `600 ${size}px Fraunces`;
+        x.letterSpacing = `${-size * 0.025}px`;
+      } while (x.measureText('Hey. I’m Deepika.').width > 640 && size-- > 50);
+      x.fillText('Hey. I’m Deepika.', left, 270);
+      x.letterSpacing = '0px';
+
+      x.font = '400 31px Fraunces';
+      x.fillStyle = '#4a443c';
+      x.fillText('I turn messy user problems into', left, 345);
+      const lead = 'products people ';
+      x.fillText(lead, left, 389);
+      const leadW = x.measureText(lead).width;
+      x.font = 'italic 500 31px Fraunces';
+      x.fillStyle = ACCENT;
+      x.fillText('actually finish.', left + leadW, 389);
+
+      x.strokeStyle = 'rgba(26, 23, 19, 0.14)';
+      x.lineWidth = 1.5;
+      x.beginPath();
+      x.moveTo(left, 462);
+      x.lineTo(left + 600, 462);
+      x.stroke();
+      x.font = '500 20px Outfit';
+      x.fillStyle = MUTED;
+      x.fillText('dubey1209.github.io/DeepikaDubey_ProductPortfolio', left, 500);
+
+      function arch(ax, ay, aw, ah, foot) {
+        const r = aw / 2;
+        x.beginPath();
+        x.moveTo(ax, ay + r);
+        x.arc(ax + r, ay + r, r, Math.PI, 0);
+        x.lineTo(ax + aw, ay + ah - foot);
+        x.quadraticCurveTo(ax + aw, ay + ah, ax + aw - foot, ay + ah);
+        x.lineTo(ax + foot, ay + ah);
+        x.quadraticCurveTo(ax, ay + ah, ax, ay + ah - foot);
+        x.closePath();
+      }
+
+      const wx = 800, wy = 88, ww = 320, wh = 456, inset = 9;
+
+      x.save();
+      x.shadowColor = 'rgba(0, 0, 0, 0.14)';
+      x.shadowBlur = 50;
+      x.shadowOffsetY = 26;
+      arch(wx, wy, ww, wh, 18);
+      x.fillStyle = PAPER;
+      x.fill();
+      x.restore();
+
+      arch(wx - 10, wy - 10, ww + 20, wh + 20, 26);
+      x.strokeStyle = 'rgba(196, 92, 38, 0.10)';
+      x.lineWidth = 10;
+      x.stroke();
+
+      const px = wx + inset, py = wy + inset, pw = ww - inset * 2, ph = wh - inset * 2;
+      x.save();
+      arch(px, py, pw, ph, 12);
+      x.clip();
+      x.fillStyle = '#ecdcca';
+      x.fillRect(px, py, pw, ph);
+      const halo = x.createRadialGradient(px + pw / 2, py + ph * 0.4, 0, px + pw / 2, py + ph * 0.4, pw * 0.8);
+      halo.addColorStop(0, 'rgba(196, 92, 38, 0.30)');
+      halo.addColorStop(1, 'rgba(196, 92, 38, 0)');
+      x.fillStyle = halo;
+      x.fillRect(px, py, pw, ph);
+
+      const cw = sheet.naturalWidth / 3, chh = sheet.naturalHeight / 3;
+      const dw = pw * 1.12, dh = dw * chh / cw;
+      x.drawImage(sheet, cw, chh, cw, chh, px + (pw - dw) / 2, py + ph - dh + ph * 0.02, dw, dh);
+      x.restore();
+
+      arch(wx, wy, ww, wh, 18);
+      x.strokeStyle = SPIN;
+      x.lineWidth = 2;
+      x.stroke();
+
+      const url = c.toDataURL('image/jpeg', 0.9);
+      document.getElementById('download').href = url;
+      window.ogCard = url;
+    })();
+  </script>
+</body>
+</html>

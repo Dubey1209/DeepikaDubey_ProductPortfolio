@@ -237,8 +237,7 @@ class PortfolioLock {
     // other one rises.
     const setDark = (dark) => {
       document.body.classList.toggle('dark-theme', dark);
-      const icon = document.getElementById('theme-toggle-icon');
-      if (icon) icon.textContent = dark ? '🌙' : '☀️';
+      if (window.paintThemeToggle) window.paintThemeToggle(dark);
       try { localStorage.setItem('theme', dark ? 'dark' : 'light'); } catch { /* private mode */ }
     };
     let flipping = false;

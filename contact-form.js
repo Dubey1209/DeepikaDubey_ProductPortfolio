@@ -36,7 +36,7 @@
   function sendWithFormSubmit(fields) {
     return fetch(FORMSUBMIT_URL, {
       method: 'POST',
-      // Lets the send finish even if the visitor leaves after being thanked.
+      // Lets the send finish even if the visitor leaves mid-send.
       keepalive: true,
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       body: JSON.stringify({
@@ -44,6 +44,7 @@
         _replyto: fields.email,
         _template: 'table',
         _captcha: 'false',
+        _honey: fields.honey,
         name: fields.name,
         email: fields.email,
         company: fields.company,
@@ -93,46 +94,36 @@
         email: document.getElementById('email').value,
         company: document.getElementById('company').value || 'Not provided',
         message: document.getElementById('message').value,
+        honey: form.querySelector('[name="_honey"]')?.value || '',
       };
 
-      // Only bots tick the hidden box: they get a success message, nothing is sent.
-      const trap = form.querySelector('[name="botcheck"]');
-      const sending = trap && trap.checked
+      // People never see the _honey field; bots that fill it are shown the
+      // thanks and nothing is sent. FormSubmit also drops any message with it filled.
+      const sending = fields.honey
         ? Promise.resolve()
         : sendWithFormSubmit(fields).catch(function () {
           return sendWithEmailJs(fields);
         });
 
-      // FormSubmit can take several seconds to answer. Past a short wait the
-      // visitor is thanked right away and the send finishes in the background;
-      // if it then fails, the error replaces the thanks and the message is put
-      // back in the form so nothing is lost.
-      let thanked = false;
-      function thank() {
-        if (thanked) return;
-        thanked = true;
+      // FormSubmit can take several seconds to answer, so a slow send says so
+      // instead of leaving the button on "Sending..." with no explanation.
+      const slow = setTimeout(function () {
         formStatus.innerHTML =
-          '<div class="success-message">Message sent. I will get back to you soon.</div>';
-        form.reset();
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = originalBtnText;
-        formStatus.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-      const early = setTimeout(thank, 2500);
+          '<div class="pending-message">Still sending, this can take a few seconds…</div>';
+      }, 2500);
 
       sending
         .then(function () {
-          clearTimeout(early);
-          thank();
+          clearTimeout(slow);
+          formStatus.innerHTML =
+            '<div class="success-message">Message sent. I will get back to you soon.</div>';
+          form.reset();
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalBtnText;
+          formStatus.scrollIntoView({ behavior: 'smooth', block: 'center' });
         })
         .catch(function () {
-          clearTimeout(early);
-          if (thanked) {
-            document.getElementById('name').value = fields.name;
-            document.getElementById('email').value = fields.email;
-            document.getElementById('company').value = fields.company === 'Not provided' ? '' : fields.company;
-            document.getElementById('message').value = fields.message;
-          }
+          clearTimeout(slow);
           formStatus.innerHTML =
             '<div class="error-message">Oops! Something went wrong. Please try again or email me directly at <a href="mailto:dubeydeepika1209@gmail.com">dubeydeepika1209@gmail.com</a></div>';
           submitBtn.disabled = false;
