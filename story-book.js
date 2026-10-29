@@ -285,7 +285,7 @@
         '<p class="sb-cover-vol" aria-hidden="true">vol. I</p>' +
         '<div class="sb-label">' +
           '<p class="sb-cover-kicker">The long version</p>' +
-          '<h3 class="sb-cover-title"><span>Wanna know me</span><span>beyond resume?</span></h3>' +
+          '<h3 class="sb-cover-title"><span>Wanna know me</span><span>beyond the resume?</span></h3>' +
           '<p class="sb-label-by">a journal by Deepika</p>' +
         '</div>' +
         '<div class="sb-cover-portrait">' +
@@ -405,7 +405,7 @@
         cameo('is-sticker is-mood', 4, false, 2) +
         '<span class="sb-mood-note" aria-hidden="true">thank you!</span>' +
       '</span>' +
-      '<h3 class="sb-open-title">Watch me. I\'m just getting started.</h3>' +
+      '<h3 class="sb-open-title">Watch me. I’m just getting started.</h3>' +
       SQUIGGLE +
       '<button type="button" class="wb-cta" data-chapter="cover">Back to the cover</button>' +
     '</div>' +

@@ -86,6 +86,7 @@
       title: text('.case-study-title, .project-title'),
       hook: text('.project-hook'),
       cat: text('.project-category'),
+      brand: card.querySelector('.case-study-title') ? text('.project-category').split(/\s*[·|]\s*/)[0] : '',
     });
   });
   if (!items.length) return;
@@ -105,7 +106,7 @@
   var device = 'desk';
 
   function pad(n) { return (n < 10 ? '0' : '') + n; }
-  function short(it) { return it.cat.split('|')[0].trim() || it.title; }
+  function short(it) { return it.brand || it.title; }
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
@@ -125,7 +126,7 @@
     var at = group.indexOf(it);
     $('.case-reader-title').textContent = it.title;
     $('.case-reader-hook').textContent = it.hook;
-    $('.case-reader-cat').textContent = it.cat.replace(/\s*\|\s*/, ' · ');
+    $('.case-reader-cat').textContent = it.cat;
     $('.case-reader-count').textContent = pad(at + 1) + ' / ' + pad(group.length);
     dots.innerHTML = group.map(function (x, k) { return '<i' + (k === at ? ' class="is-on"' : '') + '></i>'; }).join('');
     var solo = group.length < 2;
