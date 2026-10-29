@@ -421,6 +421,22 @@
       w.io.observe(el);
     }
 
+    // Anything still parked below the fold would print in its start pose.
+    window.addEventListener('beforeprint', function () {
+      Object.keys(watchers).forEach(function (pct) {
+        var w = watchers[pct];
+        w.calls.forEach(function (fn, el) {
+          w.io.unobserve(el);
+          fn();
+        });
+        w.calls.clear();
+      });
+      g.globalTimeline.getChildren(true, true, false).forEach(function (t) {
+        if (t.scrollTrigger || (t.repeat && t.repeat() === -1)) return;
+        t.progress(1);
+      });
+    });
+
     // Already on screen when this binds: leave it be. Animating it now would
     // show the final state first and then snap back to the start pose.
     function onScreen(el) {

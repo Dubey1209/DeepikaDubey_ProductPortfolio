@@ -92,28 +92,33 @@ export function freezeCss({ freezeTransitions = true } = {}) {
  * Drive every ScrollTrigger reveal to its final state.
  *
  * The reveals are one-way (opacity 0 -> 1, once: true), so stepping down the
- * full height and back up leaves the whole document revealed. Lenis smooth
- * scroll is bypassed by writing scrollTop directly rather than dispatching
- * wheel events.
+ * full height and back up leaves the whole document revealed. Scrolling goes
+ * through Lenis with `immediate`, not wheel events, so each step lands at once.
  */
 export async function revealEverything(page) {
   await page.evaluate(async () => {
     const step = Math.round(window.innerHeight * 0.6);
     const el = document.scrollingElement || document.documentElement;
     const settle = () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
-
-    for (let y = 0; y < el.scrollHeight; y += step) {
+    // While Lenis runs it writes its own position back every frame, so a bare
+    // scrollTop write moved the page by a pixel or two and no reveal fired.
+    const lenis = window.atelierLenis;
+    const scrollTo = (y) => {
+      if (lenis) lenis.scrollTo(y, { immediate: true, force: true });
       el.scrollTop = y;
       window.dispatchEvent(new Event('scroll'));
+    };
+
+    for (let y = 0; y < el.scrollHeight; y += step) {
+      scrollTo(y);
       await settle();
     }
 
-    el.scrollTop = el.scrollHeight;
+    scrollTo(el.scrollHeight);
     window.ScrollTrigger?.refresh();
     await settle();
 
-    el.scrollTop = 0;
-    window.dispatchEvent(new Event('scroll'));
+    scrollTo(0);
     await settle();
   });
 }

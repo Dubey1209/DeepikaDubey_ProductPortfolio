@@ -26,8 +26,17 @@ python -m http.server 8000
 | `my-story.html` | A separate narrative page rendered as a flip-book. |
 | `404.html` | Served by GitHub Pages for unknown paths. Deliberately self-contained — it shares no stylesheet with the site, so the CSS refactor cannot break it. |
 
-Both pages load the **same** five stylesheets in the **same order**. The nav and
-footer markup is currently duplicated between them — keep them in sync by hand.
+Both pages load the **same** three stylesheets in the **same order**. The nav and
+footer are written out in both pages, so each works without JavaScript, but
+`index.html` is the source: edit them there, then run
+
+```bash
+node tools/sync-shared.mjs          # copy nav + footer into my-story.html
+node tools/sync-shared.mjs --check  # exit 1 if my-story.html has drifted
+```
+
+On `my-story.html` the in-page links (`#about`) become `index.html#about`, and
+"Back to top" points at `#main-content`.
 
 ## Stylesheet load order
 
@@ -36,7 +45,7 @@ Do not reorder these `<link>` tags.
 
 | # | File | Owns |
 | --- | --- | --- |
-| 1 | `base.css` | Base reset, font stack, typography scale, form/link defaults — **plus** a superseded blue/white card design that `atelier.css` overrides, and a Bootstrap-style breakpoint ladder (575 / 767 / 991 / 1199) that disagrees with the one used elsewhere. |
+| 1 | `base.css` | Base reset, font stack, typography scale, form/link defaults — **plus** what is left of the old blue/white card design and its Bootstrap-style breakpoint ladder (575 / 767 / 991 / 1199). Every remaining rule was measured as still doing something (or is a `:hover`/`:focus` rule the probe cannot judge), so it cannot simply be deleted; it has to be folded into `atelier.css` rule by rule. |
 | 2 | `atelier.css` | The current visual identity. Defines all design tokens in `:root` and re-skins nearly every component, mostly scoped under `html.atelier` to outrank `base.css`. Opens with what was a small patch layer: safe-area insets, `box-sizing`, overflow clipping, touch-target sizing. |
 | 3 | `motion.css` | Animation and scroll-interaction styling. |
 
@@ -52,12 +61,14 @@ something there would have been no way to tell which half did it.
 
 ## Script load order
 
-All scripts are `defer`red. Third-party libraries come from the jsDelivr CDN.
+All scripts are `defer`red. Third-party libraries are committed in `vendor/`
+and served from the site itself, so a CDN outage cannot take the motion or the
+story book down.
 
 | File | Role |
 | --- | --- |
 | `portfolio-lock.js` | Loaded in `<head>` on `index.html` only. Gates the site behind a name prompt; unlock state is kept in `sessionStorage`. Reveals `#site-shell` and dispatches a `portfolio-unlocked` event. |
-| `script.js` | Mobile nav drawer, dropdowns, smooth anchor scrolling, the experience accordion (whose content is hardcoded in this file), the work-detail modal, and the certificate stack. |
+| `script.js` | Mobile nav drawer, dropdowns, smooth anchor scrolling (through Lenis), the experience accordion, the work-detail modal, and the certificate stack. The experience roles themselves are plain HTML in `#atelier-exp` in `index.html`; edit them there. |
 | `theme-toggle.js` | Toggles `.dark-theme` on `<body>`, persisted to `localStorage`. An inline script at the top of `<body>` applies the saved theme early to avoid a flash. |
 | `motion.js` | GSAP + ScrollTrigger + Lenis scroll animations. |
 | `contact-form.js` | Contact form via FormSubmit, falling back to EmailJS if it fails. The EmailJS SDK is loaded only for that fallback. |
@@ -69,15 +80,27 @@ The visual and computed-style harnesses hide the mascot's drawings (they are in
 the pointer was and on a random blink timer. The card around them is still
 compared.
 
-### External dependencies (CDN, runtime)
+### External dependencies
 
-GSAP 3.12.7, ScrollTrigger 3.12.7, Lenis 1.1.20, page-flip 2.0.7, and
-`@emailjs/browser` 4 (lazy-loaded).
+In `vendor/`, loaded by both pages: GSAP 3.12.7, ScrollTrigger 3.12.7 and
+Lenis 1.1.20; page-flip 2.0.7 on `my-story.html` only. To upgrade one, replace
+the file (keep its licence header).
+
+The one runtime CDN request is `@emailjs/browser` 4, which `contact-form.js`
+loads only if FormSubmit fails.
+
+### Icons
+
+Icons that appear on more than one card (case study, code, Figma, document)
+are `<symbol>`s in one hidden `<svg>` at the top of `index.html`'s `<body>`;
+each card draws one with `<svg …><use href="#i-case"/></svg>`. Change the
+symbol and every card follows. One-off icons stay inline.
 
 ## Cache busting
 
 Every stylesheet and script is referenced with a **single shared** `?v=` token
-(currently `20261132`; the mascot sheet URLs in `atelier.css` carry it too).
+(currently `20261162`; the mascot sheet URLs in `atelier.css` and the
+`og:image` URLs carry it too).
 When you change any CSS, JS or mascot sheet, bump that token —
 in both `index.html` and `my-story.html`.
 
@@ -110,7 +133,9 @@ Two deliberate choices here:
   quietly break the hero animation. WebP support is universal enough to serve
   directly.
 - **`og:image` stays JPEG**, and absolute. Social scrapers do not resolve
-  relative URLs, and several still do not decode WebP.
+  relative URLs, and several still do not decode WebP. It is `og-image.jpg`,
+  a 1200×630 card (mascot, name, pitch) drawn by `tools/og-card.html`: serve
+  the repo, open that page and use its download link.
 - **The favicon is the logo mark**, not a face: a cream serif `P` and blue
   `{}` on an ink rounded square (`favicon-32.png`, `favicon.png` at 64px,
   and a full-bleed `apple-touch-icon.png` at 180px, since iOS rounds it
@@ -124,8 +149,8 @@ positioned sheet, so the attributes would have no effect on layout.
 
 The hero shows a cartoon of Deepika instead of a photo. Two pictures of her a
 scroll apart, in two styles (a tilted photo on a coloured card, a frameless
-cartoon), read as inconsistent, so the photo was dropped from the page (it
-stays as `og:image`) and the mascot moved up from About. There
+cartoon), read as inconsistent, so the photo was dropped from the page and
+the mascot moved up from About. There
 her thought cloud opens to her left (`--cloud-tail: right` in the hero), so it
 never runs off the page; on phones it sits above her head as before. Once per
 visit, after the hero's entrance and the lock screen, she says hello
@@ -457,7 +482,7 @@ rate limiting / CAPTCHA in the respective dashboards.
 ## Accessibility notes
 
 Worth preserving as the site evolves: `prefers-reduced-motion: reduce` is
-honoured in all five stylesheets and in `portfolio-lock.js`; there is a skip
+honoured in all three stylesheets and in `portfolio-lock.js`; there is a skip
 link, ARIA attributes on the nav and modals, and focus is restored after the
 work modal closes.
 
@@ -516,9 +541,12 @@ about before editing `tests/visual.mjs`:
   GSAP ticker.
 - **Pausing a CSS animation is not deterministic.** It freezes at whatever
   phase it reached, so animations are first seeked to a fixed far-future time.
-- **Reveal animations need triggering.** Content below the fold sits at
-  `opacity: 0` until scrolled to, so the harness steps through the whole
-  document and back to the top.
+- **Reveal animations need triggering.** Content below the fold waits in its
+  start pose until scrolled to, so the harness steps through the whole
+  document and back to the top. It scrolls through Lenis
+  (`atelierLenis.scrollTo(y, { immediate: true })`): a bare `scrollTop` write
+  is undone by Lenis on its next frame, so nothing below the fold revealed,
+  and the work-modal scenarios could not click the still-turned case-study card.
 - **`motion.js` has a 4500 ms fallback** that force-finalises the hero. Capture
   happens after it fires, otherwise the hero is a coin flip between two states.
 - **Lazy images race the screenshot.** All images are forced eager and awaited
@@ -598,7 +626,7 @@ Two deliberate differences from the screenshot harness:
   elements, including all colour and typography, is still compared exactly.
 
 `prefers-reduced-motion` is deliberately **not** used to calm the page down:
-all five stylesheets restyle the site under that media query, so it would
+all three stylesheets restyle the site under that media query, so it would
 capture a design real visitors never see.
 
 ## Known bugs (found during the Phase 2 audit)
@@ -812,8 +840,26 @@ competing breakpoint systems, and design tokens scoped to `html.atelier`
 instead of `:root`. A phased refactor is underway.
 
 Phase 3 first moved those lines into three files without touching a single rule,
-then began pruning what the merge exposed. The CSS is now 7,624 lines and 772
-`!important`s, every deletion measured rather than reasoned about.
+then began pruning what the merge exposed, every deletion measured rather than
+reasoned about. Since then the design work (mascot, story book, project viewer,
+lock screen) has added far more than the pruning removed. As of October 2026:
+
+| File | Lines | `!important` |
+| --- | --- | --- |
+| `base.css` | 2,431 | 108 |
+| `atelier.css` | 8,395 | 661 |
+| `motion.css` | 2,311 | 179 |
+| **Total** | **13,137** | **948** |
+
+There are 37 distinct `@media` conditions, with max-width breakpoints at 380,
+420, 480, 520, 560, 575, 600, 620, 640, 700, 720, 760, 767, 768, 800, 840, 860,
+900, 992, 1040 and 1200. Merging them is Phase 4. It is not a mechanical change:
+moving a rule from 767px to 760px changes the layout for every screen between
+the two, which the harnesses (375/800/1440, plus the probe's sweep widths) do
+not see, so each merge needs a look at the widths it moves.
+
+The latest probe of `base.css` found 6 more inert rules (32 lines), now deleted;
+`npm run computed` showed nothing but the usual animation and random-star noise.
 
 `base.css` took the bulk of it: of its 417 measurable rules, 139 contributed
 nothing to any of the 38 probed states and are gone — 632 lines, a fifth of the
@@ -839,7 +885,10 @@ mattered. That is the shape of this codebase, and why the phase is slow.
   - [ ] probe `atelier.css` and `motion.css`
   - [x] fix the known bugs: 3, 5 and 6 fixed; 2 and 4 turned out not to be bugs
 - [ ] **Phase 4** — unify breakpoints
-- [ ] **Phase 5** — extract content into a data layer
+- [ ] **Phase 5** — make content easy to edit
+  - [x] experience roles moved out of `script.js` into plain HTML
+  - [x] nav and footer kept in sync by `tools/sync-shared.mjs`
+  - [x] repeated card icons moved into one `<symbol>` sprite
 - [ ] **Phase 6** — decide the future of the lock screen
 
 The **no-build-step property is intentional** and should survive the refactor.

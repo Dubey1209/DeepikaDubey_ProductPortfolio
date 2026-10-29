@@ -124,13 +124,6 @@ p, li, td, th, label, input, textarea, button, select {
 }
 
 /* Section Titles */
-.about-title, .skills-title, .projects-title, .education-title, .contact-title {
-  font-weight: 700;
-  letter-spacing: -0.5px;
-  line-height: 1.2;
-  margin-bottom: 1.5rem;
-  text-align: center;
-}
 
 /* Form Elements */
 input, textarea, select {
@@ -1443,13 +1436,6 @@ body.dark-theme .project-category {
     outline: none;
   }
   
-  .dropdown > a {
-    display: flex !important;
-    justify-content: space-between;
-    align-items: center;
-    padding-right: 1.5rem !important;
-    position: relative;
-  }
   
   .dropdown > a::after {
     content: '';
@@ -1642,9 +1628,7 @@ body.dark-theme .project-category {
 @media (min-width: 801px) {
 }
 
-@media (max-width: 800px) {.menu-toggle {
-    display: flex !important;
-  }
+@media (max-width: 800px) {
   .drawer-close-btn-li {
     display: none;
   }
@@ -1856,16 +1840,6 @@ body.page-loaded .home-left > :nth-child(5) { transition-delay: 320ms; }
   overflow: hidden;
 }
 
-.atelier-gate {
-  position: relative;
-  z-index: 10;
-  width: min(92vw, 32rem);
-  border-radius: 1.15rem;
-  padding: 2.35rem 2.1rem 1.9rem;
-  background: #fffaf3;
-  border: 1.5px solid #1a1713;
-  box-shadow: 10px 12px 0 #1a1713;
-}
 
 
 
@@ -2166,10 +2140,7 @@ body.page-loaded .home-left > :nth-child(5) { transition-delay: 320ms; }
 }
 
 /* ===== MEDIUM DEVICES (768px - 991px) - TABLETS ===== */
-@media (min-width: 768px) and (max-width: 991px) {.home-container {
-    flex-direction: row;
-    gap: 3rem;
-  }
+@media (min-width: 768px) and (max-width: 991px) {
   
   /* Project cards for tablets */
   
@@ -2209,10 +2180,7 @@ body.page-loaded .home-left > :nth-child(5) { transition-delay: 320ms; }
 }
 
 /* ===== LARGE DEVICES (992px - 1199px) ===== */
-@media (min-width: 992px) and (max-width: 1199px) {.projects-cards-row {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
-  }
+@media (min-width: 992px) and (max-width: 1199px) {
   
   
   /* Better home section layout */
