@@ -21,6 +21,9 @@
 //                               going and she says something about it
 //   cursor resting on the page  she keeps watching it and, now and then, has
 //                               a little moment (a tilt, hearts, a smile)
+//   nobody moving for ~22s      she dozes off facing front, eyes shut,
+//                               breathing, z's; any movement startles her
+//                               awake with a line about it
 //
 // The cursor comes first: wherever it goes she looks, and a mood she was
 // having to herself ends the moment it moves.
@@ -449,9 +452,9 @@
   // Expressions are eased in and out slowly enough to read as a feeling
   // passing over her face; at the old 180ms they flickered like a slideshow.
   // Blinks stay quick, as real ones are.
-  var FACE_IN_MS = 360;
-  var FACE_OUT_MS = 520;
-  var TO_FRONT_MS = 400;
+  var FACE_IN_MS = 440;
+  var FACE_OUT_MS = 640;
+  var TO_FRONT_MS = 460;
 
   // Whether the running reaction is one she started herself (idle, a passing
   // mood). Those give way the moment the visitor points somewhere else.
@@ -523,7 +526,10 @@
     clearTimeout(faceDelay);
     clearTimeout(reactTimer);
     if (ms) reactTimer = setTimeout(endReaction, ms);
-    var faceIn = index === BLINK ? 110 : FACE_IN_MS;
+    // Dozing off, the lids sink slowly from sleepy to shut, straight across
+    // rather than through her open-eyed face.
+    var faceIn = asleep ? 1100 : index === BLINK ? 110 : FACE_IN_MS;
+    face.through = !asleep;
 
     if (WHOLE.indexOf(index) >= 0) {
       face.hide(260);
@@ -567,8 +573,14 @@
     if (reducedMotion) return;
     blinkTimer = setTimeout(function () {
       blink();
-      // Now and then a double blink, which reads as more alive than a metronome.
-      if (Math.random() < 0.12) setTimeout(blink, 520);
+      // Now and then a double blink, which reads as more alive than a
+      // metronome, and rarely a quick flutter of three.
+      var r = Math.random();
+      if (r < 0.18) setTimeout(blink, 560);
+      else if (r < 0.24) {
+        setTimeout(blink, 420);
+        setTimeout(blink, 840);
+      }
       scheduleBlink();
     }, 3600 + Math.random() * 4400);
   }
@@ -585,17 +597,24 @@
   lids.style.opacity = '0';
   el.insertBefore(lids, layerB.nextSibling);
 
-  var LID_DOWN_MS = 180;
-  var LID_REST_MS = 90;
-  var LID_UP_MS = 340;
+  var LID_DOWN_MS = 160;
+  var LID_REST_MS = 110;
+  var LID_UP_MS = 380;
+
+  // Facing front, a blink is sometimes a happy one: eyes closing into a
+  // little smile for a beat, the head dipping with it.
+  var HAPPY_BLINK = 0.12;
 
   function blink() {
     if (!visible || reacting >= 0 || body.running || body.key !== 'look:' + lookIndex) return;
+    // The head dips a touch as the lids fall, the way a soft blink does.
+    nudge(0, 0.07);
     if (lookIndex === CENTRE) {
-      face.show('react', BLINK, LID_DOWN_MS);
-    setTimeout(function () {
-        if (reacting < 0) face.hide(LID_UP_MS);
-      }, LID_DOWN_MS + LID_REST_MS);
+      var happy = Math.random() < HAPPY_BLINK;
+      face.show('react', happy ? GIGGLE : BLINK, happy ? 240 : LID_DOWN_MS);
+      setTimeout(function () {
+        if (reacting < 0) face.hide(happy ? 460 : LID_UP_MS);
+      }, happy ? 620 : LID_DOWN_MS + LID_REST_MS);
       return;
     }
     if (!document.documentElement.classList.contains('has-reactions') || typeof lids.animate !== 'function') return;
@@ -647,12 +666,12 @@
   // seven frames, which the eye reads as a cut. Only a turn right across
   // (left to right, up to down) passes through the middle, in two
   // overlapping steps, or both heads showed at once.
-  var TURN_MS = 260;
-  var STEP_MS = 190;
+  var TURN_MS = 310;
+  var STEP_MS = 220;
   // Letting go of an expression to follow the cursor. At TURN_MS the face
   // snapped off (0.86 -> 0.44 between two frames); a feeling fades slower
   // than a glance moves.
-  var LET_GO_MS = 300;
+  var LET_GO_MS = 380;
   var letGoUntil = 0;
 
   function axis(current, v) {
@@ -672,7 +691,8 @@
     // when she is angry: she keeps glaring at you until it passes.
     // The rest of a moment goes too: its next beat brought the face back
     // after she had turned away.
-    if (reacting >= 0 && reacting !== ANGRY && index !== CENTRE && pointer) {
+    // Waking from a nap holds too: the move that wakes her points elsewhere.
+    if (reacting >= 0 && reacting !== ANGRY && now() >= holdFaceUntil && index !== CENTRE && pointer) {
       momentTimers.forEach(clearTimeout);
       momentTimers = [];
       endReaction(LET_GO_MS);
@@ -1139,6 +1159,8 @@
         'ouch! I can smell a Monday coming',
         [WINK, 'this nose can smell good snacks from a mile away'],
         [GIGGLE, 'achoo! …false alarm, carry on'],
+        [LAUGH, 'haha, okay, okay, that was a good boop'],
+        [PLAYFUL, 'boop me again, I dare you. blep'],
       ],
     },
     eye: {
@@ -1176,6 +1198,8 @@
         'eyes shut, mind still overthinking',
         [SHY, 'stop, you’re making me lose eye contact'],
         'blink… loading a dramatic eye roll',
+        [SLEEPY, 'shh, my eyes are on a lunch break'],
+        [PUPPY, 'careful… these are my puppy eyes, they’re fragile'],
       ],
     },
     cheek: {
@@ -1215,6 +1239,8 @@
         'aww, whoever you are, you’re doing great',
         'eep! pinker than a strawberry milkshake',
         [GIGGLE, 'hehe, chubby cheeks, happy heart'],
+        [LOVE, 'okay, my heart did a little flip there'],
+        [LOVE, 'you poked, I melted. that’s the whole story'],
       ],
     },
     mouth: {
@@ -1252,6 +1278,8 @@
         'mmf! okay fine, I’ll stop talking. for 5 seconds.',
         [GRIN, 'smiling because you clicked. that’s all it takes'],
         [WINK, 'lips sealed. the gossip stays in here'],
+        [PLAYFUL, 'blep! surprise feature, not in the release notes'],
+        [LAUGH, 'hahaha, sorry, I just remembered a meme'],
       ],
     },
     forehead: {
@@ -1290,6 +1318,8 @@
         'boop! you reset my train of thought. thanks?',
         [THINKING, 'thinking about snacks. and products. mostly snacks.'],
         'careful, that’s where I keep my overthinking',
+        [CONFUSED, 'wait, was that a new idea or an old bug?'],
+        [EXCITED, 'ooh! you just poked a brilliant idea loose'],
       ],
     },
     hair: {
@@ -1641,6 +1671,31 @@
       'psst… stretch your shoulders. yes, you.',
       'hmm, good ideas always arrive in the shower',
       'dreaming of a day with zero notifications',
+      [LOVE, 'hmm… is it weird that I love a clean Figma file?'],
+      [CONFUSED, 'why do meetings about saving time take an hour?'],
+      [SLEEPY, 'chai first, opinions later'],
+      [SMUG, 'pretty sure good UX is just empathy with a grid'],
+      'what would this look like for a first-time user?',
+      'the best feature is sometimes the one we don’t build',
+      [EXCITED, 'ooh, what if onboarding was actually fun?'],
+      'hmm… does this button explain itself?',
+      [CONFUSED, 'who named this setting? and why?'],
+      'note to self: talk to users, not about them',
+      [PUPPY, 'psst… have you seen the case studies yet?'],
+      'hmm, is this a feature or a workaround in disguise?',
+      [PLAYFUL, 'secret: I rename my Figma layers. all of them.'],
+      'thinking about the empty state nobody designed',
+      [SAD, 'a feature shipped and nobody noticed… it happens'],
+      'hmm, what does success look like in a week?',
+      [SMUG, 'Ctrl+Z is my favourite feature. no contest'],
+      'one clear sentence beats a ten-slide deck',
+      [LOVE, 'a user said “that was easy”. best day ever'],
+      'hmm, should dark mode be the default? discuss.',
+      [SLEEPY, 'my brain at 4pm: buffering…'],
+      'what’s the smallest thing we could ship to learn this?',
+      [CONFUSED, 'why is the loading spinner always so confident?'],
+      [EXCITED, 'new notebook, new ideas, who dis'],
+      'if users keep asking, the UI is answering badly',
     ],
   };
 
@@ -2255,6 +2310,14 @@
       'your cursor is very calm. teach me',
       [THINKING, 'blinking… in a user-centred way'],
       'staring contest? I never lose. I blink in style',
+      [SLEEPY, 'it’s so quiet… I might take a tiny nap'],
+      [PUPPY, 'hello? anyone? I’ll be good, promise'],
+      [SMUG, 'idle? no. I’m in deep focus mode'],
+      [PLAYFUL, 'while you’re away… blep'],
+      [CONFUSED, 'did the internet go out, or just you?'],
+      [LOVE, 'this cursor and I? we have a thing now'],
+      'tip: the Work section is where the good stuff lives',
+      [SAD, 'nobody is poking me today…'],
     ],
   };
 
@@ -2466,13 +2529,92 @@
     idleTimer = setTimeout(idleTick, ms || 3500 + Math.random() * 3000);
   }
 
+  // ---- napping --------------------------------------------------------------
+  //
+  // Left alone long enough she nods off, and it has to read from across the
+  // room: she turns to the front, gets drowsy, her eyes sink shut, she
+  // breathes slowly with z's floating up, and any movement startles her
+  // awake. As a held face behind a turned head it went unnoticed.
+
+  var NAP_AFTER = 22000;
+  var asleep = false;
+  var snoreTimer = 0;
+  var lastNap = 0;
+  var holdFaceUntil = 0;
+  var wokeTimer = 0;
+
+  var WOKE = {
+    face: GRIN,
+    lines: [
+      'huh? no no, I’m awake!',
+      [SHY, 'I wasn’t sleeping, I was… thinking deeply'],
+      [GIGGLE, 'oops, power nap. 10/10 recommend'],
+      'I’m up! I’m up! what did I miss?',
+      [SMUG, 'just resting my eyes. very strategic'],
+      [CONFUSED, 'wait… what year is it?'],
+      [SHY, 'please tell me I didn’t snore'],
+      [PLAYFUL, 'caught napping. blep'],
+      'sorry! the cursor was so calm, I drifted off',
+      [GIGGLE, 'I dreamt the backlog was empty. beautiful'],
+      [EXCITED, 'okay, fully recharged. let’s go!'],
+      [SLEEPY, 'five more minutes? …no? okay, fine'],
+    ],
+  };
+
+  function snore() {
+    clearTimeout(snoreTimer);
+    snoreTimer = setTimeout(function () {
+      if (!asleep) return;
+      burst('zzz');
+      snore();
+    }, 2800);
+  }
+
+  function fallAsleep() {
+    asleep = true;
+    lastNap = now();
+    momentTimers.forEach(clearTimeout);
+    momentTimers = [];
+    react(SLEEPY, 0, false, true);
+    moveBody('doze');
+    later(function () { if (asleep) burst('zzz'); }, 900);
+    later(function () {
+      if (!asleep) return;
+      react(BLINK, 0, false, true);
+      el.classList.add('is-asleep');
+      snore();
+    }, 2700);
+  }
+
+  function wakeUp() {
+    asleep = false;
+    clearTimeout(snoreTimer);
+    el.classList.remove('is-asleep');
+    var line = pickLine('woke', WOKE);
+    var hold = holdFor(line.text);
+    holdFaceUntil = now() + 650 + Math.min(hold, 2600);
+    react(GASP, 900, false, true);
+    moveBody('jump');
+    clearTimeout(wokeTimer);
+    wokeTimer = setTimeout(function () {
+      react(line.face, hold, false, true);
+      say(line.text, hold);
+    }, 650);
+  }
+
   function idleTick() {
     var quiet = now() - lastActive;
+    if (asleep) return;
     if (!visible || reacting >= 0 || bubble.classList.contains('is-in') || quiet < IDLE_AFTER) {
       scheduleIdle();
       return;
     }
     idling = true;
+    if (quiet > NAP_AFTER && now() - lastNap > 60000) {
+      clearIdleSteps();
+      fallAsleep();
+      return;
+    }
     var busy;
     if (quiet > 30000 && now() - lastIdleLine > 45000 && Math.random() < 0.4) {
       lastIdleLine = now();
@@ -2490,6 +2632,13 @@
 
   function wake() {
     lastActive = now();
+    if (asleep) {
+      idling = false;
+      clearIdleSteps();
+      wakeUp();
+      scheduleIdle();
+      return;
+    }
     if (!idling) return;
     idling = false;
     clearIdleSteps();
