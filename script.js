@@ -208,7 +208,12 @@ function initExperienceShowcase() {
   root.querySelectorAll('.atelier-exp-item').forEach(function (item) {
     var btn = item.querySelector('.atelier-exp-row');
     if (!btn) return;
-    btn.addEventListener('click', function () {
+    btn.addEventListener('click', function (e) {
+      var mark = e.target.closest('.atelier-exp-mark[data-href]');
+      if (mark) {
+        window.open(mark.getAttribute('data-href'), '_blank', 'noopener');
+        return;
+      }
       var wasOpen = item.classList.contains('is-open');
       root.querySelectorAll('.atelier-exp-item').forEach(function (other) {
         other.classList.remove('is-open');
@@ -459,3 +464,31 @@ function initExperienceShowcase() {
   });
 })();
 
+// Footer "Let's ship.": plays the dot chain (atelier.css, fxf-*) once the mark
+// is in view, and again whenever it is hovered or tapped.
+(function () {
+  var mark = document.querySelector('.fx-footer-mark');
+  if (!mark || !('IntersectionObserver' in window)) return;
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  var busy = false;
+  mark.classList.add('is-armed');
+
+  function play() {
+    if (busy) return;
+    busy = true;
+    mark.classList.remove('is-live');
+    void mark.offsetWidth;
+    mark.classList.add('is-live');
+    setTimeout(function () { busy = false; }, 2200);
+  }
+
+  var io = new IntersectionObserver(function (entries) {
+    if (!entries[0].isIntersecting) return;
+    io.disconnect();
+    setTimeout(play, 650);
+  }, { threshold: 0.6 });
+  io.observe(mark);
+
+  mark.addEventListener('pointerenter', play);
+})();
