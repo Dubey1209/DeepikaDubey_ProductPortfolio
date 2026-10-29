@@ -100,7 +100,7 @@ symbol and every card follows. One-off icons stay inline.
 ## Cache busting
 
 Every stylesheet and script is referenced with a **single shared** `?v=` token
-(currently `20261175`; the mascot sheet URLs in `atelier.css` and the
+(currently `20261176`; the mascot sheet URLs in `atelier.css` and the
 `og:image` URLs carry it too).
 When you change any CSS, JS or mascot sheet, bump that token —
 in both `index.html` and `my-story.html`.
@@ -306,7 +306,7 @@ It follows the idea of [page-mascot](https://koboyo.com/page-mascot), which is a
 component; this is a plain-JS version (`mascot.js`) so the site keeps no React
 and no build step.
 
-It is two 3×3 sprite sheets in `mascots/`:
+It is three 3×3 sprite sheets in `mascots/`:
 
 - `deepika-directions.webp` — the head turned towards nine directions (rows up
   / level / down, columns left / centre / right). The frame follows the
@@ -316,6 +316,11 @@ It is two 3×3 sprite sheets in `mascots/`:
   when the pointer arrives, shy when it rests on her face, giggle when it
   scrubs over her, a friendly face per click, sometimes starry when a link is
   hovered). The table at the top of `mascot.js` is the full list.
+- `deepika-reactions-2.webp` — love (heart eyes), laugh, sleepy, excited,
+  puppy eyes, smug, confused, sad, playful (tongue out), shown through
+  `deepika-face-mask-2.png`. `mascot.js` numbers them 9–17 and fetches the
+  sheet after the first; until it arrives each borrows the nearest first-sheet
+  face. They come up in the little moments, poke lines and idle acts.
 
 Where she is poked decides how she reacts, and every poke gets a thought that
 belongs to the face she is making: a little cute, a little product manager, and
@@ -431,6 +436,11 @@ drawn ~3% smaller, so every reaction shrank her head and the end of it grew it
 back. It then moves each reaction until its skin (face outline, ears, neck)
 overlaps the centre frame's best; they had been drawn up to 9px off, which made
 the face jump on every expression.
+
+The second reaction sheet is marked `extra`: it is aligned the same way but
+left out of the shared size and scale, so adding it changed nothing in the
+first two sheets or the earrings measured on them. To rebuild only it and its
+mask, run `node tools/build-mascot.mjs --only=-2`.
 
 Two cut-out details that each showed on the dark theme:
 

@@ -29,6 +29,9 @@ import { statSync } from 'node:fs';
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const CHECK_ONLY = process.argv.includes('--check');
 const FORCE = process.argv.includes('--force');
+// --only=<text>: write only the sheets (and masks) whose output path contains it.
+const ONLY = (process.argv.find((a) => a.startsWith('--only=')) || '').slice(7);
+const writes = (path) => !ONLY || path.includes(ONLY);
 
 // `columns` maps each output column to a source column, optionally mirrored.
 //
@@ -55,15 +58,28 @@ const SHEETS = [
     // mascot.js lays these faces over the centre direction frame, so each one
     // is moved until its face sits exactly on that frame's face.
     alignFaces: true,
+    mask: 'mascots/deepika-face-mask.png',
+  },
+  {
+    // More faces, same treatment. Kept out of the shared sizing (extra), so
+    // adding it leaves the two sheets above, and the earrings measured on
+    // them, exactly as they were.
+    src: 'tools/mascot-src/deepika-reactions2-raw.jpg',
+    out: 'mascots/deepika-reactions-2.webp',
+    columns: [{ from: 0 }, { from: 1 }, { from: 2 }],
+    frontFacing: [0, 1, 2],
+    alignFaces: true,
+    extra: true,
+    faceOnly: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+    mask: 'mascots/deepika-face-mask-2.png',
   },
 ];
 
 // How far a reaction face may be moved onto the centre face, in output pixels.
 const ALIGN_REACH = 24;
-// The masks atelier.css shows reaction faces through, one per reaction in the
-// same 3x3 layout; see faceRegion.
-const FACE_MASK = 'mascots/deepika-face-mask.png';
-// Reactions mascot.js shows through that mask. Thinking (7) replaces the whole
+// Each sheet's `mask` is what atelier.css shows its faces through, one per
+// reaction in the same 3x3 layout; see faceRegion.
+// Reactions mascot.js shows through the first mask. Thinking (7) replaces the whole
 // figure and sleepy (8) is unused, so neither narrows it.
 const FACE_ONLY = [0, 1, 2, 3, 4, 5, 6];
 // The centre direction frame, which every reaction face is laid over.
@@ -903,8 +919,10 @@ async function main() {
     sheets.push({ ...sheet, img, bg, cells });
   }
 
-  // Both sheets are swapped between at runtime, so they are checked as one set.
+  // All sheets are swapped between at runtime, so they are checked as one set;
+  // the shared size and scale come from the original two only.
   const all = sheets.flatMap((s) => s.cells.map((c) => ({ ...c, sheet: s.out })));
+  const core = sheets.filter((s) => !s.extra).flatMap((s) => s.cells);
   const medH = median(all.map((c) => c.height));
   const medW = median(all.map((c) => c.width));
 
@@ -950,8 +968,8 @@ async function main() {
 
   // One scale for every frame: scaling frames individually would hide a size
   // jump by turning it into a different one.
-  const commonH = Math.min(...all.map((c) => c.height));
-  const maxW = Math.max(...all.map((c) => c.width));
+  const commonH = Math.min(...core.map((c) => c.height));
+  const maxW = Math.max(...core.map((c) => c.width));
   const fit = Math.min((CELL_H * 0.94) / commonH, (CELL_W * 0.98) / maxW);
   // Written at twice the display size: on high-density screens the browser
   // would otherwise upscale a 1x sheet itself, softening every outline.
@@ -961,9 +979,10 @@ async function main() {
   const h = Math.round(commonH * scale);
   let refSkin = null;
   let faceArea = null;
-  const faceMasks = [];
 
   for (const s of sheets) {
+    const faceMasks = (s.faceMasks = []);
+    const faceOnly = s.faceOnly || FACE_ONLY;
     const rgba = cutOut(s.img, s.bg);
     // Blurred so the bumps of the model's sketchy outer line become one smooth
     // curve. At 0.7 they survived as a serrated edge every few pixels down the
@@ -1045,7 +1064,7 @@ async function main() {
           // at once; a narrower one (shy) then cut the others' outer lashes
           // and the open eye beneath peeked out at the corner of a blink,
           // while the centre frame's alone let shy's outline show by her eye.
-          if (FACE_ONLY.includes(row * 3 + col)) {
+          if (faceOnly.includes(row * 3 + col)) {
             const aligned = skinMask(await placeInCell(piece, left, top, cellW, cellH), cellW, cellH);
             const region = faceRegion(aligned, cellW, cellH);
             faceMasks[row * 3 + col] = faceArea.map((v, p) => v & region[p]);
@@ -1083,12 +1102,13 @@ async function main() {
     // opens the specks of background between eyelash strokes, and on a face
     // layer those holes showed the open eye of the frame underneath as a
     // ghost at the corner of every blink.
-    const faceCells = s.alignFaces ? FACE_ONLY : [CENTRE_CELL];
+    const faceCells = s.alignFaces ? faceOnly : [CENTRE_CELL];
     for (const index of faceCells) {
       const region = s.alignFaces ? faceMasks[index] : faceArea;
       if (region) sealFace(sheet, cellW * 3, region, cellW, cellH, (index % 3) * cellW, Math.floor(index / 3) * cellH);
     }
 
+    if (!writes(s.out)) continue;
     await sharp(sheet, { raw: { width: cellW * 3, height: cellH * 3, channels: 4 } })
       // Above 1x, compression artefacts are smaller than a screen pixel, so a
       // lower quality than a 1x sheet would need still looks clean.
@@ -1099,8 +1119,14 @@ async function main() {
     console.log(`Wrote ${s.out}  (${cellW * 3} x ${cellH * 3}, scale ${scale.toFixed(3)}, ${Math.round(size / 1024)}KB)`);
   }
 
-  // A 3x3 sheet laid out like the reactions sheet, at display size: a soft
-  // mask needs no more. Feathered by a few pixels so a change has no edge.
+  for (const s of sheets) {
+    if (s.mask && writes(s.mask)) await writeMask(s.faceMasks, s.mask, cellW, cellH);
+  }
+}
+
+// A 3x3 sheet laid out like the reactions sheet, at display size: a soft
+// mask needs no more. Feathered by a few pixels so a change has no edge.
+async function writeMask(faceMasks, out, cellW, cellH) {
   const maskW = CELL_W;
   const maskH = CELL_H;
   const alpha = Buffer.alloc(maskW * 3 * maskH * 3);
@@ -1122,8 +1148,8 @@ async function main() {
   await sharp({ create: { width: maskW * 3, height: maskH * 3, channels: 3, background: '#ffffff' } })
     .joinChannel(alpha, { raw: { width: maskW * 3, height: maskH * 3, channels: 1 } })
     .png({ compressionLevel: 9 })
-    .toFile(join(ROOT, FACE_MASK));
-  console.log(`Wrote ${FACE_MASK}`);
+    .toFile(join(ROOT, out));
+  console.log(`Wrote ${out}`);
 }
 
 await main();

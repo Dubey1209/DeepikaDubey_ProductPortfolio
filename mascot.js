@@ -8,7 +8,10 @@
 //   directions  row = up / level / down, column = left / centre / right
 //   reactions   0 blink   1 wink      2 grin
 //               3 gasp    4 giggle    5 shy
-//               6 starry  7 thinking  8 sleepy (unused)
+//               6 angry   7 thinking  8 unimpressed
+//   reactions-2 9 love    10 laugh    11 sleepy
+//               12 excited 13 puppy   14 smug
+//               15 confused 16 sad    17 playful (tongue out)
 //
 // What triggers each reaction:
 //   pointer arrives on her      grin (at most every 15s)
@@ -24,17 +27,20 @@
 //
 // One character, not a slideshow:
 //   - An expression changes only her face. The reaction faces are drawn on
-//     separate layers masked to a soft oval over the eyes, nose and mouth, and
-//     the build aligns each one onto the centre direction frame's face. Her
-//     hair, outline and sweater never change for an expression, so nothing
-//     flickers around the edges and she reads as the same drawing.
-//   - Turning her head does swap the whole drawing, so that is a true
-//     cross-fade: the new frame fades in while the old one fades out on an
-//     overlapping curve. Hiding the old frame only once the new one is opaque
-//     made the outline jump at the end of every fade. A change that arrives
-//     mid-fade waits for it to finish instead of cutting it short.
-//   - She only turns once the cursor has settled on a new direction for a
-//     moment, and the closer the cursor, the further it has to move before she
+//     separate layers, each through a mask traced from the skin of the face
+//     (mascots/deepika-face-mask.png), and the build aligns each one onto the
+//     centre direction frame's face. Her hair, outline and sweater never
+//     change for an expression, so nothing flickers around the edges and she
+//     reads as the same drawing. The faces look straight out, so while she is
+//     turned away a feeling shows as body language (a nod, a blush, a hop)
+//     instead of turning her to the front and then changing the face.
+//   - Turning her head does swap the whole drawing, so that is a cross-fade
+//     on overlapping curves, over 260ms, during which both frames slide so
+//     their faces stay on the same spot (FOLLOW, FACE_OFFSET): the face glides
+//     from where it was to where it lands instead of showing twice. A change
+//     that arrives mid-fade starts from what is on screen at that moment.
+//   - She only turns once the cursor has settled on a new direction for
+//     140ms, and the closer the cursor, the further it has to move before she
 //     turns. Near her, small movements sweep through every angle, which used to
 //     flip her head back and forth.
 //   - The lean towards the cursor is a spring, not a CSS transition. Turning
@@ -49,17 +55,30 @@
 // The reaction sheet (atelier.css, --mascot-react) loads once the page has,
 // so it doesn't compete with the fonts and the direction sheet for first
 // paint; .has-reactions switches it on everywhere (here and the lock door).
+// The second reaction sheet (--mascot-react-2) follows the first and sets
+// .has-reactions-2; until then its faces stand in with a first-sheet one.
 (function () {
   var root = document.documentElement;
-  function ready() { root.classList.add('has-reactions'); }
-  function load() {
-    var match = /url\(["']?([^"')]+)["']?\)/.exec(getComputedStyle(root).getPropertyValue('--mascot-react'));
+  function fetchSheet(prop, cls, then) {
+    var done = false;
+    var ready = function () {
+      if (done) return;
+      done = true;
+      root.classList.add(cls);
+      if (then) then();
+    };
+    var match = /url\(["']?([^"')]+)["']?\)/.exec(getComputedStyle(root).getPropertyValue(prop));
     if (!match) return ready();
     var img = new Image();
     img.onload = ready;
     img.onerror = ready;
     img.src = match[1];
     if (img.decode) img.decode().then(ready, function () {});
+  }
+  function load() {
+    fetchSheet('--mascot-react', 'has-reactions', function () {
+      fetchSheet('--mascot-react-2', 'has-reactions-2');
+    });
   }
   function soon() {
     if (window.requestIdleCallback) window.requestIdleCallback(load, { timeout: 1500 });
@@ -87,12 +106,25 @@
   var GASP = 3;
   var GIGGLE = 4;
   var SHY = 5;
-  // Cell 6 was star eyes, which read as blurry, oversized sparkles, so her
-  // "excited" moments use the open grin and the cell holds her angry pout.
-  var STARRY = GRIN;
+  // Cell 6 was star eyes, which read as blurry, oversized sparkles, so the
+  // cell holds her angry pout; "excited" moments use EXCITED below.
   var ANGRY = 6;
   var THINKING = 7;
   var UNIMPRESSED = 8;
+  // The second reaction sheet, numbered on from the first (index - 9 is its
+  // cell). Same face masks idea, its own mask file.
+  var LOVE = 9;
+  var LAUGH = 10;
+  var SLEEPY = 11;
+  var EXCITED = 12;
+  var PUPPY = 13;
+  var SMUG = 14;
+  var CONFUSED = 15;
+  var SAD = 16;
+  var PLAYFUL = 17;
+  var STARRY = EXCITED;
+  // While the second sheet is still on its way, the nearest first-sheet face.
+  var STAND_IN = [SHY, GIGGLE, BLINK, GRIN, SHY, WINK, UNIMPRESSED, UNIMPRESSED, GIGGLE];
   var CENTRE = 4;
   // Reactions whose drawing reaches outside the face (her hand), so they
   // replace the whole figure rather than only the face.
@@ -135,13 +167,18 @@
   function paint(layer, sheet, index) {
     // Until the reaction sheet has arrived, a reaction holds the centre frame
     // rather than fading to an empty layer.
-    if (sheet === 'react' && !document.documentElement.classList.contains('has-reactions')) {
+    var html = document.documentElement;
+    if (sheet === 'react' && index >= 9 && !html.classList.contains('has-reactions-2')) index = STAND_IN[index - 9];
+    if (sheet === 'react' && !html.classList.contains('has-reactions')) {
       sheet = 'look';
       index = CENTRE;
     }
+    var second = sheet === 'react' && index >= 9;
+    if (second) index -= 9;
     var position = (index % 3) * 50 + '% ' + Math.floor(index / 3) * 50 + '%';
     layer.classList.toggle('is-look', sheet === 'look');
-    layer.classList.toggle('is-react', sheet === 'react');
+    layer.classList.toggle('is-react', sheet === 'react' && !second);
+    layer.classList.toggle('is-react2', second);
     layer.style.backgroundPosition = position;
     // Face layers have one mask per reaction, laid out like the sheet.
     layer.style.webkitMaskPosition = position;
@@ -249,15 +286,32 @@
     if (!running) return;
     this.running = null;
     var now = this.layers.map(function (layer) {
-      return getComputedStyle(layer).opacity;
+      var cs = getComputedStyle(layer);
+      return [cs.opacity, cs.getPropertyValue('--face-sx'), cs.getPropertyValue('--face-sy')];
     });
     running.forEach(function (a) {
       a.cancel();
     });
+    var follow = this.follow;
     this.layers.forEach(function (layer, i) {
-      layer.style.opacity = now[i];
+      layer.style.opacity = now[i][0];
+      if (follow) {
+        layer.style.setProperty('--face-sx', now[i][1] || '0%');
+        layer.style.setProperty('--face-sy', now[i][2] || '0%');
+      }
     });
   };
+
+  // Where the face sits in a frame, relative to the centre direction frame
+  // (FACE_OFFSET, % of the box). Reaction frames are aligned onto the centre.
+  function faceAt(key) {
+    if (key.indexOf('look:') !== 0) return [0, 0];
+    return FACE_OFFSET[+key.slice(5)] || [0, 0];
+  }
+
+  function shiftOf(layer, prop) {
+    return parseFloat(layer.style.getPropertyValue(prop)) || 0;
+  }
 
   Pair.prototype.show = function (sheet, index, ms) {
     var key = sheet + ':' + index;
@@ -270,9 +324,25 @@
       if (!incoming || +layer.style.opacity < +incoming.style.opacity) incoming = layer;
     });
     var previous = this.key ? this.front : null;
+    var previousKey = this.key;
     this.front = incoming;
     this.key = key;
     paint(incoming, sheet, index);
+    incoming.faceKey = key;
+    if (this.follow) {
+      // The incoming frame starts with its face where the visible one's face
+      // is now, so the two never show as a double face mid-fade.
+      var to = faceAt(key);
+      var startX = 0;
+      var startY = 0;
+      if (previous && previousKey) {
+        var was = faceAt(previousKey);
+        startX = (was[0] - to[0]) * FOLLOW + shiftOf(previous, '--face-sx');
+        startY = (was[1] - to[1]) * FOLLOW + shiftOf(previous, '--face-sy');
+      }
+      incoming.style.setProperty('--face-sx', startX + '%');
+      incoming.style.setProperty('--face-sy', startY + '%');
+    }
     // Newest on top, the one it replaces just below, anything older beneath.
     this.layers.forEach(function (layer) {
       layer.style.zIndex = String(layer === incoming ? self.z + 2 : layer === previous ? self.z + 1 : self.z);
@@ -328,6 +398,30 @@
         fill: 'backwards',
       }));
     });
+
+    // Every face on screen glides to where the incoming frame's face rests,
+    // the way a head carries the face round as it turns.
+    if (this.follow && incoming) {
+      var to = faceAt(incoming.faceKey || '');
+      [incoming].concat(outgoing).forEach(function (layer) {
+        var at = faceAt(layer.faceKey || '');
+        var endX = layer === incoming ? 0 : (to[0] - at[0]) * FOLLOW;
+        var endY = layer === incoming ? 0 : (to[1] - at[1]) * FOLLOW;
+        var fromX = shiftOf(layer, '--face-sx');
+        var fromY = shiftOf(layer, '--face-sy');
+        layer.style.setProperty('--face-sx', endX + '%');
+        layer.style.setProperty('--face-sy', endY + '%');
+        if (!animate || (fromX === endX && fromY === endY)) return;
+        anims.push(layer.animate([
+          { '--face-sx': fromX + '%', '--face-sy': fromY + '%' },
+          { '--face-sx': endX + '%', '--face-sy': endY + '%' },
+        ], {
+          duration: ms,
+          easing: 'cubic-bezier(0.45, 0, 0.25, 1)',
+          fill: 'backwards',
+        }));
+      });
+    }
     if (!anims.length) return;
 
     var self = this;
@@ -337,7 +431,15 @@
     }, function () {});
   };
 
+  // How much of the face's travel between two frames the layers make up while
+  // they cross-fade. All of it would line the faces up exactly but slide the
+  // shoulders, which stay put in a real turn, by as much; most of it keeps the
+  // eyes and mouth together and the body's drift small.
+  var FOLLOW = 0.8;
+
   var body = new Pair([layerA, layerB, layerC], 1, 'look:' + CENTRE);
+  body.follow = !reducedMotion;
+  layerA.faceKey = 'look:' + CENTRE;
   var face = new Pair([makeLayer(), makeLayer(), makeLayer()], 3, '');
   face.through = true;
   paint(layerA, 'look', CENTRE);
@@ -377,13 +479,22 @@
     if (index === SHY) {
       blushFor(ms || 2400);
       moveBody('tilt');
-    } else if (index === GRIN || index === WINK) {
+    } else if (index === LOVE) {
+      blushFor(ms || 2400);
+      moveBody('hop');
+      burst('heart');
+    } else if (index === GRIN || index === WINK || index === SMUG || index === PLAYFUL) {
       moveBody('nod');
-    } else if (index === GIGGLE) {
+    } else if (index === GIGGLE || index === LAUGH) {
       moveBody('squish');
-    } else if (index === GASP) {
+    } else if (index === GASP || index === EXCITED) {
       moveBody('jump');
-    } else if (index === THINKING || index === UNIMPRESSED) {
+    } else if (index === SLEEPY) {
+      moveBody('doze');
+      burst('zzz');
+    } else if (index === PUPPY || index === SAD) {
+      moveBody('tilt');
+    } else if (index === THINKING || index === UNIMPRESSED || index === CONFUSED) {
       moveBody('tilt');
       burst('ask');
     }
@@ -396,7 +507,10 @@
   // force: a big moment (the theme flipping) is worth turning to face the
   // visitor for, wherever the cursor is.
   function react(index, ms, auto, force) {
-    if (!force && cursorAside()) {
+    // Turned away (following the cursor, or glancing round on her own), a
+    // reaction would mean swapping the whole drawing to face front and then
+    // the face on top: two picture changes for one feeling.
+    if (!force && (cursorAside() || (index !== BLINK && wantLook !== CENTRE))) {
       if (reacting >= 0) endReaction(LET_GO_MS);
       if (index !== BLINK) heldReaction(index, ms);
       return;
@@ -524,13 +638,17 @@
   // ahead at a cursor that was clearly up and to one side.
   var ENTER = 0.42;
   var LEAVE = 0.22;
-  // She settles on a direction only once the cursor has held it this long.
-  var SETTLE_MS = 30;
-  // A head turn is one quick cross-fade straight to the frame the cursor is
-  // in. Only a turn right across (left to right, up to down) passes through
-  // the middle, in two fast steps, or both heads showed at once.
-  var TURN_MS = 120;
-  var STEP_MS = 80;
+  // She settles on a direction only once the cursor has held it this long,
+  // about a person's reaction time. At 30ms every flick of the mouse swapped
+  // the drawing, which read as a slideshow.
+  var SETTLE_MS = 140;
+  // A head turn is one cross-fade straight to the frame the cursor is in,
+  // with the face gliding between the two (FOLLOW). At 120ms it was about
+  // seven frames, which the eye reads as a cut. Only a turn right across
+  // (left to right, up to down) passes through the middle, in two
+  // overlapping steps, or both heads showed at once.
+  var TURN_MS = 260;
+  var STEP_MS = 190;
   // Letting go of an expression to follow the cursor. At TURN_MS the face
   // snapped off (0.86 -> 0.44 between two frames); a feeling fades slower
   // than a glance moves.
@@ -585,7 +703,7 @@
     }
     setFaceOffset(lookIndex);
     clearTimeout(lookTimer);
-    if (lookIndex !== wantLook) lookTimer = setTimeout(commitLook, STEP_MS - 10);
+    if (lookIndex !== wantLook) lookTimer = setTimeout(commitLook, STEP_MS * 0.6);
   }
 
   function aim() {
@@ -1014,7 +1132,7 @@
         [GIGGLE, 'boop accepted. please boop responsibly'],
         'ow! my nose was minding its own business',
         [WINK, 'you have a very boopable finger, huh?'],
-        [GIGGLE, 'hehe, my nose just did a little wiggle'],
+        [PLAYFUL, 'hehe, my nose just did a little wiggle'],
         'eep! the nose has left the chat',
         [SHY, 'okay, that was kind of cute. don’t tell anyone'],
         [GIGGLE, 'boop count: one. friendship level: up'],
@@ -1047,10 +1165,10 @@
         'okay, eyes off the dashboard for a sec',
         'careful, I squint at every pixel',
         'ow! these have been staring at screens all day',
-        'blink… just resting my eyes. not sleeping. promise.',
+        [SLEEPY, 'blink… just resting my eyes. not sleeping. promise.'],
         [GIGGLE, 'hey! I wasn’t done rolling them yet'],
-        'eyes closed. pretending it’s still the weekend',
-        'blink! five more minutes, please',
+        [SLEEPY, 'eyes closed. pretending it’s still the weekend'],
+        [SLEEPY, 'five more minutes, please'],
         [WINK, 'wink wink. you saw nothing'],
         'ow! my screen time report is judging me already',
         'blink… did I leave the stove on? no. okay.',
@@ -1063,7 +1181,7 @@
     cheek: {
       face: SHY,
       lines: [
-        'aww, you’re making me blush',
+        [LOVE, 'aww, you’re making me blush'],
         'stop it… my NPS just went up',
         'blushing is a feature, not a bug',
         'hehe, these cheeks are on the roadmap',
@@ -1077,7 +1195,7 @@
         'hehe, my cheeks have a fan club now',
         'aww, thanks for stopping by my portfolio',
         'okay, you just made my whole sprint',
-        'you’re officially my favourite visitor',
+        [LOVE, 'you’re officially my favourite visitor'],
         'stop, I’m blushing in production',
         'aww, small gesture, big impact',
         'hehe, that’s the cutest feedback so far',
@@ -1091,7 +1209,7 @@
         'aww, this is the nicest thing on my screen today',
         'okay, I’m blushing. act normal. act normal.',
         [GIGGLE, 'cheek squeeze? that’s grandma-level love'],
-        'aww, you’re cute too, you know',
+        [LOVE, 'aww, you’re cute too, you know'],
         'hehe, I go pink faster than my phone dies',
         [WINK, 'careful, blushing is contagious'],
         'aww, whoever you are, you’re doing great',
@@ -1126,11 +1244,11 @@
         'mmf! I was about to say something smart, I swear',
         [GRIN, 'smile on. even on Mondays. mostly.'],
         'mmph! and that was my last brain cell talking',
-        [GIGGLE, 'pfft! you made me laugh at the wrong time'],
-        [WINK, 'shh, the snacks are a secret'],
-        'mmf! I was mid-yawn, how rude',
+        [LAUGH, 'pfft! you made me laugh at the wrong time'],
+        [PLAYFUL, 'shh, the snacks are a secret'],
+        [SLEEPY, 'mmf! I was mid-yawn, how rude'],
         [GRIN, 'this smile is powered by snacks and good vibes'],
-        [GIGGLE, 'hehe, I laugh at my own jokes. someone has to'],
+        [LAUGH, 'haha, I laugh at my own jokes. someone has to'],
         'mmf! okay fine, I’ll stop talking. for 5 seconds.',
         [GRIN, 'smiling because you clicked. that’s all it takes'],
         [WINK, 'lips sealed. the gossip stays in here'],
@@ -1160,13 +1278,13 @@
         'idea received. now, does it earn a place?',
         [THINKING, 'hmm, slides or a working MVP? MVP.'],
         'knock knock, it’s product intuition',
-        'tap tap… 47 tabs open in here, sorry',
+        [CONFUSED, 'tap tap… 47 tabs open in here, sorry'],
         [THINKING, 'hmm, did I reply to that message? …no.'],
         'boop! you just interrupted a shower thought',
         [THINKING, 'overthinking: 100%. sleep: 0%'],
-        'tap! the brain is buffering, please wait',
+        [CONFUSED, 'tap! the brain is buffering, please wait'],
         [GIGGLE, 'knock knock… nobody’s home, it’s 3pm'],
-        [THINKING, 'hmm, what was I doing? oh yes. nothing.'],
+        [CONFUSED, 'wait, what was I doing? oh yes. nothing.'],
         'tap! ideas at 2am, sleep at never',
         [WINK, 'big brain moment incoming… any second now'],
         'boop! you reset my train of thought. thanks?',
@@ -1185,7 +1303,7 @@
         [THINKING, 'sometimes I think, short hair? then I see these waves. never.'],
         [THINKING, 'what if I cut them short… how would I even look?'],
         [THINKING, 'a bob cut, maybe? …my hair just said no'],
-        [GIGGLE, 'humidity: 90%. my hair: 300%'],
+        [LAUGH, 'humidity: 90%. my hair: 300%'],
         [GIGGLE, 'every wave has a mood. today it’s dramatic'],
         'one touch, one tangle. choose wisely',
         [WINK, 'yes, they’re real. no, I won’t share my oil'],
@@ -1218,7 +1336,7 @@
       face: UNIMPRESSED,
       lines: [
         'great. now that’s one more oil session',
-        'I can feel a knot forming. thanks.',
+        [SAD, 'I can feel a knot forming. thanks.'],
         [GASP, 'stop! the comb is all the way in my room'],
         'fine, ruffle them. you’re oiling them later',
         'okay, you clearly don’t own a comb',
@@ -1263,9 +1381,9 @@
       lines: [
         'okay fine, I can’t stay angry. they forgive you',
         [GIGGLE, 'hmph… they do look good messy though'],
-        'truce? you bring the oil, I bring the comb',
+        [PUPPY, 'truce? you bring the oil, I bring the comb'],
         [GIGGLE, 'okay, I was never really angry. maybe a little.'],
-        'fine, you win. but next time, ask first',
+        [PUPPY, 'fine, you win. but next time, ask first'],
         [GIGGLE, 'angry mode lasted 6 seconds. a new record'],
       ],
     },
@@ -1292,7 +1410,7 @@
         [GRIN, 'yes! I pick accessories like I pick features'],
         [SHY, 'aww, you noticed. most people miss them'],
         'details are where the delight hides',
-        [GIGGLE, 'I always lose one earring. never both. why?'],
+        [CONFUSED, 'I always lose one earring. never both. why?'],
         [GRIN, 'yes, I heard that. I hear everything'],
         'tiny earrings, giant mood boost',
         [WINK, 'they swing when I’m excited. like now'],
@@ -1318,7 +1436,7 @@
         'hehe, that’s not in the spec',
         [THINKING, 'hmm, chin on hand, user in mind'],
         'hehe, ticklish chins are a known issue',
-        [WINK, 'chin up, scope down'],
+        [SMUG, 'chin up, scope down'],
         'hehe! okay, you found the weak spot',
         [THINKING, 'stroking my chin… very product of me'],
         [GRIN, 'chin poke counted as positive feedback'],
@@ -1357,7 +1475,7 @@
         'hehe, careful, I’m wrapped like a burrito in here',
         [GIGGLE, 'eek! I laughed so hard my turtleneck moved'],
         [GRIN, 'cosy level: blanket, chai and a good playlist'],
-        [SHY, 'aww, now I want a nap'],
+        [SLEEPY, 'aww, now I want a nap'],
         'hehe, no tickling before coffee, please',
         [WINK, 'neck deep in cosiness. and work.'],
       ],
@@ -1390,9 +1508,9 @@
         [SHY, 'it’s like wearing a hug all day'],
         [GIGGLE, 'hehe, stripes make everything look planned'],
         'careful, this sweater has been through many deadlines',
-        [WINK, 'comfy outside, chaotic inside'],
+        [PLAYFUL, 'comfy outside, chaotic inside'],
         [SHY, 'soft clothes, big dreams'],
-        [GIGGLE, 'I could nap in this sweater right now'],
+        [SLEEPY, 'I could nap in this sweater right now'],
         [GRIN, 'stripes: because plain is too easy'],
       ],
     },
@@ -1404,7 +1522,7 @@
         'hehe, hi there!',
         [STARRY, 'accessibility win! hello!'],
         'tab, tab, enter… hi!',
-        [STARRY, 'a keyboard user! my favourite'],
+        [LOVE, 'a keyboard user! my favourite'],
         'hi! thanks for exploring',
         'hello! I’m Deepika, nice to meet you',
         [WINK, 'hi! the case studies are just below'],
@@ -1412,7 +1530,7 @@
         [STARRY, 'welcome! make yourself at home'],
         'hi! hiring for product? let’s talk',
         [GRIN, 'hi! hope your day is going nicely'],
-        [WINK, 'hello! you look like someone with great taste'],
+        [SMUG, 'hello! you look like someone with great taste'],
         'hey! grab a snack, stay a while',
         [STARRY, 'hi! you just made my day a little brighter'],
         'hello! no mouse needed, I like your style',
@@ -1426,7 +1544,7 @@
       face: THINKING,
       lines: [
         'hmm… is this a usability test?',
-        'so many clicks… A/B testing me?',
+        [CONFUSED, 'so many clicks… A/B testing me?'],
         'hmm, is this rage-clicking?',
         'are you measuring my response time?',
         'hmm, that’s a lot of engagement…',
@@ -1441,12 +1559,12 @@
       face: SHY,
       lines: [
         'okay, engagement is way up',
-        'you really like me, huh?',
+        [LOVE, 'you really like me, huh?'],
         'stop, I’m getting attached',
         'daily active user: you',
         'stop it, you’re too sweet',
         'okay, we’re friends now. it’s official',
-        'aww, you keep coming back',
+        [PUPPY, 'aww, you keep coming back'],
       ],
     },
     {
@@ -1595,33 +1713,39 @@
   }
 
   // Little moments: a run of faces with a body move, a small effect and a
-  // line, so a tap is never quite predictable. The sheets only hold nine
+  // line, so a tap is never quite predictable. The sheets only hold eighteen
   // faces; it is the sequence, the move and the effect that make each one
   // its own expression. Dealt like the lines, every one before any repeats.
   // steps: [face, ms]; move: a class on her box (see .is-m-* in atelier.css).
   var MOMENTS = [
     { id: 'hum', steps: [[GIGGLE, 900], [BLINK, 900], [GIGGLE, 700]], move: 'dance', fx: 'note', line: 'la la la… don’t mind me' },
-    { id: 'aha', steps: [[THINKING, 1000], [GASP, 260], [GRIN, 1300]], move: 'hop', fx: 'bulb', at: 1000, line: 'ooh! I just had an idea' },
+    { id: 'aha', steps: [[THINKING, 1000], [GASP, 260], [EXCITED, 1300]], move: 'hop', fx: 'bulb', at: 1000, line: 'ooh! I just had an idea' },
     { id: 'sneeze', steps: [[GASP, 420], [GASP, 380], [BLINK, 260], [GIGGLE, 1100]], move: 'sneeze', at: 800, sayAt: 700, line: 'a-a-achoo! …excuse me' },
     { id: 'shy', steps: [[SHY, 2400]], move: 'tilt', fx: 'heart', blush: true, line: 'stop it, you’re making me blush' },
     { id: 'dizzy', steps: [[GASP, 500], [BLINK, 500], [GIGGLE, 1000]], move: 'dizzy', fx: 'spark', line: 'whee! the page is spinning' },
-    { id: 'sleepy', steps: [[BLINK, 1700], [GASP, 500], [GRIN, 900]], move: 'doze', fx: 'zzz', sayAt: 1700, line: 'huh? no no, I’m awake!' },
-    { id: 'confused', steps: [[THINKING, 1500], [UNIMPRESSED, 900]], move: 'tilt', fx: 'ask', line: 'wait… what were we doing?' },
-    { id: 'proud', steps: [[GRIN, 1600]], move: 'bounce', fx: 'spark', line: 'nailed it, as usual' },
+    { id: 'sleepy', steps: [[SLEEPY, 1700], [GASP, 500], [GRIN, 900]], move: 'doze', fx: 'zzz', sayAt: 1700, line: 'huh? no no, I’m awake!' },
+    { id: 'confused', steps: [[THINKING, 1300], [CONFUSED, 1100]], move: 'tilt', fx: 'ask', line: 'wait… what were we doing?' },
+    { id: 'proud', steps: [[SMUG, 1600]], move: 'bounce', fx: 'spark', line: 'nailed it, as usual' },
     { id: 'secret', steps: [[WINK, 900], [SHY, 1200]], move: 'lean', blush: true, line: 'psst… I like you already' },
-    { id: 'judging', steps: [[UNIMPRESSED, 1500], [GIGGLE, 800]], move: 'shake', line: 'hmm. I’ll allow it' },
+    { id: 'judging', steps: [[UNIMPRESSED, 1300], [SMUG, 1000]], move: 'shake', line: 'hmm. I’ll allow it' },
     { id: 'tickled', steps: [[GIGGLE, 700], [BLINK, 200], [GIGGLE, 900]], move: 'squish', line: 'hehe, that tickles!' },
     { id: 'nervous', steps: [[GASP, 700], [SHY, 1300]], move: 'shiver', fx: 'sweat', line: 'uh oh… was that a bug?' },
-    { id: 'aww', steps: [[SHY, 900], [GRIN, 1200]], move: 'hop', fx: 'heart', blush: true, line: 'aww, you’re sweet' },
+    { id: 'aww', steps: [[SHY, 900], [LOVE, 1300]], move: 'hop', fx: 'heart', blush: true, line: 'aww, you’re sweet' },
     { id: 'startled', steps: [[GASP, 900], [GIGGLE, 1000]], move: 'jump', fx: 'bang', line: 'eep! you scared me' },
     { id: 'agree', steps: [[GRIN, 1500]], move: 'nod', line: 'yep, yep, totally agree' },
-    { id: 'cool', steps: [[WINK, 1500]], move: 'tilt', fx: 'spark', line: 'too cool for a bug report' },
-    { id: 'yawn', steps: [[GASP, 1100], [BLINK, 900], [GRIN, 600]], move: 'stretch', fx: 'zzz', line: '*yawn*… long design review' },
-    { id: 'cheer', steps: [[GRIN, 700], [GIGGLE, 700], [GRIN, 600]], move: 'bounce', fx: 'note', line: 'woohoo! you found me!' },
-    { id: 'pout', steps: [[UNIMPRESSED, 1100], [SHY, 1000]], move: 'shake', line: 'hmph. fine. one more boop' },
-    { id: 'calc', steps: [[THINKING, 1400], [GRIN, 900]], move: 'dance', fx: 'ask', line: 'calculating cuteness… 100%' },
+    { id: 'cool', steps: [[SMUG, 1500]], move: 'tilt', fx: 'spark', line: 'too cool for a bug report' },
+    { id: 'yawn', steps: [[SLEEPY, 1300], [BLINK, 700], [GRIN, 600]], move: 'stretch', fx: 'zzz', line: '*yawn*… long design review' },
+    { id: 'cheer', steps: [[EXCITED, 800], [LAUGH, 800], [GRIN, 600]], move: 'bounce', fx: 'note', line: 'woohoo! you found me!' },
+    { id: 'pout', steps: [[UNIMPRESSED, 1000], [PUPPY, 1200]], move: 'shake', line: 'hmph. fine. one more boop' },
+    { id: 'calc', steps: [[THINKING, 1400], [SMUG, 900]], move: 'dance', fx: 'ask', line: 'calculating cuteness… 100%' },
     { id: 'peek', steps: [[BLINK, 900], [WINK, 1000]], move: 'lean', fx: 'heart', line: 'peekaboo!' },
-    { id: 'wow', steps: [[GASP, 1100], [GRIN, 900]], move: 'jump', fx: 'spark', line: 'whoa, you have great taste' },
+    { id: 'wow', steps: [[GASP, 900], [EXCITED, 1100]], move: 'jump', fx: 'spark', line: 'whoa, you have great taste' },
+    { id: 'smitten', steps: [[LOVE, 1800], [SHY, 900]], move: 'tilt', fx: 'heart', blush: true, line: 'okay, I think I have a tiny crush on this page' },
+    { id: 'lol', steps: [[LAUGH, 1300], [GIGGLE, 800]], move: 'squish', fx: 'note', line: 'hahaha… wait, what was funny?' },
+    { id: 'blep', steps: [[PLAYFUL, 1500]], move: 'nod', line: 'blep! very professional, I know' },
+    { id: 'sulk', steps: [[SAD, 1200], [PUPPY, 1100], [GRIN, 800]], move: 'tilt', line: 'nobody read my case studies… kidding, you will' },
+    { id: 'please', steps: [[PUPPY, 1600], [SHY, 800]], move: 'lean', blush: true, line: 'pretty please read one case study?' },
+    { id: 'lost', steps: [[CONFUSED, 1400], [GIGGLE, 800]], move: 'shake', fx: 'ask', line: 'wait, which tab was I on?' },
   ];
 
   var momentTimers = [];
@@ -1807,7 +1931,7 @@
   el.addEventListener('pointerenter', function () {
     if (now() - lastGreet < 15000 || reacting >= 0) return;
     lastGreet = now();
-    react(GRIN, 1900, true);
+    react(Math.random() < 0.3 ? EXCITED : GRIN, 1900, true);
   });
 
   // A pointer resting on her for a moment gets a passing thought, at most
@@ -1853,7 +1977,7 @@
     reversals.push(t);
     if (reversals.length >= 5) {
       reversals = [];
-      react(GIGGLE, 1900, true);
+      react(Math.random() < 0.5 ? LAUGH : GIGGLE, 1900, true);
     }
   });
 
@@ -1965,9 +2089,9 @@
         'ahh, cosy mode. blanket, chai, done',
         'lights off, ideas on',
         'shh… the pixels are sleeping',
-        [WINK, 'dark mode: now I look mysterious'],
+        [SMUG, 'dark mode: now I look mysterious'],
         'night shift: fairy lights and focus',
-        [SHY, 'finally, my eyes can relax'],
+        [SLEEPY, 'finally, my eyes can relax'],
         [GRIN, 'moon’s out. time for big ideas'],
         'no sunscreen needed. moonscreen, maybe',
         'less glare, fewer squints. good UX',
@@ -2043,8 +2167,8 @@
   }
 
   // Copying text from the page, and coming back to the tab.
-  var COPIED = { face: STARRY, lines: ['copying my lines? I’m flattered', [WINK, 'ctrl+c? excellent taste'], [GRIN, 'ooh, quote me on that'], [WINK, 'credit the author, okay?'], 'copy-paste is a valid design pattern'] };
-  var WELCOME_BACK = { face: GRIN, lines: ['oh, you’re back!', [SHY, 'missed you. kidding. a little'], [WINK, 'welcome back! I kept your seat warm'], 'hey! I knew you’d come back', [WINK, 'other tab was boring, right?'], [GRIN, 'back already? the bounce rate thanks you']] };
+  var COPIED = { face: STARRY, lines: ['copying my lines? I’m flattered', [SMUG, 'ctrl+c? excellent taste'], [GRIN, 'ooh, quote me on that'], [WINK, 'credit the author, okay?'], 'copy-paste is a valid design pattern'] };
+  var WELCOME_BACK = { face: GRIN, lines: ['oh, you’re back!', [PUPPY, 'missed you. kidding. a little'], [WINK, 'welcome back! I kept your seat warm'], 'hey! I knew you’d come back', [SMUG, 'other tab was boring, right?'], [GRIN, 'back already? the bounce rate thanks you']] };
 
   document.addEventListener('copy', function () {
     if (!visible || reacting >= 0) return;
@@ -2121,13 +2245,13 @@
     face: GIGGLE,
     lines: [
       '♪ hmm hm hmm… ♪',
-      'still there? I’ll wait, no rush',
+      [PUPPY, 'still there? I’ll wait, no rush'],
       [THINKING, 'what should I build next…'],
       'scroll down, the work is good, I promise',
       [WINK, 'taking a tiny break. same as you?'],
       [THINKING, 'hmm, did I ship that fix?'],
       'is this a meeting that could’ve been an email?',
-      [WINK, 'I’m not idle, I’m “strategically paused”'],
+      [SMUG, 'I’m not idle, I’m “strategically paused”'],
       'your cursor is very calm. teach me',
       [THINKING, 'blinking… in a user-centred way'],
       'staring contest? I never lose. I blink in style',
@@ -2171,7 +2295,12 @@
       gazeTo(first);
       var hold = 1700 + Math.random() * 1400;
       if (Math.random() < 0.3) {
-        var second = GLANCES[Math.floor(Math.random() * GLANCES.length)];
+        // A neighbour of the first, so the second look is one small turn
+        // rather than a sweep across through the middle.
+        var near = GLANCES.filter(function (g) {
+          return g !== first && Math.abs((g % 3) - (first % 3)) <= 1 && Math.abs(Math.floor(g / 3) - Math.floor(first / 3)) <= 1;
+        });
+        var second = near.length ? near[Math.floor(Math.random() * near.length)] : first;
         later(function () { gazeTo(second); }, hold);
         hold += 1400 + Math.random() * 1000;
       }
@@ -2199,6 +2328,17 @@
       react(THINKING, 3000, true);
       return 3400;
     }],
+    // Drowsy, the lids heavy for a while, then back.
+    [8, function () {
+      react(SLEEPY, 2600, true);
+      burst('zzz');
+      return 3100;
+    }],
+    // A sly little smile, pleased with herself.
+    [6, function () {
+      react(SMUG, 2000, true);
+      return 2500;
+    }],
     // An eye roll, unhurried: up and round, a beat, back with a blink.
     [6, function () {
       var path = [3, 0, 1, 2];
@@ -2219,7 +2359,7 @@
     // Now and then one of her little moments, to herself: humming, dozing
     // off, a sneeze, a happy wiggle.
     [10, function () {
-      var quietOnes = ['hum', 'sleepy', 'sneeze', 'shy', 'tickled', 'yawn', 'aha', 'peek'];
+      var quietOnes = ['hum', 'sleepy', 'sneeze', 'shy', 'tickled', 'yawn', 'aha', 'peek', 'blep', 'lost', 'smitten'];
       var pick = quietOnes[Math.floor(Math.random() * quietOnes.length)];
       var m = MOMENTS.filter(function (x) { return x.id === pick; })[0];
       return playMoment(m, true) + 400;
@@ -2276,6 +2416,22 @@
     [10, function () {
       react(WINK, 1700, true);
       return 2200;
+    }],
+    // Heart eyes, briefly, with a blush.
+    [8, function () {
+      react(LOVE, 2200, true);
+      blushFor(2400);
+      return 2700;
+    }],
+    // A cheeky tongue out.
+    [6, function () {
+      react(PLAYFUL, 1600, true);
+      return 2100;
+    }],
+    // Big hopeful eyes at the visitor.
+    [6, function () {
+      react(PUPPY, 2000, true);
+      return 2500;
     }],
   ];
 
