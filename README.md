@@ -100,7 +100,7 @@ symbol and every card follows. One-off icons stay inline.
 ## Cache busting
 
 Every stylesheet and script is referenced with a **single shared** `?v=` token
-(currently `20261178`; the mascot sheet URLs in `atelier.css` and the
+(currently `20261179`; the mascot sheet URLs in `atelier.css` and the
 `og:image` URLs carry it too).
 When you change any CSS, JS or mascot sheet, bump that token —
 in both `index.html` and `my-story.html`.
