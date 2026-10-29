@@ -1638,12 +1638,12 @@ html.atelier .atelier-mascot-layer.is-look {
 /* Phones get a lighter copy of the direction sheet: the mascot is drawn at
    about 240px there, so the full-size cells are wasted bytes on slow links. */
 html.atelier {
-  --mascot-look: url('mascots/deepika-directions.webp?v=20261162');
+  --mascot-look: url('mascots/deepika-directions.webp?v=20261163');
 }
 
 @media (max-width: 760px) {
   html.atelier {
-    --mascot-look: url('mascots/deepika-directions-sm.webp?v=20261162');
+    --mascot-look: url('mascots/deepika-directions-sm.webp?v=20261163');
   }
 }
 
@@ -1652,7 +1652,7 @@ html.atelier {
    has loaded (it reads the URL from --mascot-react) and sets .has-reactions
    on <html> once it has decoded. */
 html.atelier {
-  --mascot-react: url('mascots/deepika-reactions.webp?v=20261162');
+  --mascot-react: url('mascots/deepika-reactions.webp?v=20261163');
 }
 
 /* mascot.js uses the second layer for direction frames too (.is-look), and
@@ -1674,7 +1674,7 @@ html.atelier.has-reactions .atelier-mascot-layer.is-react {
 }
 
 html.atelier.has-reactions .atelier-mascot-lids {
-  background-image: url('mascots/deepika-blinks.webp?v=20261162');
+  background-image: url('mascots/deepika-blinks.webp?v=20261163');
 }
 
 html.atelier .atelier-mascot-lids {
@@ -1700,12 +1700,12 @@ html.atelier .atelier-mascot.has-earrings .atelier-mascot-layer.is-look > .ateli
 
 html.atelier .atelier-mascot-ear.is-cover {
   inset: 0;
-  background-image: url('mascots/deepika-earcover.webp?v=20261162');
+  background-image: url('mascots/deepika-earcover.webp?v=20261163');
   background-size: 300% 300%;
 }
 
 html.atelier .atelier-mascot-ear.is-drop {
-  background-image: url('mascots/deepika-eardrops.webp?v=20261162');
+  background-image: url('mascots/deepika-eardrops.webp?v=20261163');
 }
 
 html.atelier .atelier-mascot-ear.is-left {
@@ -1727,8 +1727,8 @@ html.atelier .atelier-mascot-react {
    mask with the frame. Her hair, jaw and outline always come from the frame
    underneath; an oval reached the jaw and showed a second chin. */
 html.atelier.has-reactions .atelier-mascot-face {
-  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261162');
-  mask-image: url('mascots/deepika-face-mask.png?v=20261162');
+  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261163');
+  mask-image: url('mascots/deepika-face-mask.png?v=20261163');
 }
 
 html.atelier .atelier-mascot-face {
@@ -6872,7 +6872,7 @@ html.atelier .sb-cameo-art {
 }
 
 html.atelier .sb-cameo-art.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261162');
+  background-image: url('mascots/deepika-reactions.webp?v=20261163');
 }
 
 html.atelier .sb-cameo-art.is-face {
@@ -8391,5 +8391,634 @@ html.atelier .fun-facts-section .atelier-note p {
 
   html.atelier .fun-facts-section .atelier-notes {
     gap: 0.9rem;
+  }
+}
+
+/* —— Project sections: counter-drifting rows of compact cards (case-reel.js) ——
+   The original cards stay in the HTML as the no-JS fallback and as the source
+   the reader (viewer.js) and the "Read more" modal (script.js) work from. */
+html.atelier .has-reel {
+  overflow-x: clip;
+}
+
+html.atelier .has-reel .projects-cards-row {
+  display: none !important;
+}
+
+html.atelier .case-reel {
+  position: relative;
+  width: 100vw;
+  margin: 2.2rem 0 0 calc(50% - 50vw);
+  display: grid;
+  gap: 0.35rem;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+          mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+}
+
+html.atelier .case-reel-row {
+  overflow: hidden;
+  padding: 8px 0 18px;
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+html.atelier .case-reel-row.is-dragging {
+  cursor: grabbing;
+}
+
+html.atelier .case-reel-track {
+  display: flex;
+  gap: 1rem;
+  width: max-content;
+  will-change: transform;
+}
+
+html.atelier .cr {
+  --h: var(--spin);
+  position: relative;
+  flex: 0 0 auto;
+  width: 356px;
+  padding: 1.05rem 1.15rem 1.1rem;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    radial-gradient(120% 90% at 100% 0%, color-mix(in srgb, var(--h) 9%, transparent), transparent 55%),
+    var(--card);
+  color: var(--ink);
+  transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.35s ease,
+    box-shadow 0.45s ease, opacity 0.4s ease;
+}
+
+html.atelier .cr:hover,
+html.atelier .cr:focus-within {
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--h) 55%, var(--line));
+  box-shadow: 0 18px 34px -20px color-mix(in srgb, var(--h) 70%, #000);
+}
+
+html.atelier .case-reel-row.is-hover .cr:not(:hover) {
+  opacity: 0.5;
+}
+
+/* The brand's initials, set large and cropped by the card's corner. */
+html.atelier .cr-mark {
+  position: absolute;
+  right: -0.35rem;
+  bottom: -1.55rem;
+  z-index: -1;
+  font: italic 500 6.2rem/1 var(--serif);
+  letter-spacing: -0.06em;
+  color: var(--h);
+  opacity: 0.07;
+  pointer-events: none;
+  transition: opacity 0.45s ease, transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+html.atelier .cr:hover .cr-mark,
+html.atelier .cr:focus-within .cr-mark {
+  opacity: 0.16;
+  transform: translate(-6px, -4px) rotate(-4deg);
+}
+
+html.atelier .cr-head {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+html.atelier .cr-logo {
+  flex: none;
+  display: grid;
+  place-items: center;
+  min-width: 40px;
+  height: 40px;
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--h) 15%, var(--card));
+  color: var(--h);
+  font: 600 0.95rem/1 var(--serif);
+  letter-spacing: -0.01em;
+  transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.35s ease, color 0.35s ease;
+}
+
+/* Real brand marks sit on white in both themes so their colours stay true. */
+html.atelier .cr-logo.has-img {
+  padding: 0 7px;
+  background: #fff;
+  box-shadow: inset 0 0 0 1px rgba(26, 23, 19, 0.08);
+}
+
+html.atelier .cr-logo img {
+  display: block;
+  width: auto;
+  height: 28px;
+  max-width: 58px;
+  object-fit: contain;
+  -webkit-user-drag: none;
+}
+
+html.atelier body.dark-theme .cr-logo:not(.has-img) {
+  color: color-mix(in srgb, var(--h) 45%, #fff);
+  background: color-mix(in srgb, var(--h) 34%, var(--card));
+}
+
+html.atelier .cr:hover .cr-logo,
+html.atelier .cr:focus-within .cr-logo {
+  transform: rotate(-6deg) scale(1.05);
+}
+
+html.atelier .cr:hover .cr-logo:not(.has-img),
+html.atelier .cr:focus-within .cr-logo:not(.has-img) {
+  background: var(--h);
+  color: #fff;
+}
+
+html.atelier .cr-who {
+  min-width: 0;
+  flex: 1;
+  display: grid;
+  gap: 2px;
+}
+
+html.atelier .cr-brand {
+  font: 600 0.86rem/1.2 var(--sans);
+  color: var(--ink);
+}
+
+html.atelier .cr-kind {
+  font: 500 0.74rem/1.2 var(--sans);
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+html.atelier .cr-go {
+  position: relative;
+  z-index: 2;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  color: var(--ink) !important;
+  text-decoration: none !important;
+  transition: background 0.35s ease, border-color 0.35s ease, color 0.35s ease;
+  -webkit-user-drag: none;
+}
+
+html.atelier .cr-go svg {
+  width: 13px;
+  height: 13px;
+  transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+html.atelier .cr:hover .cr-go,
+html.atelier .cr:focus-within .cr-go {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--paper) !important;
+}
+
+html.atelier .cr:hover .cr-go svg,
+html.atelier .cr:focus-within .cr-go svg {
+  transform: rotate(45deg);
+}
+
+html.atelier h3.cr-title {
+  margin: 0.85rem 0 0 !important;
+  font: 500 1.14rem/1.25 var(--serif) !important;
+  letter-spacing: -0.01em !important;
+  color: var(--ink) !important;
+  -webkit-text-fill-color: currentColor !important;
+  text-align: left !important;
+}
+
+/* The title button opens the card's "Read more" and covers the whole card. */
+html.atelier .cr-more {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 2.5em;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  text-wrap: balance;
+  cursor: inherit;
+}
+
+html.atelier .cr-more::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+html.atelier .cr-more:focus-visible {
+  outline: none;
+}
+
+html.atelier .cr:has(.cr-more:focus-visible) {
+  outline: 2px solid var(--spin);
+  outline-offset: 3px;
+}
+
+html.atelier p.cr-hook {
+  margin: 0.3rem 0 0 !important;
+  font: 400 0.86rem/1.4 var(--sans) !important;
+  color: var(--muted) !important;
+  -webkit-text-fill-color: currentColor !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Chips sit above the title's full-card hit area. */
+html.atelier .cr-chips {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+html.atelier a.cr-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.65rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--card);
+  font: 600 0.74rem/1 var(--sans);
+  color: var(--ink) !important;
+  text-decoration: none !important;
+  white-space: nowrap;
+  transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  -webkit-user-drag: none;
+}
+
+html.atelier .cr-chip svg,
+html.atelier .cr-chip img {
+  width: 13px;
+  height: 13px;
+  flex: none;
+}
+
+html.atelier .cr-chip img {
+  width: auto;
+}
+
+html.atelier a.cr-chip:hover,
+html.atelier a.cr-chip:focus-visible {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--paper) !important;
+}
+
+/* —— Design: Figma frames on a dotted canvas —— */
+html.atelier .cr--frame {
+  --h: #0d99ff;
+  width: 372px;
+  padding: 0.95rem 1.1rem 1rem;
+  border-radius: 6px;
+  overflow: visible;
+  background:
+    radial-gradient(circle, color-mix(in srgb, var(--ink) 13%, transparent) 1px, transparent 1.4px) 0 0 / 14px 14px,
+    var(--card);
+}
+
+html.atelier .cr--frame:hover,
+html.atelier .cr--frame:focus-within {
+  transform: none;
+  border-color: var(--h);
+  box-shadow: 0 0 0 1px var(--h), 0 18px 34px -24px rgba(13, 153, 255, 0.6);
+}
+
+html.atelier .cr-frame-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font: 500 0.72rem/1.2 var(--sans);
+  color: var(--muted);
+}
+
+html.atelier .cr-frame-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.3s ease;
+}
+
+html.atelier .cr-frame-name b {
+  font-weight: 600;
+  color: var(--h);
+}
+
+html.atelier .cr--frame:hover .cr-frame-name {
+  color: var(--h);
+}
+
+html.atelier .cr-frame-kind {
+  flex: none;
+  padding: 0.18rem 0.5rem;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--ink) 6%, transparent);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+html.atelier .cr--frame h3.cr-title {
+  margin-top: 0.8rem !important;
+}
+
+html.atelier .cr--frame .cr-chips {
+  margin-top: 0.85rem;
+}
+
+html.atelier .cr-select {
+  position: absolute;
+  inset: -1px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+html.atelier .cr--frame:hover .cr-select,
+html.atelier .cr--frame:focus-within .cr-select {
+  opacity: 1;
+}
+
+html.atelier .cr-select i {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: #fff;
+  border: 1.5px solid var(--h);
+  border-radius: 1px;
+}
+
+html.atelier .cr-select i:nth-child(1) { top: -4px; left: -4px; }
+html.atelier .cr-select i:nth-child(2) { top: -4px; right: -4px; }
+html.atelier .cr-select i:nth-child(3) { bottom: -4px; left: -4px; }
+html.atelier .cr-select i:nth-child(4) { bottom: -4px; right: -4px; }
+
+/* Size readout under the selection, filled in from the card's box. */
+html.atelier .cr-select em {
+  position: absolute;
+  left: 50%;
+  bottom: -11px;
+  transform: translate(-50%, 50%);
+  padding: 0.15rem 0.4rem;
+  border-radius: 3px;
+  background: var(--h);
+  color: #fff;
+  font: 600 0.64rem/1.2 var(--sans);
+  font-style: normal;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+html.atelier .cr-select em::before {
+  content: attr(data-size);
+}
+
+/* —— Projects: quiet editor cards ——
+   Same paper card as the rest; the code feel comes from a few mono details. */
+html.atelier .cr--code {
+  --mono: ui-monospace, 'SFMono-Regular', 'Cascadia Code', Menlo, Consolas, monospace;
+  display: flex;
+  flex-direction: column;
+  width: 340px;
+}
+
+html.atelier .cr-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+  font: 500 0.72rem/1 var(--mono);
+  color: var(--muted);
+}
+
+html.atelier .cr-dots {
+  display: inline-flex;
+  gap: 4px;
+  flex: none;
+}
+
+html.atelier .cr-dots i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--line);
+  transition: background 0.3s ease;
+}
+
+html.atelier .cr--code:hover .cr-dots i:nth-child(1) { background: #ff5f57; }
+html.atelier .cr--code:hover .cr-dots i:nth-child(2) { background: #febc2e; transition-delay: 0.05s; }
+html.atelier .cr--code:hover .cr-dots i:nth-child(3) { background: #28c840; transition-delay: 0.1s; }
+
+html.atelier .cr-path {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.3s ease;
+}
+
+html.atelier .cr--code:hover .cr-path {
+  color: var(--ink);
+}
+
+html.atelier .cr-caret {
+  display: inline-block;
+  width: 5px;
+  height: 0.95em;
+  margin-left: 3px;
+  vertical-align: -2px;
+  background: var(--h);
+  opacity: 0;
+}
+
+html.atelier .cr--code:hover .cr-caret {
+  animation: cr-blink 1s steps(1) infinite;
+}
+
+@keyframes cr-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+html.atelier .cr-flag {
+  flex: none;
+  margin-left: auto;
+  padding: 0.14rem 0.4rem;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  font-size: 0.62rem;
+}
+
+html.atelier p.cr-comment {
+  margin: 0.3rem 0 0 !important;
+  font: 400 0.76rem/1.45 var(--mono) !important;
+  color: var(--muted) !important;
+  -webkit-text-fill-color: currentColor !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+html.atelier .cr-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: auto;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--line);
+}
+
+html.atelier .cr--code h3.cr-title {
+  margin-top: 0.75rem !important;
+}
+
+html.atelier .cr--code .cr-more {
+  min-height: 0;
+}
+
+html.atelier .cr--code p.cr-comment {
+  margin-bottom: 0.85rem !important;
+}
+
+html.atelier .cr-stack {
+  min-width: 0;
+  font: 400 0.7rem/1.2 var(--mono);
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+html.atelier .cr-links {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  gap: 0.85rem;
+  flex: none;
+}
+
+html.atelier a.cr-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font: 600 0.74rem/1 var(--mono);
+  color: var(--ink) !important;
+  text-decoration: none !important;
+  transition: color 0.25s ease;
+  -webkit-user-drag: none;
+}
+
+html.atelier a.cr-link svg {
+  width: 10px;
+  height: 10px;
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+html.atelier a.cr-link:hover,
+html.atelier a.cr-link:focus-visible {
+  color: var(--h) !important;
+}
+
+html.atelier a.cr-link:hover svg {
+  transform: rotate(45deg);
+}
+
+html.atelier .cr-live {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #28c840;
+}
+
+html.atelier .cr--code:hover .cr-live {
+  animation: cr-pulse 1.6s ease-out infinite;
+}
+
+@keyframes cr-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(40, 200, 64, 0.5); }
+  70%, 100% { box-shadow: 0 0 0 5px rgba(40, 200, 64, 0); }
+}
+
+html.atelier .case-reel--frame .case-reel-row {
+  padding: 10px 0 26px;
+}
+
+@keyframes cr-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(40, 200, 64, 0.55); }
+  70%, 100% { box-shadow: 0 0 0 6px rgba(40, 200, 64, 0); }
+}
+
+@media (max-width: 600px) {
+  html.atelier .cr {
+    width: 288px;
+  }
+
+  html.atelier .cr--code {
+    width: 300px;
+  }
+
+  html.atelier .case-reel {
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+            mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.atelier .case-reel {
+    -webkit-mask-image: none;
+            mask-image: none;
+  }
+
+  html.atelier .case-reel-row {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    cursor: auto;
+  }
+
+  html.atelier .case-reel-track {
+    padding: 0 6vw;
+  }
+
+  html.atelier .cr {
+    scroll-snap-align: center;
+  }
+
+  html.atelier .case-reel-track > [aria-hidden="true"] {
+    display: none;
+  }
+}
+
+@media print {
+  html.atelier .case-reel {
+    display: none !important;
+  }
+
+  html.atelier .has-reel .projects-cards-row {
+    display: grid !important;
   }
 }

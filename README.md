@@ -71,6 +71,7 @@ story book down.
 | `script.js` | Mobile nav drawer, dropdowns, smooth anchor scrolling (through Lenis), the experience accordion, the work-detail modal, and the certificate stack. The experience roles themselves are plain HTML in `#atelier-exp` in `index.html`; edit them there. |
 | `theme-toggle.js` | Toggles `.dark-theme` on `<body>`, persisted to `localStorage`. An inline script at the top of `<body>` applies the saved theme early to avoid a flash. |
 | `motion.js` | GSAP + ScrollTrigger + Lenis scroll animations. |
+| `case-reel.js` | `index.html` only. Turns each project section's `.projects-cards-row` into rows of compact cards drifting in opposite directions (hover or focus eases a row to a stop; drag to flick). Case studies are brand cards, Design are Figma frames, Projects are editor windows. The original cards stay in the HTML as the source of every label, the no-JS and print fallback, and what the title (Read more) and links click through to. On a case-study card, `data-logo` (a file in `logos/`) shows the brand's mark and `data-hue` sets its accent; without a logo the brand's initials are used. |
 | `contact-form.js` | Contact form via FormSubmit, falling back to EmailJS if it fails. The EmailJS SDK is loaded only for that fallback. |
 | `mascot.js` | `index.html` only. The cartoon in the hero: looks towards the cursor, reacts when clicked, blinks. See [About mascot](#about-mascot). |
 | `story-book.js` | Flip-book behaviour on `my-story.html`, using page-flip. |
@@ -99,7 +100,7 @@ symbol and every card follows. One-off icons stay inline.
 ## Cache busting
 
 Every stylesheet and script is referenced with a **single shared** `?v=` token
-(currently `20261162`; the mascot sheet URLs in `atelier.css` and the
+(currently `20261163`; the mascot sheet URLs in `atelier.css` and the
 `og:image` URLs carry it too).
 When you change any CSS, JS or mascot sheet, bump that token —
 in both `index.html` and `my-story.html`.
