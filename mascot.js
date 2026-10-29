@@ -528,7 +528,7 @@
     if (ms) reactTimer = setTimeout(endReaction, ms);
     // Dozing off, the lids sink slowly from sleepy to shut, straight across
     // rather than through her open-eyed face.
-    var faceIn = asleep ? 1100 : index === BLINK ? 110 : FACE_IN_MS;
+    var faceIn = asleep ? 1100 : index === BLINK ? 180 : FACE_IN_MS;
     face.through = !asleep;
 
     if (WHOLE.indexOf(index) >= 0) {
@@ -572,17 +572,16 @@
     clearTimeout(blinkTimer);
     if (reducedMotion) return;
     blinkTimer = setTimeout(function () {
-      blink();
       // Now and then a double blink, which reads as more alive than a
-      // metronome, and rarely a quick flutter of three.
-      var r = Math.random();
-      if (r < 0.18) setTimeout(blink, 560);
-      else if (r < 0.24) {
-        setTimeout(blink, 420);
-        setTimeout(blink, 840);
-      }
+      // metronome. The second starts only once the first has fully opened;
+      // overlapping, or a flutter of three, looked twitchy.
+      if (blink() && Math.random() < 0.14) doubleBlink();
       scheduleBlink();
-    }, 3600 + Math.random() * 4400);
+    }, 3800 + Math.random() * 4200);
+  }
+
+  function doubleBlink() {
+    setTimeout(function () { blink(true); }, BLINK_TOTAL_MS + 200);
   }
 
   // A soft, unhurried blink: the lids come down, rest a beat and lift a
@@ -597,27 +596,42 @@
   lids.style.opacity = '0';
   el.insertBefore(lids, layerB.nextSibling);
 
-  var LID_DOWN_MS = 160;
-  var LID_REST_MS = 110;
-  var LID_UP_MS = 380;
+  var LID_DOWN_MS = 190;
+  var LID_REST_MS = 130;
+  var LID_UP_MS = 420;
+  var BLINK_TOTAL_MS = LID_DOWN_MS + LID_REST_MS + LID_UP_MS;
 
   // Facing front, a blink is sometimes a happy one: eyes closing into a
   // little smile for a beat, the head dipping with it.
-  var HAPPY_BLINK = 0.12;
+  var HAPPY_BLINK = 0.1;
+  var HAPPY_MS = [260, 640, 480];
 
-  function blink() {
-    if (!visible || reacting >= 0 || body.running || body.key !== 'look:' + lookIndex) return;
+  // Blinks come from her own timer and from what she does at rest, so they
+  // all pass one gate: never two within BLINK_GAP_MS, except the second of a
+  // deliberate double, and never one over another still under way.
+  var BLINK_GAP_MS = 2600;
+  var lastBlinkAt = 0;
+  var blinkBusyUntil = 0;
+
+  // Returns whether she blinked.
+  function blink(second) {
+    var t = now();
+    if (t < blinkBusyUntil || (second !== true && t - lastBlinkAt < BLINK_GAP_MS)) return false;
+    if (!visible || reacting >= 0 || body.running || body.key !== 'look:' + lookIndex) return false;
+    var front = lookIndex === CENTRE;
+    if (!front && (!document.documentElement.classList.contains('has-reactions') || typeof lids.animate !== 'function')) return false;
+    var happy = front && second !== true && Math.random() < HAPPY_BLINK;
+    lastBlinkAt = t;
+    blinkBusyUntil = t + (happy ? HAPPY_MS[1] + HAPPY_MS[2] : BLINK_TOTAL_MS) + 80;
     // The head dips a touch as the lids fall, the way a soft blink does.
-    nudge(0, 0.07);
-    if (lookIndex === CENTRE) {
-      var happy = Math.random() < HAPPY_BLINK;
-      face.show('react', happy ? GIGGLE : BLINK, happy ? 240 : LID_DOWN_MS);
+    nudge(0, 0.06);
+    if (front) {
+      face.show('react', happy ? GIGGLE : BLINK, happy ? HAPPY_MS[0] : LID_DOWN_MS);
       setTimeout(function () {
-        if (reacting < 0) face.hide(happy ? 460 : LID_UP_MS);
-      }, happy ? 620 : LID_DOWN_MS + LID_REST_MS);
-      return;
+        if (reacting < 0) face.hide(happy ? HAPPY_MS[2] : LID_UP_MS);
+      }, happy ? HAPPY_MS[1] : LID_DOWN_MS + LID_REST_MS);
+      return true;
     }
-    if (!document.documentElement.classList.contains('has-reactions') || typeof lids.animate !== 'function') return;
     lids.style.backgroundPosition = (lookIndex % 3) * 50 + '% ' + Math.floor(lookIndex / 3) * 50 + '%';
     // The lid is uncovered from the top down and covered again from the
     // bottom up, so it falls over the eye and lifts off it like a real one;
@@ -625,16 +639,17 @@
     var band = LID_BAND[Math.floor(lookIndex / 3)];
     var open = band[0] + '%';
     var shut = band[1] + '%';
-    var total = LID_DOWN_MS + LID_REST_MS + LID_UP_MS;
+    var total = BLINK_TOTAL_MS;
     lids.animate(
       [
-        { opacity: 1, '--lid-y': open, easing: 'cubic-bezier(0.55, 0, 0.8, 0.4)' },
+        { opacity: 1, '--lid-y': open, easing: 'cubic-bezier(0.5, 0, 0.75, 0.45)' },
         { opacity: 1, '--lid-y': shut, offset: LID_DOWN_MS / total },
-        { opacity: 1, '--lid-y': shut, offset: (LID_DOWN_MS + LID_REST_MS) / total, easing: 'cubic-bezier(0.2, 0.6, 0.35, 1)' },
+        { opacity: 1, '--lid-y': shut, offset: (LID_DOWN_MS + LID_REST_MS) / total, easing: 'cubic-bezier(0.25, 0.55, 0.35, 1)' },
         { opacity: 1, '--lid-y': open },
       ],
       { duration: total }
     );
+    return true;
   }
 
   // The eyes' vertical band in each row of the sheet (% of the box), with the
@@ -2415,9 +2430,8 @@
     }],
     // A slow double blink.
     [6, function () {
-      blink();
-      later(blink, 600);
-      return 1100;
+      if (blink()) later(function () { blink(true); }, BLINK_TOTAL_MS + 200);
+      return BLINK_TOTAL_MS * 2 + 500;
     }],
     // Now and then one of her little moments, to herself: humming, dozing
     // off, a sneeze, a happy wiggle.
@@ -2437,9 +2451,8 @@
   var WATCH_ACTS = [
     // Just resting her eyes on it: a slow blink, now and then a second.
     [22, function () {
-      blink();
-      if (Math.random() < 0.4) later(blink, 900);
-      return 1800;
+      if (blink() && Math.random() < 0.2) later(function () { blink(true); }, BLINK_TOTAL_MS + 260);
+      return BLINK_TOTAL_MS * 2 + 600;
     }],
     // A curious tilt at whatever the cursor is resting on.
     [18, function () {
