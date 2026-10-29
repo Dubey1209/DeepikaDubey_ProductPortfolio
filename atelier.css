@@ -1638,12 +1638,12 @@ html.atelier .atelier-mascot-layer.is-look {
 /* Phones get a lighter copy of the direction sheet: the mascot is drawn at
    about 240px there, so the full-size cells are wasted bytes on slow links. */
 html.atelier {
-  --mascot-look: url('mascots/deepika-directions.webp?v=20261173');
+  --mascot-look: url('mascots/deepika-directions.webp?v=20261175');
 }
 
 @media (max-width: 760px) {
   html.atelier {
-    --mascot-look: url('mascots/deepika-directions-sm.webp?v=20261173');
+    --mascot-look: url('mascots/deepika-directions-sm.webp?v=20261175');
   }
 }
 
@@ -1652,7 +1652,7 @@ html.atelier {
    has loaded (it reads the URL from --mascot-react) and sets .has-reactions
    on <html> once it has decoded. */
 html.atelier {
-  --mascot-react: url('mascots/deepika-reactions.webp?v=20261173');
+  --mascot-react: url('mascots/deepika-reactions.webp?v=20261175');
 }
 
 /* mascot.js uses the second layer for direction frames too (.is-look), and
@@ -1674,7 +1674,7 @@ html.atelier.has-reactions .atelier-mascot-layer.is-react {
 }
 
 html.atelier.has-reactions .atelier-mascot-lids {
-  background-image: url('mascots/deepika-blinks.webp?v=20261173');
+  background-image: url('mascots/deepika-blinks.webp?v=20261175');
 }
 
 html.atelier .atelier-mascot-lids {
@@ -1700,12 +1700,12 @@ html.atelier .atelier-mascot.has-earrings .atelier-mascot-layer.is-look > .ateli
 
 html.atelier .atelier-mascot-ear.is-cover {
   inset: 0;
-  background-image: url('mascots/deepika-earcover.webp?v=20261173');
+  background-image: url('mascots/deepika-earcover.webp?v=20261175');
   background-size: 300% 300%;
 }
 
 html.atelier .atelier-mascot-ear.is-drop {
-  background-image: url('mascots/deepika-eardrops.webp?v=20261173');
+  background-image: url('mascots/deepika-eardrops.webp?v=20261175');
 }
 
 html.atelier .atelier-mascot-ear.is-left {
@@ -1727,8 +1727,8 @@ html.atelier .atelier-mascot-react {
    mask with the frame. Her hair, jaw and outline always come from the frame
    underneath; an oval reached the jaw and showed a second chin. */
 html.atelier.has-reactions .atelier-mascot-face {
-  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261173');
-  mask-image: url('mascots/deepika-face-mask.png?v=20261173');
+  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261175');
+  mask-image: url('mascots/deepika-face-mask.png?v=20261175');
 }
 
 html.atelier .atelier-mascot-face {
@@ -6711,32 +6711,8 @@ html.atelier .atelier-contact-status::after {
   }
 }
 
-/* Footer: the full stop of "Let's ship." hops when you reach for it. */
-html.atelier .fx-footer-dot {
-  display: inline-block;
-  font-style: normal;
-  color: var(--spin);
-}
-
-html.atelier .fx-footer-mark:hover .fx-footer-dot {
-  animation: footer-hop 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-@keyframes footer-hop {
-  0%, 100% {
-    translate: 0 0;
-  }
-  35% {
-    translate: 0.06em -0.28em;
-  }
-  65% {
-    translate: 0.1em 0;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  html.atelier .atelier-contact-status::after,
-  html.atelier .fx-footer-mark:hover .fx-footer-dot {
+  html.atelier .atelier-contact-status::after {
     animation: none;
   }
 
@@ -6869,7 +6845,7 @@ html.atelier .sb-cameo-art {
 }
 
 html.atelier .sb-cameo-art.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261173');
+  background-image: url('mascots/deepika-reactions.webp?v=20261175');
 }
 
 html.atelier .sb-cameo-art.is-face {
@@ -9674,4 +9650,205 @@ html.atelier .fun-facts-section .atelier-note:hover .atelier-note-icon {
   border-color: var(--fh);
   background: var(--fh);
   color: #fff;
+}
+
+/* Footer "Let's ship.": three dots in one chain. The full stop drops in and
+   lands with a squash, the jolt bounces the i's tittle, and the apostrophe
+   swings from its top like a hung tag. Replays on hover. */
+html.atelier .fx-footer-mark {
+  padding-top: 0.32em;
+  margin-top: calc(2.4rem - 0.32em);
+}
+
+html.atelier .fxf-apos {
+  display: inline-block;
+  font-style: normal;
+  transform-origin: 50% 22%;
+}
+
+html.atelier .fxf-tittle,
+html.atelier .fxf-dot {
+  display: inline-block;
+  border-radius: 50%;
+  transform-origin: 50% 100%;
+}
+
+html.atelier .fxf-tittle {
+  width: 0.135em;
+  height: 0.135em;
+  margin: 0 -0.1855em 0 0.0505em;
+  vertical-align: 0.5125em;
+  background: currentColor;
+}
+
+html.atelier .fxf-dot {
+  position: relative;
+  width: 0.14em;
+  height: 0.14em;
+  margin-left: 0.03em;
+  background: var(--spin);
+}
+
+html.atelier .fxf-dot::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -0.02em;
+  width: 0.5em;
+  height: 0.12em;
+  margin-left: -0.25em;
+  border: 0.012em solid var(--spin);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+html.atelier .fx-footer-mark.is-armed:not(.is-live) .fxf-dot {
+  opacity: 0;
+}
+
+html.atelier .fx-footer-mark.is-live .fxf-dot {
+  animation: fxfDrop 1.15s both;
+}
+
+html.atelier .fx-footer-mark.is-live .fxf-dot::after {
+  animation: fxfRipple 0.75s 0.42s ease-out both;
+}
+
+html.atelier .fx-footer-mark.is-live .fxf-tittle {
+  animation: fxfHop 0.85s 0.44s both;
+}
+
+html.atelier .fx-footer-mark.is-live .fxf-apos {
+  animation: fxfSwing 1.3s 0.78s both;
+}
+
+@keyframes fxfDrop {
+  0% { opacity: 0; translate: 0 -1.15em; scale: 0.82 1.28; animation-timing-function: cubic-bezier(0.55, 0, 0.9, 0.45); }
+  8% { opacity: 1; }
+  38% { translate: 0 0; scale: 0.86 1.22; animation-timing-function: cubic-bezier(0.2, 0.7, 0.3, 1); }
+  45% { translate: 0 0; scale: 1.45 0.58; animation-timing-function: cubic-bezier(0.2, 0.7, 0.3, 1); }
+  62% { translate: 0 -0.24em; scale: 0.9 1.12; animation-timing-function: cubic-bezier(0.55, 0, 0.9, 0.45); }
+  76% { translate: 0 0; scale: 1.18 0.84; animation-timing-function: cubic-bezier(0.2, 0.7, 0.3, 1); }
+  86% { translate: 0 -0.05em; scale: 0.97 1.03; }
+  100% { opacity: 1; translate: 0 0; scale: 1 1; }
+}
+
+@keyframes fxfRipple {
+  0% { opacity: 0.55; scale: 0.2 0.4; }
+  100% { opacity: 0; scale: 1.6 1.4; }
+}
+
+@keyframes fxfHop {
+  0% { translate: 0 0; scale: 1 1; animation-timing-function: ease-out; }
+  10% { translate: 0 0; scale: 1.25 0.75; animation-timing-function: cubic-bezier(0.2, 0.7, 0.3, 1); }
+  42% { translate: 0 -0.2em; scale: 0.88 1.14; animation-timing-function: cubic-bezier(0.55, 0, 0.9, 0.45); }
+  64% { translate: 0 0; scale: 1.3 0.72; animation-timing-function: cubic-bezier(0.2, 0.7, 0.3, 1); }
+  80% { translate: 0 -0.04em; scale: 0.96 1.05; }
+  100% { translate: 0 0; scale: 1 1; }
+}
+
+@keyframes fxfSwing {
+  0% { rotate: 0deg; animation-timing-function: cubic-bezier(0.3, 0, 0.4, 1); }
+  18% { rotate: -22deg; animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1); }
+  42% { rotate: 14deg; animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1); }
+  62% { rotate: -7deg; animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1); }
+  80% { rotate: 3deg; }
+  100% { rotate: 0deg; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.atelier .fx-footer-mark .fxf-dot,
+  html.atelier .fx-footer-mark .fxf-dot::after,
+  html.atelier .fx-footer-mark .fxf-tittle,
+  html.atelier .fx-footer-mark .fxf-apos {
+    animation: none !important;
+    opacity: 1;
+  }
+
+  html.atelier .fx-footer-mark .fxf-dot::after {
+    opacity: 0;
+  }
+}
+
+/* Theme toggle: a calm pill with an even inset thumb, ink by day with a
+   moon, terracotta by night with a sun; line icons instead of emoji. */
+html.atelier .theme-toggle-btn,
+html.atelier .drawer-theme-toggle-li .theme-toggle-btn,
+html.atelier .drawer-theme-toggle-li .theme-toggle-btn:hover,
+html.atelier .drawer-theme-toggle-li .theme-toggle-btn:focus,
+html.atelier .drawer-theme-toggle-li .theme-toggle-btn:active {
+  position: relative;
+  display: block;
+  width: 50px !important;
+  height: 28px !important;
+  padding: 0 !important;
+  border: 1.5px solid var(--line) !important;
+  border-radius: 999px !important;
+  background: var(--card) !important;
+  box-shadow: none !important;
+  overflow: visible;
+  transform: none;
+}
+
+html.atelier .theme-toggle-btn:hover {
+  border-color: var(--ink) !important;
+}
+
+html.atelier .theme-toggle-icon-wrapper {
+  position: absolute;
+  top: 2.5px;
+  left: 2.5px;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  border-radius: 50%;
+  background: var(--ink);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+  transform: none;
+  transition: translate 0.45s cubic-bezier(0.34, 1.4, 0.64, 1), background-color 0.3s ease;
+}
+
+html.atelier body.dark-theme .theme-toggle-icon-wrapper {
+  transform: none;
+  translate: 22px 0;
+  background: var(--spin);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+html.atelier .theme-toggle-btn #theme-toggle-icon {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  font-size: 0;
+  color: var(--paper);
+  transition: rotate 0.5s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+html.atelier body.dark-theme .theme-toggle-btn #theme-toggle-icon {
+  color: var(--paper);
+  rotate: 180deg;
+}
+
+html.atelier #theme-toggle-icon svg {
+  width: 12px;
+  height: 12px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+html.atelier body:not(.dark-theme) #theme-toggle-icon svg path {
+  fill: currentColor;
+  stroke: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.atelier .theme-toggle-icon-wrapper,
+  html.atelier .theme-toggle-btn #theme-toggle-icon {
+    transition: none;
+  }
 }
