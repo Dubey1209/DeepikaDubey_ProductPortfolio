@@ -1638,12 +1638,12 @@ html.atelier .atelier-mascot-layer.is-look {
 /* Phones get a lighter copy of the direction sheet: the mascot is drawn at
    about 240px there, so the full-size cells are wasted bytes on slow links. */
 html.atelier {
-  --mascot-look: url('mascots/deepika-directions.webp?v=20261163');
+  --mascot-look: url('mascots/deepika-directions.webp?v=20261173');
 }
 
 @media (max-width: 760px) {
   html.atelier {
-    --mascot-look: url('mascots/deepika-directions-sm.webp?v=20261163');
+    --mascot-look: url('mascots/deepika-directions-sm.webp?v=20261173');
   }
 }
 
@@ -1652,7 +1652,7 @@ html.atelier {
    has loaded (it reads the URL from --mascot-react) and sets .has-reactions
    on <html> once it has decoded. */
 html.atelier {
-  --mascot-react: url('mascots/deepika-reactions.webp?v=20261163');
+  --mascot-react: url('mascots/deepika-reactions.webp?v=20261173');
 }
 
 /* mascot.js uses the second layer for direction frames too (.is-look), and
@@ -1674,7 +1674,7 @@ html.atelier.has-reactions .atelier-mascot-layer.is-react {
 }
 
 html.atelier.has-reactions .atelier-mascot-lids {
-  background-image: url('mascots/deepika-blinks.webp?v=20261163');
+  background-image: url('mascots/deepika-blinks.webp?v=20261173');
 }
 
 html.atelier .atelier-mascot-lids {
@@ -1700,12 +1700,12 @@ html.atelier .atelier-mascot.has-earrings .atelier-mascot-layer.is-look > .ateli
 
 html.atelier .atelier-mascot-ear.is-cover {
   inset: 0;
-  background-image: url('mascots/deepika-earcover.webp?v=20261163');
+  background-image: url('mascots/deepika-earcover.webp?v=20261173');
   background-size: 300% 300%;
 }
 
 html.atelier .atelier-mascot-ear.is-drop {
-  background-image: url('mascots/deepika-eardrops.webp?v=20261163');
+  background-image: url('mascots/deepika-eardrops.webp?v=20261173');
 }
 
 html.atelier .atelier-mascot-ear.is-left {
@@ -1727,8 +1727,8 @@ html.atelier .atelier-mascot-react {
    mask with the frame. Her hair, jaw and outline always come from the frame
    underneath; an oval reached the jaw and showed a second chin. */
 html.atelier.has-reactions .atelier-mascot-face {
-  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261163');
-  mask-image: url('mascots/deepika-face-mask.png?v=20261163');
+  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261173');
+  mask-image: url('mascots/deepika-face-mask.png?v=20261173');
 }
 
 html.atelier .atelier-mascot-face {
@@ -2414,7 +2414,6 @@ html.atelier .atelier-edu-distinction:hover .atelier-edu-distinction-ring path {
 html.atelier.is-dialog-open {
   overflow: hidden;
 }
-
 
 html.atelier .atelier-degree {
   width: min(90vw, 36rem);
@@ -5164,7 +5163,6 @@ html.atelier .portfolio-lock.is-opening .lock-frame::after {
     font-size: 0.72rem;
   }
 
-
   html.atelier .lock-knock {
     width: min(5.6rem, calc(50vw - 6.4rem));
     font-size: 0.85rem;
@@ -5267,7 +5265,6 @@ html.atelier .portfolio-lock.is-opening .lock-frame::after {
   html.atelier .portfolio-lock .lock-stop {
     margin-bottom: 0.6rem !important;
   }
-
 
   html.atelier .portfolio-lock form.unlock-form {
     gap: 1rem;
@@ -6872,7 +6869,7 @@ html.atelier .sb-cameo-art {
 }
 
 html.atelier .sb-cameo-art.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261163');
+  background-image: url('mascots/deepika-reactions.webp?v=20261173');
 }
 
 html.atelier .sb-cameo-art.is-face {
@@ -6982,8 +6979,6 @@ html.atelier .story-book {
     translate: -50% -50%;
   }
 }
-
-
 
 /* ---- Project viewer ---------------------------------------------------------
    A bottom sheet over the page: case studies, live sites, Figma files and code
@@ -9021,4 +9016,662 @@ html.atelier .case-reel--frame .case-reel-row {
   html.atelier .has-reel .projects-cards-row {
     display: grid !important;
   }
+}
+
+/* Skills: a soft per-card hue (--sk) on the icon tile, corner wash and chip
+   hover; the AI card spans the grid with tools and practice side by side. */
+html.atelier .atelier-skill-card {
+  --sk: var(--spin);
+  --sk-ink: color-mix(in srgb, var(--sk) 62%, var(--ink));
+  background-color: var(--card);
+  background-image: radial-gradient(130% 90% at 100% 0%, color-mix(in srgb, var(--sk) 7%, transparent), transparent 55%);
+}
+
+html.atelier .atelier-skill-card .atelier-skill-icon {
+  color: var(--sk-ink);
+  background: color-mix(in srgb, var(--sk) 9%, var(--paper));
+  border-color: color-mix(in srgb, var(--sk) 26%, var(--line));
+}
+
+html.atelier .atelier-skill-card:hover .atelier-skill-icon {
+  border-color: var(--sk);
+}
+
+html.atelier .atelier-skill-card .atelier-skill-tags li {
+  transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+}
+
+html.atelier .atelier-skill-card:hover .atelier-skill-tags li {
+  border-color: color-mix(in srgb, var(--sk) 24%, var(--line));
+}
+
+html.atelier body .atelier-skill-card .atelier-skill-tags li:hover {
+  color: var(--sk-ink) !important;
+  border-color: color-mix(in srgb, var(--sk) 55%, transparent);
+  background-color: color-mix(in srgb, var(--sk) 9%, transparent);
+}
+
+html.atelier .atelier-skill-card,
+html.atelier .atelier-skill-lead {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 0.75rem;
+  align-content: start;
+  align-items: center;
+}
+
+html.atelier .atelier-skill-card {
+  padding: 1.1rem 1.15rem 1.2rem;
+}
+
+html.atelier .atelier-skill-card .atelier-skill-icon {
+  width: 2.2rem;
+  height: 2.2rem;
+  margin: 0;
+  border-radius: 0.65rem;
+}
+
+html.atelier .atelier-skill-card .atelier-skill-icon svg {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+html.atelier .atelier-skill-card h3 {
+  margin: 0;
+  font-size: 1.22rem !important;
+}
+
+html.atelier .atelier-skill-card > .atelier-skill-tags {
+  grid-column: 1 / -1;
+  margin-top: 0.85rem;
+  padding-top: 0.8rem;
+}
+
+html.atelier .atelier-skill-card .atelier-skill-tags {
+  gap: 0.32rem;
+}
+
+html.atelier .atelier-skill-card .atelier-skill-tags li {
+  padding: 0.18rem 0.5rem;
+  font-size: 0.7rem;
+}
+
+html.atelier .atelier-skill-card--ai {
+  grid-column: 1 / -1;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.55fr);
+  gap: 1.4rem;
+  align-items: start;
+}
+
+html.atelier .atelier-skill-note {
+  grid-column: 1 / -1;
+  margin: 0.7rem 0 0;
+  max-width: 26ch;
+  color: var(--muted) !important;
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+
+html.atelier .atelier-skill-groups {
+  display: grid;
+  gap: 0.8rem;
+  align-self: stretch;
+  align-content: center;
+  padding-left: 1.4rem;
+  border-left: 1px solid var(--line);
+}
+
+html.atelier .atelier-skill-sub {
+  margin: 0 0 0.4rem;
+  color: var(--muted) !important;
+  font-family: var(--sans);
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+html.atelier .atelier-skill-group .atelier-skill-tags {
+  padding: 0;
+  border-top: 0;
+}
+
+html.atelier .atelier-skill-group:first-child .atelier-skill-tags li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.38rem;
+  color: var(--ink) !important;
+}
+
+html.atelier .atelier-skill-group:first-child .atelier-skill-tags li::before {
+  content: "";
+  width: 0.36rem;
+  height: 0.36rem;
+  border-radius: 50%;
+  background: var(--sk);
+  opacity: 0.75;
+}
+
+@media (max-width: 720px) {
+  html.atelier .atelier-skill-card--ai {
+    grid-template-columns: 1fr;
+    gap: 1.1rem;
+  }
+
+  html.atelier .atelier-skill-note {
+    max-width: none;
+  }
+
+  html.atelier .atelier-skill-groups {
+    padding: 1rem 0 0;
+    border-left: 0;
+    border-top: 1px solid var(--line);
+  }
+}
+
+/* Experience: a live dot on the current role, a soft hover wash on rows,
+   and the open card rising in with its points following one by one. */
+html.atelier .atelier-exp-row {
+  position: relative;
+  border-radius: 0.8rem;
+  transition: background-color 0.25s ease;
+}
+
+html.atelier .atelier-exp-row:hover {
+  background-color: color-mix(in srgb, var(--card) 70%, transparent);
+}
+
+html.atelier .atelier-exp-role {
+  transition: color 0.25s ease, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+html.atelier .atelier-exp-row:hover .atelier-exp-role {
+  transform: translateX(4px);
+}
+
+html.atelier .atelier-exp-leader {
+  transition: border-color 0.3s ease;
+}
+
+html.atelier .atelier-exp-row:hover .atelier-exp-leader,
+html.atelier .atelier-exp-item.is-open .atelier-exp-leader {
+  border-bottom-color: color-mix(in srgb, var(--accent) 55%, transparent);
+}
+
+html.atelier .atelier-exp-dur {
+  margin-left: -0.35rem;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0.75;
+}
+
+html.atelier .atelier-exp-dur::before {
+  content: "·";
+  margin-right: 0.4rem;
+}
+
+html.atelier .atelier-exp-toggle {
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.25s ease, border-color 0.25s ease;
+}
+
+html.atelier .atelier-exp-row:hover .atelier-exp-toggle {
+  border-color: var(--ink);
+}
+
+html.atelier .atelier-exp-item.is-open .atelier-exp-toggle {
+  transform: rotate(180deg);
+}
+
+html.atelier .atelier-exp-item--now .atelier-exp-year {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+html.atelier .atelier-exp-item--now .atelier-exp-year::after {
+  content: "";
+  flex: 0 0 auto;
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: var(--spin);
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--spin) 45%, transparent);
+  animation: expLive 2.2s ease-out infinite;
+}
+
+@keyframes expLive {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--spin) 45%, transparent); }
+  70%, 100% { box-shadow: 0 0 0 0.5rem transparent; }
+}
+
+html.atelier .atelier-exp-item.is-open .atelier-exp-paper {
+  animation: expRise 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+html.atelier .atelier-exp-item.is-open .atelier-exp-body li,
+html.atelier .atelier-exp-item.is-open .atelier-exp-tags {
+  animation: expRise 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+html.atelier .atelier-exp-item.is-open .atelier-exp-body li:nth-child(1) { animation-delay: 0.08s; }
+html.atelier .atelier-exp-item.is-open .atelier-exp-body li:nth-child(2) { animation-delay: 0.13s; }
+html.atelier .atelier-exp-item.is-open .atelier-exp-body li:nth-child(3) { animation-delay: 0.18s; }
+html.atelier .atelier-exp-item.is-open .atelier-exp-body li:nth-child(4) { animation-delay: 0.23s; }
+html.atelier .atelier-exp-item.is-open .atelier-exp-body li:nth-child(5) { animation-delay: 0.28s; }
+html.atelier .atelier-exp-item.is-open .atelier-exp-body li:nth-child(n+6) { animation-delay: 0.33s; }
+html.atelier .atelier-exp-item.is-open .atelier-exp-tags { animation-delay: 0.36s; }
+
+@keyframes expRise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+html.atelier .atelier-exp-body li {
+  transition: padding-left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+html.atelier .atelier-exp-body li::before {
+  width: 7px;
+  height: 2px;
+  top: 1.25rem;
+  border-radius: 2px;
+  background: var(--accent);
+  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+html.atelier .atelier-exp-body li:hover {
+  padding-left: 1.35rem;
+}
+
+html.atelier .atelier-exp-body li:hover::before {
+  width: 13px;
+}
+
+html.atelier .atelier-exp-tags li {
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+html.atelier .atelier-exp-tags li:hover {
+  color: var(--ink);
+  border-color: var(--ink);
+}
+
+@media (max-width: 720px) {
+  html.atelier .atelier-exp-dur {
+    margin-left: 0;
+  }
+
+  html.atelier .atelier-exp-row:hover .atelier-exp-role {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.atelier .atelier-exp-item--now .atelier-exp-year::after,
+  html.atelier .atelier-exp-item.is-open .atelier-exp-paper,
+  html.atelier .atelier-exp-item.is-open .atelier-exp-body li,
+  html.atelier .atelier-exp-item.is-open .atelier-exp-tags {
+    animation: none;
+  }
+}
+
+/* Experience brand: each role carries its company colour (--brand) through
+   the logo mark, the open card's top edge, corner wash, dashes and tags. */
+html.atelier .atelier-exp-item {
+  --brand: var(--accent);
+  --brand-ink: color-mix(in srgb, var(--brand) 72%, var(--ink));
+}
+
+html.atelier .atelier-exp-mark {
+  flex: 0 0 auto;
+  display: inline-grid;
+  place-items: center;
+  width: 1.55rem;
+  height: 1.55rem;
+  margin-right: -0.4rem;
+  align-self: center;
+  border: 1px solid color-mix(in srgb, var(--brand) 30%, var(--line));
+  border-radius: 0.45rem;
+  background: color-mix(in srgb, var(--brand) 9%, var(--paper));
+  color: var(--brand-ink);
+  font-family: var(--serif);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+html.atelier .atelier-exp-mark--parse {
+  border-color: #0f0f11;
+  background: #0f0f11;
+}
+
+html.atelier .atelier-exp-mark svg {
+  width: 0.95rem;
+  height: 0.95rem;
+  display: block;
+}
+
+html.atelier .atelier-exp-row:hover .atelier-exp-mark,
+html.atelier .atelier-exp-item.is-open .atelier-exp-mark {
+  transform: rotate(-6deg) scale(1.06);
+}
+
+html.atelier .atelier-exp-row:hover .atelier-exp-role,
+html.atelier .atelier-exp-item.is-open .atelier-exp-role {
+  color: var(--brand-ink);
+}
+
+html.atelier .atelier-exp-row:hover .atelier-exp-leader,
+html.atelier .atelier-exp-item.is-open .atelier-exp-leader {
+  border-bottom-color: color-mix(in srgb, var(--brand) 55%, transparent);
+}
+
+html.atelier body .atelier-exp-item .atelier-exp-period {
+  color: var(--brand-ink) !important;
+}
+
+html.atelier .atelier-exp-body li::before {
+  background: var(--brand);
+}
+
+html.atelier .atelier-exp-tags li:hover {
+  color: var(--brand-ink);
+  border-color: var(--brand);
+}
+
+html.atelier .atelier-exp-item--now .atelier-exp-year::after {
+  background: var(--brand);
+  animation-name: expLiveBrand;
+}
+
+@keyframes expLiveBrand {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--brand) 45%, transparent); }
+  70%, 100% { box-shadow: 0 0 0 0.5rem transparent; }
+}
+
+html.atelier .atelier-exp-mark[data-href] {
+  cursor: alias;
+}
+
+html.atelier .atelier-exp-mark--img {
+  overflow: hidden;
+  border-color: color-mix(in srgb, var(--brand) 22%, var(--line));
+  background: #fff;
+}
+
+html.atelier .atelier-exp-mark--img img {
+  display: block;
+  width: 72%;
+  height: 72%;
+  object-fit: contain;
+}
+
+html.atelier .atelier-exp-mark--round {
+  border-radius: 50%;
+  border-color: transparent;
+  background: transparent;
+}
+
+html.atelier .atelier-exp-mark--round img {
+  width: 100%;
+  height: 100%;
+}
+
+html.atelier .atelier-exp-item.has-brand .atelier-exp-year {
+  color: var(--brand-ink);
+}
+
+/* Open role: a brand-tinted side panel (logo, dates, link) beside the story,
+   with the site's offset shadow taking the company colour. */
+html.atelier .atelier-exp-paper {
+  padding: 0;
+}
+
+html.atelier .atelier-exp-paper::before {
+  display: none;
+}
+
+html.atelier .atelier-exp-item.is-open .atelier-exp-paper {
+  display: grid;
+  grid-template-columns: 15rem minmax(0, 1fr);
+  border-color: var(--ink);
+  box-shadow: 7px 9px 0 color-mix(in srgb, var(--brand) 82%, var(--ink));
+}
+
+html.atelier .atelier-exp-side {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.95rem;
+  padding: 1.5rem 1.35rem 1.4rem;
+  background: color-mix(in srgb, var(--brand) 9%, var(--card));
+  border-right: 1px solid color-mix(in srgb, var(--brand) 28%, var(--line));
+  overflow: hidden;
+}
+
+html.atelier .atelier-exp-side::after {
+  content: attr(data-year);
+  position: absolute;
+  right: -0.15rem;
+  bottom: -0.9rem;
+  font-family: var(--serif);
+  font-size: 5.4rem;
+  font-weight: 560;
+  letter-spacing: -0.06em;
+  line-height: 1;
+  color: var(--brand);
+  opacity: 0.13;
+  pointer-events: none;
+}
+
+html.atelier .atelier-exp-side > * {
+  position: relative;
+  z-index: 1;
+}
+
+html.atelier .atelier-exp-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3.5rem;
+  padding: 0.65rem 0.95rem;
+  border: 1px solid color-mix(in srgb, var(--brand) 24%, var(--line));
+  border-radius: 0.85rem;
+  background: #fff;
+  line-height: 0;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease;
+}
+
+html.atelier a.atelier-exp-logo:hover,
+html.atelier a.atelier-exp-logo:focus-visible {
+  transform: translateY(-2px) rotate(-1.5deg);
+  box-shadow: 3px 4px 0 var(--brand);
+}
+
+html.atelier .atelier-exp-logo img {
+  display: block;
+  width: auto;
+  height: 1.85rem;
+  max-width: 10.5rem;
+  object-fit: contain;
+}
+
+html.atelier .atelier-exp-logo--badge {
+  padding: 0.5rem 0.75rem;
+  border-color: #0f0f11;
+  background: #0f0f11;
+}
+
+html.atelier .atelier-exp-logo--badge img {
+  height: 2.1rem;
+}
+
+html.atelier .atelier-exp-logo--round {
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+}
+
+html.atelier .atelier-exp-logo--round img {
+  height: 4.2rem;
+  border-radius: 50%;
+}
+
+html.atelier .atelier-exp-logo--mono {
+  font-family: var(--serif);
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--brand-ink);
+}
+
+html.atelier .atelier-exp-item.is-open .atelier-exp-logo {
+  animation: expPop 0.6s 0.1s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes expPop {
+  from { opacity: 0; transform: scale(0.86) rotate(-4deg); }
+  to { opacity: 1; transform: none; }
+}
+
+html.atelier .atelier-exp-period {
+  margin: 0;
+  line-height: 1.3;
+}
+
+html.atelier .atelier-exp-period span {
+  display: block;
+  margin-top: 0.3rem;
+  color: var(--muted);
+  font-size: 0.84rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+html.atelier .atelier-exp-main {
+  min-width: 0;
+  padding: 1.4rem 1.5rem 1.5rem;
+}
+
+@media (max-width: 720px) {
+  html.atelier .atelier-exp-item.is-open .atelier-exp-paper {
+    grid-template-columns: 1fr;
+    box-shadow: 5px 6px 0 color-mix(in srgb, var(--brand) 82%, var(--ink));
+  }
+
+  html.atelier .atelier-exp-side {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 0.9rem;
+    padding: 1.1rem 1.1rem 1rem;
+    border-right: 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--brand) 28%, var(--line));
+  }
+
+  html.atelier .atelier-exp-side::after {
+    font-size: 3.6rem;
+    bottom: -0.6rem;
+  }
+
+  html.atelier .atelier-exp-logo {
+    min-height: 2.9rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  html.atelier .atelier-exp-logo img {
+    height: 1.5rem;
+  }
+
+  html.atelier .atelier-exp-logo--badge img {
+    height: 1.7rem;
+  }
+
+  html.atelier .atelier-exp-logo--round img {
+    height: 3.1rem;
+  }
+
+  html.atelier .atelier-exp-main {
+    padding: 1.15rem 1.1rem 1.2rem;
+  }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.atelier .atelier-exp-item.is-open .atelier-exp-logo {
+    animation: none;
+  }
+}
+
+html.atelier body.dark-theme .atelier-exp-mark--parse,
+html.atelier body.dark-theme .atelier-exp-logo--badge {
+  border-color: color-mix(in srgb, var(--ink) 28%, transparent);
+}
+
+/* Fun facts: each hobby gets its own hue (--fh) on the tape, kicker, icon,
+   corner wash and the hover shadow; the pen notes stay terracotta. */
+html.atelier .fun-facts-section .atelier-note {
+  --fh: var(--spin);
+  --fh-ink: color-mix(in srgb, var(--fh) 70%, var(--ink));
+  background-color: var(--card);
+  background-image: radial-gradient(120% 85% at 100% 0%, color-mix(in srgb, var(--fh) 8%, transparent), transparent 58%);
+}
+
+html.atelier .fun-facts-section .atelier-note:nth-child(1) { --fh: #9a6234; }
+html.atelier .fun-facts-section .atelier-note:nth-child(2) { --fh: #7a5af0; }
+html.atelier .fun-facts-section .atelier-note:nth-child(3) { --fh: #3d5a80; }
+html.atelier .fun-facts-section .atelier-note:nth-child(4) { --fh: #d9443a; }
+html.atelier .fun-facts-section .atelier-note:nth-child(5) { --fh: #5b7a4a; }
+html.atelier .fun-facts-section .atelier-note:nth-child(6) { --fh: #b4436c; }
+
+html.atelier body .fun-facts-section .atelier-note:hover {
+  border-color: var(--ink);
+  box-shadow: 7px 9px 0 color-mix(in srgb, var(--fh) 78%, var(--ink)) !important;
+}
+
+html.atelier .fun-facts-section .atelier-note::after {
+  background:
+    repeating-linear-gradient(-45deg, transparent 0 5px, rgba(255, 255, 255, 0.2) 5px 7px),
+    color-mix(in srgb, var(--fh) 32%, transparent);
+  transition: rotate 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), scale 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+html.atelier body.dark-theme .fun-facts-section .atelier-note::after {
+  background:
+    repeating-linear-gradient(-45deg, transparent 0 5px, rgba(255, 255, 255, 0.08) 5px 7px),
+    color-mix(in srgb, var(--fh) 45%, transparent);
+}
+
+html.atelier .fun-facts-section .atelier-note:hover::after {
+  rotate: calc(var(--tape-r) * -0.6);
+  scale: 1.06;
+}
+
+html.atelier body .fun-facts-section .atelier-note-kicker {
+  color: var(--fh-ink) !important;
+}
+
+html.atelier .fun-facts-section .atelier-note:hover .atelier-note-kicker::after {
+  background: var(--fh);
+}
+
+html.atelier .fun-facts-section .atelier-note-icon {
+  border-color: color-mix(in srgb, var(--fh) 30%, var(--line));
+  background: color-mix(in srgb, var(--fh) 9%, var(--card));
+  color: var(--fh-ink);
+}
+
+html.atelier .fun-facts-section .atelier-note:hover .atelier-note-icon {
+  border-color: var(--fh);
+  background: var(--fh);
+  color: #fff;
 }
