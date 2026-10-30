@@ -1659,12 +1659,12 @@ html.atelier .atelier-mascot-layer.is-look {
 /* Phones get a lighter copy of the direction sheet: the mascot is drawn at
    about 240px there, so the full-size cells are wasted bytes on slow links. */
 html.atelier {
-  --mascot-look: url('mascots/deepika-directions.webp?v=20261188');
+  --mascot-look: url('mascots/deepika-directions.webp?v=20261190');
 }
 
 @media (max-width: 760px) {
   html.atelier {
-    --mascot-look: url('mascots/deepika-directions-sm.webp?v=20261188');
+    --mascot-look: url('mascots/deepika-directions-sm.webp?v=20261190');
   }
 }
 
@@ -1673,7 +1673,7 @@ html.atelier {
    has loaded (it reads the URL from --mascot-react) and sets .has-reactions
    on <html> once it has decoded. */
 html.atelier {
-  --mascot-react: url('mascots/deepika-reactions.webp?v=20261188');
+  --mascot-react: url('mascots/deepika-reactions.webp?v=20261190');
 }
 
 /* mascot.js uses the second layer for direction frames too (.is-look), and
@@ -1695,7 +1695,7 @@ html.atelier.has-reactions .atelier-mascot-layer.is-react {
 }
 
 html.atelier.has-reactions .atelier-mascot-lids {
-  background-image: url('mascots/deepika-blinks.webp?v=20261188');
+  background-image: url('mascots/deepika-blinks.webp?v=20261190');
 }
 
 html.atelier .atelier-mascot-lids {
@@ -1721,12 +1721,12 @@ html.atelier .atelier-mascot.has-earrings .atelier-mascot-layer.is-look > .ateli
 
 html.atelier .atelier-mascot-ear.is-cover {
   inset: 0;
-  background-image: url('mascots/deepika-earcover.webp?v=20261188');
+  background-image: url('mascots/deepika-earcover.webp?v=20261190');
   background-size: 300% 300%;
 }
 
 html.atelier .atelier-mascot-ear.is-drop {
-  background-image: url('mascots/deepika-eardrops.webp?v=20261188');
+  background-image: url('mascots/deepika-eardrops.webp?v=20261190');
 }
 
 html.atelier .atelier-mascot-ear.is-left {
@@ -1748,14 +1748,14 @@ html.atelier .atelier-mascot-react {
    mask with the frame. Her hair, jaw and outline always come from the frame
    underneath; an oval reached the jaw and showed a second chin. */
 html.atelier.has-reactions .atelier-mascot-face {
-  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261188');
-  mask-image: url('mascots/deepika-face-mask.png?v=20261188');
+  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261190');
+  mask-image: url('mascots/deepika-face-mask.png?v=20261190');
 }
 
 /* The second reaction sheet (love, laugh, sleepy…), fetched after the first;
    mascot.js marks its cells .is-react2. */
 html.atelier {
-  --mascot-react-2: url('mascots/deepika-reactions-2.webp?v=20261188');
+  --mascot-react-2: url('mascots/deepika-reactions-2.webp?v=20261190');
 }
 
 html.atelier.has-reactions-2 .atelier-mascot-layer.is-react2 {
@@ -1763,13 +1763,13 @@ html.atelier.has-reactions-2 .atelier-mascot-layer.is-react2 {
 }
 
 html.atelier.has-reactions-2 .atelier-mascot-face.is-react2 {
-  -webkit-mask-image: url('mascots/deepika-face-mask-2.png?v=20261188');
-  mask-image: url('mascots/deepika-face-mask-2.png?v=20261188');
+  -webkit-mask-image: url('mascots/deepika-face-mask-2.png?v=20261190');
+  mask-image: url('mascots/deepika-face-mask-2.png?v=20261190');
 }
 
 /* The third: pleading, teary, a cute guilt trip (.is-react3). */
 html.atelier {
-  --mascot-react-3: url('mascots/deepika-reactions-3.webp?v=20261188');
+  --mascot-react-3: url('mascots/deepika-reactions-3.webp?v=20261190');
 }
 
 html.atelier.has-reactions-3 .atelier-mascot-layer.is-react3 {
@@ -1777,8 +1777,8 @@ html.atelier.has-reactions-3 .atelier-mascot-layer.is-react3 {
 }
 
 html.atelier.has-reactions-3 .atelier-mascot-face.is-react3 {
-  -webkit-mask-image: url('mascots/deepika-face-mask-3.png?v=20261188');
-  mask-image: url('mascots/deepika-face-mask-3.png?v=20261188');
+  -webkit-mask-image: url('mascots/deepika-face-mask-3.png?v=20261190');
+  mask-image: url('mascots/deepika-face-mask-3.png?v=20261190');
 }
 
 html.atelier .atelier-mascot-face {
@@ -6899,7 +6899,7 @@ html.atelier .sb-cameo-art {
 }
 
 html.atelier .sb-cameo-art.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261188');
+  background-image: url('mascots/deepika-reactions.webp?v=20261190');
 }
 
 html.atelier .sb-cameo-art.is-face {
@@ -10477,5 +10477,454 @@ html.atelier .contact-section button[type="submit"].is-sent .form-btn-plane {
 
   html.atelier body .atelier-footer li a {
     font-size: 0.8rem;
+  }
+}
+/* ---- Phone layer: long stacks become swipe rails, lists tighten --------- */
+html.atelier .atelier-contact > * {
+  min-width: 0;
+}
+
+html.atelier .atelier-footer-logo {
+  flex: none;
+  white-space: nowrap;
+}
+
+.m-deck-foot,
+.m-tabs-bar,
+.m-story-bars {
+  display: none;
+}
+
+@keyframes m-fill {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+/* Phone modes (mobile-rails.js): About is a deck of notes, Skills are tabs
+   that play through on their own, Fun facts are stories. Each auto-plays
+   only while on screen and stops once the visitor takes over. */
+@media (max-width: 640px) {
+  /* About: a deck. The top note swipes or taps away and tucks to the back. */
+  html.atelier body .atelier-about-notes.m-deck {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 0 !important;
+    padding: 0.4rem 0.4rem 1.9rem !important;
+  }
+
+  html.atelier body .m-deck > li {
+    grid-area: 1 / 1 !important;
+    margin: 0 !important;
+    rotate: none !important;
+    translate: none !important;
+    touch-action: pan-y;
+    user-select: none;
+    -webkit-user-select: none;
+    cursor: grab;
+    transition: transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.4s ease, box-shadow 0.3s ease, border-color 0.3s ease !important;
+  }
+
+  html.atelier body .m-deck > li[data-pos="0"] {
+    z-index: 3;
+    border-color: var(--ink);
+    box-shadow: 5px 6px 0 var(--ink);
+    transform: translateX(var(--dx, 0px)) rotate(var(--rot, 0deg)) !important;
+  }
+
+  html.atelier body .m-deck > li[data-pos="1"] {
+    z-index: 2;
+    transform: translateY(13px) scale(0.955) rotate(2.4deg) !important;
+  }
+
+  html.atelier body .m-deck > li[data-pos="2"] {
+    z-index: 1;
+    transform: translateY(24px) scale(0.91) rotate(-2.2deg) !important;
+  }
+
+  html.atelier body .m-deck > li[data-pos="3"] {
+    opacity: 0;
+    transform: translateY(24px) scale(0.88) !important;
+  }
+
+  html.atelier body .m-deck > li.is-dragging {
+    cursor: grabbing;
+    transition: none !important;
+  }
+
+  html.atelier body .m-deck > li.is-leaving {
+    opacity: 0;
+    transform: translateX(calc(var(--fly, 1) * 115%)) rotate(calc(var(--fly, 1) * 14deg)) !important;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.6, 1), opacity 0.35s ease 0.05s !important;
+  }
+
+  html.atelier body .m-deck > li .atelier-about-stamp {
+    display: none;
+  }
+
+  .m-deck-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin: 0.2rem 0 0;
+    color: var(--muted);
+    font-size: 0.74rem;
+  }
+
+  .m-deck-dots {
+    display: flex;
+    gap: 0.35rem;
+  }
+
+  .m-deck-dots span {
+    position: relative;
+    width: 0.45rem;
+    height: 0.45rem;
+    overflow: hidden;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--ink) 18%, transparent);
+    transition: width 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .m-deck-dots span.is-on {
+    width: 1.6rem;
+  }
+
+  .m-deck-dots i {
+    position: absolute;
+    inset: 0;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+
+  .m-deck-dots .is-on i {
+    animation: m-fill 4.2s linear forwards paused;
+  }
+
+  .m-deck-foot.is-live:not(.is-held, .is-manual) .is-on i {
+    animation-play-state: running;
+  }
+
+  .m-deck-foot.is-manual .is-on i {
+    animation: none;
+    transform: none;
+  }
+
+  /* Skills: one category at a time, picked from a row of tabs. */
+  .m-tabs-bar {
+    display: flex;
+    gap: 0.4rem;
+    margin: 0 calc(50% - 50vw) 0.9rem;
+    padding: 0.2rem calc(50vw - 50%);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .m-tabs-bar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .m-tabs-bar button {
+    --tone: color-mix(in srgb, var(--sk, var(--accent)) 78%, var(--ink));
+    position: relative;
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    overflow: hidden;
+    padding: 0.5rem 0.95rem;
+    border: 1.5px solid var(--line);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--muted);
+    font: 600 0.82rem/1 var(--sans);
+    cursor: pointer;
+    transition: color 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+  }
+
+  .m-tabs-bar button::before {
+    content: '';
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    background: var(--sk, var(--accent));
+    opacity: 0.5;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  .m-tabs-bar button.is-on {
+    border-color: var(--tone);
+    background: color-mix(in srgb, var(--sk, var(--accent)) 10%, transparent);
+    color: var(--tone);
+  }
+
+  .m-tabs-bar button.is-on::before {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+
+  .m-tabs-bar i {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2.5px;
+    background: var(--sk, var(--accent));
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+
+  .m-tabs-bar .is-on i {
+    animation: m-fill 4.6s linear forwards paused;
+  }
+
+  .m-tabs-bar.is-live:not(.is-held, .is-manual) .is-on i {
+    animation-play-state: running;
+  }
+
+  .m-tabs-bar.is-manual .is-on i {
+    animation: none;
+    transform: none;
+    opacity: 0;
+  }
+
+  html.atelier body .atelier-skills-grid.m-tabs {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 0 !important;
+    touch-action: pan-y;
+  }
+
+  html.atelier body .m-tabs > * {
+    grid-area: 1 / 1 !important;
+    margin: 0 !important;
+    opacity: 0 !important;
+    visibility: hidden;
+    transform: translateX(calc(var(--from, 1) * 18px)) !important;
+    transition: opacity 0.4s ease, transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s linear 0.4s !important;
+  }
+
+  html.atelier body .m-tabs > .is-on {
+    opacity: 1 !important;
+    visibility: visible;
+    transform: none !important;
+    transition: opacity 0.4s ease 0.05s, transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) 0.05s, visibility 0s !important;
+  }
+
+  /* Fun facts: stories. Tap right for next, left for back, hold to pause. */
+  .m-story-bars {
+    display: flex;
+    gap: 4px;
+    margin: 0 0 0.75rem;
+  }
+
+  .m-story-bars span {
+    flex: 1;
+    height: 3px;
+    overflow: hidden;
+    border-radius: 3px;
+    background: color-mix(in srgb, var(--ink) 14%, transparent);
+  }
+
+  .m-story-bars i {
+    display: block;
+    height: 100%;
+    background: var(--spin);
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+
+  .m-story-bars .is-done i {
+    transform: none;
+  }
+
+  .m-story-bars .is-on i {
+    animation: m-fill 5s linear forwards paused;
+  }
+
+  .m-story-bars.is-live:not(.is-held) .is-on i {
+    animation-play-state: running;
+  }
+
+  html.atelier body .atelier-notes.m-stories {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 0 !important;
+    touch-action: pan-y;
+    user-select: none;
+    -webkit-user-select: none;
+    cursor: pointer;
+  }
+
+  html.atelier body .m-stories > * {
+    grid-area: 1 / 1 !important;
+    margin: 0 !important;
+    rotate: none !important;
+    opacity: 0 !important;
+    visibility: hidden;
+    transform: scale(0.94) !important;
+    transition: opacity 0.35s ease, transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s linear 0.35s !important;
+  }
+
+  html.atelier body .m-stories > .is-on {
+    opacity: 1 !important;
+    visibility: visible;
+    transform: none !important;
+    transition: opacity 0.35s ease, transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0s !important;
+  }
+
+  html.atelier body .m-stories.is-held > .is-on {
+    transform: scale(0.98) !important;
+  }
+
+  .m-story-hint {
+    margin: 0.6rem 0 0;
+    color: var(--muted);
+    font-size: 0.72rem;
+    text-align: center;
+    opacity: 0.8;
+  }
+}
+
+@media (max-width: 640px) and (prefers-reduced-motion: reduce) {
+  .m-deck-dots .is-on i,
+  .m-tabs-bar .is-on i,
+  .m-story-bars .is-on i {
+    animation: none;
+    transform: none;
+  }
+}
+
+@media (min-width: 641px) {
+  .m-story-hint {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  /* Education: courses as small pills, the two stats side by side. */
+  html.atelier body .atelier-edu-stats {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.6rem;
+  }
+
+  html.atelier body .atelier-edu-courses {
+    display: block !important;
+    padding-top: 0.9rem;
+    font-size: 0.9rem;
+    line-height: 1.75;
+  }
+
+  html.atelier body .atelier-edu-courses li {
+    display: inline;
+    padding: 0;
+    font-size: inherit;
+    line-height: inherit;
+  }
+
+  html.atelier body .atelier-edu-courses li:not(:last-child)::after {
+    content: ' \00b7  ';
+    color: var(--spin);
+    white-space: pre;
+  }
+
+  html.atelier body .atelier-edu-courses li::before {
+    display: none;
+  }
+
+  /* Certificates: the index swipes sideways under the pile. */
+  html.atelier body .atelier-cert-index {
+    flex-direction: row;
+    gap: 0.5rem;
+    margin-inline: calc(50% - 50vw);
+    padding: 0.2rem calc(50vw - 50%) 0.4rem;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scroll-padding-inline: calc(50vw - 50%);
+    scrollbar-width: none;
+  }
+
+  html.atelier body .atelier-cert-index::-webkit-scrollbar {
+    display: none;
+  }
+
+  html.atelier body .atelier-cert-index button {
+    flex: none;
+    width: auto;
+    max-width: 13rem;
+    padding: 0.6rem 0.85rem;
+    border: 1.5px solid var(--line);
+    border-radius: 0.85rem;
+    font-size: 0.95rem;
+    line-height: 1.2;
+    white-space: nowrap;
+    scroll-snap-align: start;
+  }
+
+  html.atelier body .atelier-cert-index button.is-active {
+    border-color: var(--ink);
+  }
+
+  html.atelier body .atelier-cert-index button span {
+    font-size: 0.6rem;
+  }
+
+  /* Experience: year, role and company in two tight lines. */
+  html.atelier body .atelier-exp-row {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 0.1rem 0.7rem;
+    padding: 0.8rem 2.3rem 0.8rem 0.1rem;
+  }
+
+  html.atelier body .atelier-exp-year {
+    grid-row: span 2;
+    flex-basis: auto;
+    min-width: 2.6rem;
+    font-size: 1rem;
+  }
+
+  html.atelier body .atelier-exp-role {
+    font-size: 1rem;
+    line-height: 1.25;
+  }
+
+  html.atelier body .atelier-exp-mark,
+  html.atelier body .atelier-exp-dur {
+    display: none;
+  }
+
+  html.atelier body .atelier-exp-co {
+    grid-column: 2;
+    font-size: 0.82rem;
+  }
+
+  html.atelier body .atelier-exp-toggle {
+    top: 50%;
+    margin-top: -0.7rem;
+  }
+
+  html.atelier body .atelier-exp-summary {
+    display: none;
+  }
+
+  html.atelier body .atelier-exp-main {
+    padding: 1rem 1rem 1.05rem;
+  }
+
+  html.atelier body .atelier-exp-side {
+    padding: 0.8rem 1rem;
+  }
+
+  html.atelier body .atelier-exp-body li {
+    margin-bottom: 0.35rem;
+    font-size: 0.86rem;
+    line-height: 1.45;
+  }
+
+  html.atelier body .atelier-exp-paper {
+    margin-bottom: 0.8rem;
   }
 }
