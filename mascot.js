@@ -12,9 +12,9 @@
 //   reactions-2 9 love    10 laugh    11 sleepy
 //               12 excited 13 puppy   14 smug
 //               15 confused 16 sad    17 playful (tongue out)
-//   reactions-3 18 plead  19 teary    20 wail (fake crying)
+//   reactions-3 18 plead  19 downcast 20 drama pout (eyes shut)
 //               21 hopeful 22 guilt (side-eye) 23 brave "I'm fine"
-//               24 sulk   25 pretty please 26 happy tears
+//               24 sulk   25 pretty please 26 touched
 //
 // What triggers each reaction:
 //   pointer arrives on her      grin (at most every 15s)
@@ -129,19 +129,21 @@
   var PUPPY = 13;
   var SMUG = 14;
   var CONFUSED = 15;
-  var SAD = 16;
+  // Cell 16 has tears, which read as too much; sad uses the downcast face.
+  var SAD = 19;
   var PLAYFUL = 17;
   var STARRY = EXCITED;
   // The third sheet: cute, emotional, a little manipulative (index - 18).
+  // No tears on any of them: soft, sad eyes are enough.
   var PLEAD = 18;
-  var TEARY = 19;
-  var WAIL = 20;
+  var DOWNCAST = 19;
+  var DRAMA_POUT = 20;
   var HOPEFUL = 21;
   var GUILT = 22;
   var BRAVE = 23;
   var SULK = 24;
   var PRETTY_PLEASE = 25;
-  var HAPPY_TEARS = 26;
+  var TOUCHED = 26;
   // While a later sheet is still on its way, the nearest first-sheet face.
   var STAND_IN = [
     SHY, GIGGLE, BLINK, GRIN, SHY, WINK, UNIMPRESSED, UNIMPRESSED, GIGGLE,
@@ -520,10 +522,10 @@
     } else if (index === PLEAD || index === HOPEFUL || index === PRETTY_PLEASE) {
       blushFor(ms || 2400);
       moveBody('lean');
-    } else if (index === HAPPY_TEARS) {
+    } else if (index === TOUCHED) {
       moveBody('hop');
       burst('heart');
-    } else if (index === WAIL || index === TEARY) {
+    } else if (index === DRAMA_POUT || index === DOWNCAST) {
       moveBody('shiver');
     } else if (index === PUPPY || index === SAD || index === GUILT || index === BRAVE || index === SULK) {
       moveBody('tilt');
@@ -1290,7 +1292,7 @@
         'aww, whoever you are, you’re doing great',
         'eep! pinker than a strawberry milkshake',
         [GIGGLE, 'hehe, chubby cheeks, happy heart'],
-        [HAPPY_TEARS, 'this is the sweetest poke I’ve ever received'],
+        [TOUCHED, 'this is the sweetest poke I’ve ever received'],
         'cheek status: pink. heart status: fuller',
         [SMUG, 'yes, the blush is natural. no filter.'],
         [LOVE, 'okay, my heart did a little flip there'],
@@ -1347,7 +1349,7 @@
       lines: [
         'aww, a head pat! I’ll take it',
         [GIGGLE, 'pat pat. I feel like a very good employee'],
-        [HAPPY_TEARS, 'a head pat? I didn’t know I needed this'],
+        [TOUCHED, 'a head pat? I didn’t know I needed this'],
         'head pats: the most underrated feature',
         [LOVE, 'okay, head pats are my weakness'],
         [GIGGLE, 'hehe, pat pat, I’m a happy puppy now'],
@@ -1503,7 +1505,7 @@
         [PUPPY, 'fine, you win. but next time, ask first'],
         [GIGGLE, 'angry mode lasted 6 seconds. a new record'],
         [BRAVE, 'it’s okay. they’ll untangle… someday'],
-        [TEARY, 'say sorry to my hair. it’s very sensitive'],
+        [DOWNCAST, 'say sorry to my hair. it’s very sensitive'],
       ],
     },
     ear: {
@@ -1700,7 +1702,7 @@
         'okay, we’re friends now. it’s official',
         [PUPPY, 'aww, you keep coming back'],
         [PLEAD, 'don’t stop… I mean, you can. but don’t.'],
-        [HAPPY_TEARS, 'this much attention? I might cry. happy tears.'],
+        [TOUCHED, 'this much attention? my heart is so full'],
       ],
     },
     {
@@ -2053,10 +2055,10 @@
     { id: 'lost', steps: [[CONFUSED, 1400], [GIGGLE, 800]], move: 'shake', fx: 'ask', line: 'wait, which tab was I on?' },
     // The emotional ones: a little guilt trip, played for cute.
     { id: 'plead', steps: [[PLEAD, 1700], [HOPEFUL, 1000]], move: 'lean', blush: true, line: 'read just one case study? for me?' },
-    { id: 'drama', steps: [[TEARY, 1000], [WAIL, 1300], [BRAVE, 1200]], move: 'shiver', fx: 'sweat', line: 'nobody pokes me anymore… it’s fine. I’m fine.' },
+    { id: 'drama', steps: [[DOWNCAST, 1000], [DRAMA_POUT, 1300], [BRAVE, 1200]], move: 'shiver', line: 'nobody pokes me anymore… it’s fine. I’m fine.' },
     { id: 'guilt', steps: [[GUILT, 1500], [SULK, 1100]], move: 'tilt', line: 'oh, so you’re just going to scroll past me? okay.' },
     { id: 'pretty', steps: [[PRETTY_PLEASE, 1700]], move: 'bounce', fx: 'heart', blush: true, line: 'pretty pretty please stay a little longer?' },
-    { id: 'touched', steps: [[TEARY, 900], [HAPPY_TEARS, 1600]], move: 'hop', fx: 'heart', line: 'you poked me so gently… I’m not crying, you are' },
+    { id: 'touched', steps: [[DOWNCAST, 900], [TOUCHED, 1600]], move: 'hop', fx: 'heart', line: 'you poked me so gently… my heart just melted' },
     { id: 'brave', steps: [[SULK, 1100], [BRAVE, 1500]], move: 'tilt', line: 'no, go ahead, ignore the cute girl. totally fine' },
   ];
 
@@ -2065,31 +2067,31 @@
     face: PLEAD,
     lines: [
       'wait… you’re leaving? already?',
-      [TEARY, 'you didn’t even read my case studies…'],
+      [DOWNCAST, 'you didn’t even read my case studies…'],
       [BRAVE, 'it’s okay. I’ll just be here. alone. smiling.'],
       [GUILT, 'leaving without saying bye? bold.'],
       [SULK, 'fine. go. I didn’t want a visitor anyway. (I did.)'],
       [PRETTY_PLEASE, 'one more scroll? pretty please?'],
-      [WAIL, 'nooo, don’t go, I had more fun facts!'],
+      [DRAMA_POUT, 'nooo, don’t go, I had more fun facts!'],
       'I made this whole portfolio for you… okay, for recruiters, but still',
       [HOPEFUL, 'if you stay, I’ll show you my best project'],
       [GUILT, 'you’ll come back, right? …right?'],
-      [TEARY, 'my metrics say you’re about to bounce… please don’t'],
+      [DOWNCAST, 'my metrics say you’re about to bounce… please don’t'],
       [BRAVE, 'bye! don’t worry about me. I’ll survive. probably.'],
       [PLEAD, 'just tell me one thing you liked, then you can go'],
       [SULK, 'and here I was, thinking we had something'],
       [PLEAD, 'the case studies will miss you. I’ll miss you more'],
-      [TEARY, 'you didn’t even poke me goodbye…'],
+      [DOWNCAST, 'you didn’t even poke me goodbye…'],
       [HOPEFUL, 'bookmark me? so you can come back?'],
       [BRAVE, 'go, go. I’ll be fine. I have my earrings.'],
     ],
   };
 
   var HAPPY_RETURN = {
-    face: HAPPY_TEARS,
+    face: TOUCHED,
     lines: [
-      'you came back! I’m not crying, you are',
-      [HAPPY_TEARS, 'I knew you’d return. I just knew it'],
+      'you came back! my whole day just got better',
+      [TOUCHED, 'I knew you’d return. I just knew it'],
       [HOPEFUL, 'back so soon? does that mean you liked it?'],
       [PRETTY_PLEASE, 'yay! you’re back! stay this time?'],
       'okay, I missed you. a normal amount. a lot.',
@@ -2128,10 +2130,10 @@
     please: ['just one more scroll? please?', 'please, the good part is just below', 'pretty please with chai on top?'],
     lost: ['where was I going with this?', 'brain left the meeting early', 'hold on, rebooting my train of thought'],
     plead: ['pleeease read one case study?', 'look at these eyes. can you say no?', 'for me? just one more section?'],
-    drama: ['sniff… I’m okay. totally okay.', 'no one appreciates a good portfolio anymore… sob', 'don’t mind me, just being dramatic'],
+    drama: ['hmph… I’m okay. totally okay.', 'no one appreciates a good portfolio anymore…', 'don’t mind me, just being dramatic'],
     guilt: ['you’re not even looking at me, are you?', 'I see how it is', 'scrolling past me? noted. hurtfully.'],
     pretty: ['stay, and I’ll tell you a secret', 'one more minute? I’ll be extra cute', 'please? I made this whole page for you'],
-    touched: ['you’re so kind, I might cry', 'happy tears only, I promise', 'okay, that was really sweet'],
+    touched: ['you’re so kind, it’s unfair', 'okay, my heart is officially warm', 'okay, that was really sweet'],
     brave: ['I’m strong. I’m independent. please poke me.', 'it’s fine. I’ll just talk to myself', 'totally okay. smiling through it'],
   };
 
@@ -2588,7 +2590,7 @@
     if (!visible || now() - leftAt < 4000) return;
         setTimeout(function () {
       if (reacting >= 0) return;
-      // After a guilt trip, coming back gets happy tears.
+      // After a guilt trip, coming back gets a touched smile.
       var missed = now() - lastGuilt < 10 * 60000 || Math.random() < 0.25;
       var line = missed ? pickLine('returned', HAPPY_RETURN) : pickLine('back', WELCOME_BACK);
       if (missed) burst('heart');
@@ -2899,7 +2901,7 @@
     react(line.face, hold, false, true);
     say(line.text, hold);
     if (line.face === PLEAD || line.face === PRETTY_PLEASE || line.face === HOPEFUL) blushFor(hold);
-    moveBody(line.face === WAIL || line.face === TEARY ? 'shiver' : 'lean');
+    moveBody(line.face === DRAMA_POUT || line.face === DOWNCAST ? 'shiver' : 'lean');
   }
 
   function scheduleIdle(ms) {

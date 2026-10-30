@@ -100,7 +100,7 @@ symbol and every card follows. One-off icons stay inline.
 ## Cache busting
 
 Every stylesheet and script is referenced with a **single shared** `?v=` token
-(currently `20261182`; the mascot sheet URLs in `atelier.css` and the
+(currently `20261183`; the mascot sheet URLs in `atelier.css` and the
 `og:image` URLs carry it too).
 When you change any CSS, JS or mascot sheet, bump that token —
 in both `index.html` and `my-story.html`.
@@ -321,11 +321,13 @@ It is four 3×3 sprite sheets in `mascots/`:
   `deepika-face-mask-2.png`. `mascot.js` numbers them 9–17 and fetches the
   sheet after the first; until it arrives each borrows the nearest first-sheet
   face. They come up in the little moments, poke lines and idle acts.
-- `deepika-reactions-3.webp` — the emotional set: pleading, teary, fake
-  crying, hopeful, side-eye guilt, brave "I'm fine", sulk, pretty please,
-  happy tears (18–26, through `deepika-face-mask-3.png`). A mouse leaving
+- `deepika-reactions-3.webp` — the emotional set: pleading, downcast, a
+  dramatic eyes-shut pout, hopeful, side-eye guilt, brave "I'm fine", sulk,
+  pretty please, touched (18–26, through `deepika-face-mask-3.png`). No
+  tears on any of them; drawn tears read as too much, so "sad" also uses the
+  downcast face rather than cell 16 of the second sheet. A mouse leaving
   through the top of the window (towards the tabs) gets a cute guilt trip, at
-  most every 45s, and coming back after one gets happy tears.
+  most every 45s, and coming back after one gets a touched smile.
 
 Where she is poked decides how she reacts, and every poke gets a thought that
 belongs to the face she is making: a little cute, a little product manager, and
