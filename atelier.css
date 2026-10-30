@@ -1659,12 +1659,12 @@ html.atelier .atelier-mascot-layer.is-look {
 /* Phones get a lighter copy of the direction sheet: the mascot is drawn at
    about 240px there, so the full-size cells are wasted bytes on slow links. */
 html.atelier {
-  --mascot-look: url('mascots/deepika-directions.webp?v=20261194');
+  --mascot-look: url('mascots/deepika-directions.webp?v=20261198');
 }
 
 @media (max-width: 760px) {
   html.atelier {
-    --mascot-look: url('mascots/deepika-directions-sm.webp?v=20261194');
+    --mascot-look: url('mascots/deepika-directions-sm.webp?v=20261198');
   }
 }
 
@@ -1673,7 +1673,7 @@ html.atelier {
    has loaded (it reads the URL from --mascot-react) and sets .has-reactions
    on <html> once it has decoded. */
 html.atelier {
-  --mascot-react: url('mascots/deepika-reactions.webp?v=20261194');
+  --mascot-react: url('mascots/deepika-reactions.webp?v=20261198');
 }
 
 /* mascot.js uses the second layer for direction frames too (.is-look), and
@@ -1695,7 +1695,7 @@ html.atelier.has-reactions .atelier-mascot-layer.is-react {
 }
 
 html.atelier.has-reactions .atelier-mascot-lids {
-  background-image: url('mascots/deepika-blinks.webp?v=20261194');
+  background-image: url('mascots/deepika-blinks.webp?v=20261198');
 }
 
 html.atelier .atelier-mascot-lids {
@@ -1721,12 +1721,12 @@ html.atelier .atelier-mascot.has-earrings .atelier-mascot-layer.is-look > .ateli
 
 html.atelier .atelier-mascot-ear.is-cover {
   inset: 0;
-  background-image: url('mascots/deepika-earcover.webp?v=20261194');
+  background-image: url('mascots/deepika-earcover.webp?v=20261198');
   background-size: 300% 300%;
 }
 
 html.atelier .atelier-mascot-ear.is-drop {
-  background-image: url('mascots/deepika-eardrops.webp?v=20261194');
+  background-image: url('mascots/deepika-eardrops.webp?v=20261198');
 }
 
 html.atelier .atelier-mascot-ear.is-left {
@@ -1748,14 +1748,14 @@ html.atelier .atelier-mascot-react {
    mask with the frame. Her hair, jaw and outline always come from the frame
    underneath; an oval reached the jaw and showed a second chin. */
 html.atelier.has-reactions .atelier-mascot-face {
-  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261194');
-  mask-image: url('mascots/deepika-face-mask.png?v=20261194');
+  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261198');
+  mask-image: url('mascots/deepika-face-mask.png?v=20261198');
 }
 
 /* The second reaction sheet (love, laugh, sleepy…), fetched after the first;
    mascot.js marks its cells .is-react2. */
 html.atelier {
-  --mascot-react-2: url('mascots/deepika-reactions-2.webp?v=20261194');
+  --mascot-react-2: url('mascots/deepika-reactions-2.webp?v=20261198');
 }
 
 html.atelier.has-reactions-2 .atelier-mascot-layer.is-react2 {
@@ -1763,13 +1763,13 @@ html.atelier.has-reactions-2 .atelier-mascot-layer.is-react2 {
 }
 
 html.atelier.has-reactions-2 .atelier-mascot-face.is-react2 {
-  -webkit-mask-image: url('mascots/deepika-face-mask-2.png?v=20261194');
-  mask-image: url('mascots/deepika-face-mask-2.png?v=20261194');
+  -webkit-mask-image: url('mascots/deepika-face-mask-2.png?v=20261198');
+  mask-image: url('mascots/deepika-face-mask-2.png?v=20261198');
 }
 
 /* The third: pleading, teary, a cute guilt trip (.is-react3). */
 html.atelier {
-  --mascot-react-3: url('mascots/deepika-reactions-3.webp?v=20261194');
+  --mascot-react-3: url('mascots/deepika-reactions-3.webp?v=20261198');
 }
 
 html.atelier.has-reactions-3 .atelier-mascot-layer.is-react3 {
@@ -1777,8 +1777,8 @@ html.atelier.has-reactions-3 .atelier-mascot-layer.is-react3 {
 }
 
 html.atelier.has-reactions-3 .atelier-mascot-face.is-react3 {
-  -webkit-mask-image: url('mascots/deepika-face-mask-3.png?v=20261194');
-  mask-image: url('mascots/deepika-face-mask-3.png?v=20261194');
+  -webkit-mask-image: url('mascots/deepika-face-mask-3.png?v=20261198');
+  mask-image: url('mascots/deepika-face-mask-3.png?v=20261198');
 }
 
 html.atelier .atelier-mascot-face {
@@ -6899,7 +6899,7 @@ html.atelier .sb-cameo-art {
 }
 
 html.atelier .sb-cameo-art.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261194');
+  background-image: url('mascots/deepika-reactions.webp?v=20261198');
 }
 
 html.atelier .sb-cameo-art.is-face {
@@ -10953,5 +10953,342 @@ html.atelier .atelier-footer-logo {
     max-width: min(11rem, calc(50vw - 0.5rem));
     font-size: 0.84rem;
     transform-origin: 0% 100%;
+  }
+}
+
+/* ---- Desktop navbar --------------------------------------------------------
+   A full-width paper bar whose hairline appears once the page scrolls. A
+   pill slides behind the hovered link and rests on the section being read
+   (nav.js); a terracotta dot marks it. Contact is the one ink button.
+   Between 801px and 1100px four links fold into "More". */
+html.atelier .nav-pill,
+html.atelier .nav-more {
+  display: none !important;
+}
+
+@media (min-width: 801px) {
+  html.atelier body .navbar {
+    --nav-shadow: var(--ink);
+    padding: 0.3rem 0 !important;
+    transition: border-color 0.4s ease, background-color 0.4s ease, transform 0.55s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  html.atelier body.dark-theme .navbar {
+    --nav-shadow: #000;
+  }
+
+  html.atelier body:not(.nav-scrolled) .navbar {
+    border-bottom-color: transparent !important;
+    background: color-mix(in srgb, var(--paper) 70%, transparent) !important;
+  }
+
+  html.atelier body .navbar-container {
+    min-height: 58px;
+  }
+
+  html.atelier body .logo {
+    flex: none;
+    line-height: 1;
+  }
+
+  html.atelier body .logo .logo-brace {
+    display: inline-block;
+    letter-spacing: 0;
+    transition: letter-spacing 0.4s cubic-bezier(0.34, 1.5, 0.5, 1);
+  }
+
+  html.atelier body .logo:hover .logo-brace {
+    letter-spacing: 0.12em;
+  }
+
+  html.atelier body .nav-links {
+    position: relative;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0.1rem !important;
+    padding: 0 !important;
+  }
+
+  html.atelier body .nav-links > li {
+    position: relative;
+    z-index: 1;
+    margin: 0 !important;
+  }
+
+  html.atelier body .nav-links > li.nav-pill {
+    display: block !important;
+    position: absolute;
+    z-index: 0;
+    left: 0;
+    top: 0;
+    width: var(--w, 0px);
+    height: var(--h, 0px);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--ink) 7%, transparent);
+    opacity: 0;
+    transform: translate(var(--x, 0px), var(--y, 0px));
+    transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), width 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.25s ease;
+    pointer-events: none;
+  }
+
+  html.atelier body .nav-links > li.nav-pill.is-on {
+    opacity: 1;
+  }
+
+  html.atelier body .nav-links > li > a,
+  html.atelier body .nav-links .dropbtn {
+    display: block;
+    padding: 0.52rem 0.78rem !important;
+    border: 0 !important;
+    border-radius: 999px;
+    color: var(--muted) !important;
+    font-size: 0.84rem;
+    font-weight: 500;
+    line-height: 1.2;
+    white-space: nowrap;
+    transition: color 0.25s ease;
+  }
+
+  html.atelier body .nav-links > li > a:hover,
+  html.atelier body .nav-links > li > a:focus-visible,
+  html.atelier body .nav-links > li > a.is-current,
+  html.atelier body .nav-links .dropdown:hover > .dropbtn {
+    color: var(--ink) !important;
+  }
+
+  /* The underline from motion.css becomes the "you are here" dot. */
+  html.atelier body .nav-links > li > a::after,
+  html.atelier body .nav-links .dropbtn::after {
+    left: 50%;
+    right: auto;
+    bottom: 0.16rem;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--spin);
+    transform: translateX(-50%) scale(0) !important;
+    transition: transform 0.35s cubic-bezier(0.34, 1.6, 0.5, 1);
+  }
+
+  html.atelier body .nav-links > li > a.is-current::after {
+    transform: translateX(-50%) scale(1) !important;
+  }
+
+  html.atelier body .nav-links .dropbtn {
+    padding-right: 1.55rem !important;
+    background: no-repeat right 0.7rem center / 0.6rem url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none' stroke='%237d756b' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 4.5 6 7.5 9 4.5'/%3E%3C/svg%3E");
+  }
+
+  html.atelier body .nav-links .dropdown:hover > .dropbtn {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none' stroke='%237d756b' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 7.5 6 4.5 9 7.5'/%3E%3C/svg%3E");
+  }
+
+  html.atelier body .nav-links .dropdown-content {
+    top: calc(100% + 0.7rem);
+    left: 50%;
+    min-width: 13rem;
+    padding: 0.4rem;
+    border: 1.5px solid var(--ink);
+    border-radius: 1rem;
+    box-shadow: 4px 5px 0 var(--nav-shadow);
+    transform: translateX(-50%);
+    animation: nav-drop 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  html.atelier body .nav-links .dropdown-content::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -0.9rem;
+    height: 0.9rem;
+  }
+
+  html.atelier body .nav-links .dropdown-content a {
+    padding: 0.55rem 0.8rem !important;
+    border-radius: 0.65rem;
+    color: var(--ink) !important;
+    font-size: 0.86rem;
+    transition: background-color 0.2s ease, padding 0.25s ease;
+  }
+
+  html.atelier body .nav-links .dropdown-content a:hover,
+  html.atelier body .nav-links .dropdown-content a:focus-visible {
+    padding-left: 1rem !important;
+    background: color-mix(in srgb, var(--ink) 6%, transparent) !important;
+  }
+
+  @keyframes nav-drop {
+    from { opacity: 0; transform: translate(-50%, -6px); }
+  }
+
+  /* Links sit centred between the mark and the actions on the right. */
+  html.atelier body .nav-links {
+    flex: 1 1 auto;
+    justify-content: flex-start !important;
+  }
+
+  html.atelier body .nav-links > li.drawer-close-btn-li + li {
+    margin-left: auto !important;
+  }
+
+  /* Contact: an outlined pill that fills with ink on hover. */
+  html.atelier body .nav-links > li.nav-cta {
+    margin-left: auto !important;
+  }
+
+  html.atelier body .nav-links > li.nav-cta > a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.95rem 0.5rem 1.05rem !important;
+    background: transparent;
+    box-shadow: inset 0 0 0 1.5px var(--ink);
+    color: var(--ink) !important;
+    font-weight: 600;
+    transition: transform 0.25s cubic-bezier(0.34, 1.5, 0.5, 1), background-color 0.25s ease, color 0.25s ease;
+  }
+
+  html.atelier body .nav-links > li.nav-cta > a:hover,
+  html.atelier body .nav-links > li.nav-cta > a:focus-visible {
+    background: var(--ink);
+    color: var(--paper) !important;
+  }
+
+  html.atelier body .nav-links > li.nav-cta > a::before {
+    content: '\2192';
+    order: 2;
+    display: inline-block;
+    transition: transform 0.3s cubic-bezier(0.34, 1.5, 0.5, 1);
+  }
+
+  html.atelier body .nav-links > li.nav-cta > a::after {
+    display: none;
+  }
+
+  html.atelier body .nav-links > li.nav-cta > a:hover {
+    transform: translateY(-1px);
+  }
+
+  html.atelier body .nav-links > li.nav-cta > a:hover::before {
+    transform: translateX(3px);
+  }
+
+  html.atelier body .nav-links > li.nav-cta > a.is-current {
+    background: var(--ink);
+    color: var(--paper) !important;
+  }
+
+  html.atelier body .nav-links > li.drawer-theme-toggle-li {
+    display: flex;
+    align-items: center;
+    margin-left: 0.55rem !important;
+    padding-left: 0.6rem;
+    border-left: 1px solid var(--line);
+  }
+}
+
+@media (min-width: 801px) and (max-width: 1100px) {
+  html.atelier body .nav-links > li.nav-more-item {
+    display: none !important;
+  }
+
+  html.atelier body .nav-links > li.nav-more {
+    display: block !important;
+  }
+
+  html.atelier body .nav-links > li > a,
+  html.atelier body .nav-links .dropbtn {
+    padding-left: 0.62rem !important;
+    padding-right: 0.62rem !important;
+  }
+
+  html.atelier body .nav-links .dropbtn {
+    padding-right: 1.4rem !important;
+    background-position: right 0.55rem center;
+  }
+}
+
+@media (min-width: 801px) and (prefers-reduced-motion: reduce) {
+  html.atelier body .nav-links > li.nav-pill,
+  html.atelier body .navbar-container,
+  html.atelier body .nav-links .dropdown-content {
+    transition: none;
+    animation: none;
+  }
+}
+/* Navbar details: a reading-progress line along the bar's bottom edge and
+   a Work menu that says what is behind each door. Hidden in the drawer. */
+html.atelier .nav-menu-ico,
+html.atelier .nav-menu-text small {
+  display: none;
+}
+
+@media (min-width: 801px) {
+  html.atelier body .navbar > .scroll-progress {
+    position: absolute;
+    top: auto;
+    bottom: -1px;
+    left: 0;
+    z-index: 1;
+    height: 2px;
+    background: var(--spin) !important;
+  }
+
+  html.atelier body .nav-links .dropdown:not(.nav-more) .dropdown-content {
+    min-width: 17.5rem;
+  }
+
+  html.atelier body .nav-links .dropdown-content a:has(.nav-menu-text) {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.55rem 0.7rem !important;
+    white-space: normal !important;
+  }
+
+  html.atelier body .nav-links .dropdown-content a:has(.nav-menu-text):hover,
+  html.atelier body .nav-links .dropdown-content a:has(.nav-menu-text):focus-visible {
+    padding-left: 0.7rem !important;
+  }
+
+  html.atelier body .nav-menu-ico {
+    display: block;
+    flex: none;
+    box-sizing: content-box;
+    width: 1.05rem;
+    height: 1.05rem;
+    padding: 0.45rem;
+    border-radius: 0.6rem;
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
+    color: var(--accent);
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: background-color 0.25s ease, color 0.25s ease, transform 0.35s cubic-bezier(0.34, 1.5, 0.5, 1);
+  }
+
+  html.atelier body .nav-links .dropdown-content a:hover .nav-menu-ico,
+  html.atelier body .nav-links .dropdown-content a:focus-visible .nav-menu-ico {
+    background: var(--accent);
+    color: var(--paper);
+    transform: rotate(-6deg);
+  }
+
+  html.atelier body .nav-menu-text {
+    display: block;
+    font-weight: 600;
+    font-size: 0.86rem;
+    line-height: 1.3;
+  }
+
+  html.atelier body .nav-menu-text small {
+    display: block;
+    margin-top: 0.1rem;
+    color: var(--muted);
+    font-size: 0.74rem;
+    font-weight: 400;
   }
 }
