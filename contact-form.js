@@ -85,9 +85,12 @@
       const submitBtn = form.querySelector('button[type="submit"]');
       if (!submitBtn) return;
 
-      const originalBtnText = submitBtn.innerHTML;
+      const label = submitBtn.querySelector('.form-btn-label') || submitBtn;
+      const originalBtnText = label.textContent;
       submitBtn.disabled = true;
-      submitBtn.innerHTML = 'Sending...';
+      submitBtn.classList.remove('is-sent');
+      submitBtn.classList.add('is-sending');
+      label.textContent = 'Sending…';
 
       const fields = {
         name: document.getElementById('name').value,
@@ -118,8 +121,16 @@
           formStatus.innerHTML =
             '<div class="success-message">Message sent. I will get back to you soon.</div>';
           form.reset();
+          form.dispatchEvent(new Event('input'));
           submitBtn.disabled = false;
-          submitBtn.innerHTML = originalBtnText;
+          submitBtn.classList.remove('is-sending');
+          // The plane flies off and the button says so for a moment.
+          submitBtn.classList.add('is-sent');
+          label.textContent = 'Sent!';
+          setTimeout(function () {
+            submitBtn.classList.remove('is-sent');
+            label.textContent = originalBtnText;
+          }, 2600);
           formStatus.scrollIntoView({ behavior: 'smooth', block: 'center' });
         })
         .catch(function () {
@@ -127,15 +138,86 @@
           formStatus.innerHTML =
             '<div class="error-message">Oops! Something went wrong. Please try again or email me directly at <a href="mailto:dubeydeepika1209@gmail.com">dubeydeepika1209@gmail.com</a></div>';
           submitBtn.disabled = false;
-          submitBtn.innerHTML = originalBtnText;
+          submitBtn.classList.remove('is-sending');
+          label.textContent = originalBtnText;
           formStatus.scrollIntoView({ behavior: 'smooth', block: 'center' });
         });
     });
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initContactForm);
-  } else {
+  // The small touches around the form: her local time, copying the email,
+  // quick starts for the message, and a character count.
+  function initContactExtras() {
+    const clock = document.querySelector('[data-contact-clock]');
+    if (clock && typeof Intl !== 'undefined') {
+      const fmt = new Intl.DateTimeFormat('en-IN', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'Asia/Kolkata' });
+      const tick = function () {
+        clock.textContent = fmt.format(new Date()).toUpperCase() + ' in India';
+      };
+      tick();
+      setInterval(tick, 30000);
+    }
+
+    document.querySelectorAll('.atelier-contact-clip').forEach(function (btn) {
+      const text = btn.querySelector('span');
+      let reset = 0;
+      btn.addEventListener('click', function () {
+        const value = btn.getAttribute('data-copy') || '';
+        const done = function () {
+          btn.classList.add('is-copied');
+          if (text) text.textContent = 'Copied';
+          btn.setAttribute('aria-label', 'Email address copied');
+          clearTimeout(reset);
+          reset = setTimeout(function () {
+            btn.classList.remove('is-copied');
+            if (text) text.textContent = 'Copy';
+            btn.setAttribute('aria-label', 'Copy email address');
+          }, 1800);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(value).then(done, function () {});
+        }
+      });
+    });
+
+    const message = document.getElementById('message');
+    const count = document.querySelector('[data-contact-count]');
+    const form = document.getElementById('contactForm');
+    if (message && count) {
+      const max = +message.getAttribute('maxlength') || 2000;
+      const update = function () {
+        const n = message.value.length;
+        count.textContent = n + ' / ' + max;
+        count.classList.toggle('is-near', n > max * 0.9);
+      };
+      message.addEventListener('input', update);
+      if (form) form.addEventListener('input', update);
+      update();
+    }
+
+    document.querySelectorAll('.atelier-contact-starters [data-starter]').forEach(function (chip) {
+      chip.addEventListener('click', function () {
+        if (!message) return;
+        const starter = chip.getAttribute('data-starter');
+        // Never overwrite what someone has already written.
+        message.value = message.value.trim() ? message.value.replace(/\s*$/, '\n\n') + starter : starter + ' ';
+        message.dispatchEvent(new Event('input', { bubbles: true }));
+        message.focus();
+        message.setSelectionRange(message.value.length, message.value.length);
+        chip.classList.add('is-picked');
+        setTimeout(function () { chip.classList.remove('is-picked'); }, 700);
+      });
+    });
+  }
+
+  function init() {
     initContactForm();
+    initContactExtras();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
   }
 })();

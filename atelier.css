@@ -1659,12 +1659,12 @@ html.atelier .atelier-mascot-layer.is-look {
 /* Phones get a lighter copy of the direction sheet: the mascot is drawn at
    about 240px there, so the full-size cells are wasted bytes on slow links. */
 html.atelier {
-  --mascot-look: url('mascots/deepika-directions.webp?v=20261185');
+  --mascot-look: url('mascots/deepika-directions.webp?v=20261186');
 }
 
 @media (max-width: 760px) {
   html.atelier {
-    --mascot-look: url('mascots/deepika-directions-sm.webp?v=20261185');
+    --mascot-look: url('mascots/deepika-directions-sm.webp?v=20261186');
   }
 }
 
@@ -1673,7 +1673,7 @@ html.atelier {
    has loaded (it reads the URL from --mascot-react) and sets .has-reactions
    on <html> once it has decoded. */
 html.atelier {
-  --mascot-react: url('mascots/deepika-reactions.webp?v=20261185');
+  --mascot-react: url('mascots/deepika-reactions.webp?v=20261186');
 }
 
 /* mascot.js uses the second layer for direction frames too (.is-look), and
@@ -1695,7 +1695,7 @@ html.atelier.has-reactions .atelier-mascot-layer.is-react {
 }
 
 html.atelier.has-reactions .atelier-mascot-lids {
-  background-image: url('mascots/deepika-blinks.webp?v=20261185');
+  background-image: url('mascots/deepika-blinks.webp?v=20261186');
 }
 
 html.atelier .atelier-mascot-lids {
@@ -1721,12 +1721,12 @@ html.atelier .atelier-mascot.has-earrings .atelier-mascot-layer.is-look > .ateli
 
 html.atelier .atelier-mascot-ear.is-cover {
   inset: 0;
-  background-image: url('mascots/deepika-earcover.webp?v=20261185');
+  background-image: url('mascots/deepika-earcover.webp?v=20261186');
   background-size: 300% 300%;
 }
 
 html.atelier .atelier-mascot-ear.is-drop {
-  background-image: url('mascots/deepika-eardrops.webp?v=20261185');
+  background-image: url('mascots/deepika-eardrops.webp?v=20261186');
 }
 
 html.atelier .atelier-mascot-ear.is-left {
@@ -1748,14 +1748,14 @@ html.atelier .atelier-mascot-react {
    mask with the frame. Her hair, jaw and outline always come from the frame
    underneath; an oval reached the jaw and showed a second chin. */
 html.atelier.has-reactions .atelier-mascot-face {
-  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261185');
-  mask-image: url('mascots/deepika-face-mask.png?v=20261185');
+  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261186');
+  mask-image: url('mascots/deepika-face-mask.png?v=20261186');
 }
 
 /* The second reaction sheet (love, laugh, sleepy…), fetched after the first;
    mascot.js marks its cells .is-react2. */
 html.atelier {
-  --mascot-react-2: url('mascots/deepika-reactions-2.webp?v=20261185');
+  --mascot-react-2: url('mascots/deepika-reactions-2.webp?v=20261186');
 }
 
 html.atelier.has-reactions-2 .atelier-mascot-layer.is-react2 {
@@ -1763,13 +1763,13 @@ html.atelier.has-reactions-2 .atelier-mascot-layer.is-react2 {
 }
 
 html.atelier.has-reactions-2 .atelier-mascot-face.is-react2 {
-  -webkit-mask-image: url('mascots/deepika-face-mask-2.png?v=20261185');
-  mask-image: url('mascots/deepika-face-mask-2.png?v=20261185');
+  -webkit-mask-image: url('mascots/deepika-face-mask-2.png?v=20261186');
+  mask-image: url('mascots/deepika-face-mask-2.png?v=20261186');
 }
 
 /* The third: pleading, teary, a cute guilt trip (.is-react3). */
 html.atelier {
-  --mascot-react-3: url('mascots/deepika-reactions-3.webp?v=20261185');
+  --mascot-react-3: url('mascots/deepika-reactions-3.webp?v=20261186');
 }
 
 html.atelier.has-reactions-3 .atelier-mascot-layer.is-react3 {
@@ -1777,8 +1777,8 @@ html.atelier.has-reactions-3 .atelier-mascot-layer.is-react3 {
 }
 
 html.atelier.has-reactions-3 .atelier-mascot-face.is-react3 {
-  -webkit-mask-image: url('mascots/deepika-face-mask-3.png?v=20261185');
-  mask-image: url('mascots/deepika-face-mask-3.png?v=20261185');
+  -webkit-mask-image: url('mascots/deepika-face-mask-3.png?v=20261186');
+  mask-image: url('mascots/deepika-face-mask-3.png?v=20261186');
 }
 
 html.atelier .atelier-mascot-face {
@@ -6899,7 +6899,7 @@ html.atelier .sb-cameo-art {
 }
 
 html.atelier .sb-cameo-art.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261185');
+  background-image: url('mascots/deepika-reactions.webp?v=20261186');
 }
 
 html.atelier .sb-cameo-art.is-face {
@@ -9904,5 +9904,364 @@ html.atelier body:not(.dark-theme) #theme-toggle-icon svg path {
   html.atelier .theme-toggle-icon-wrapper,
   html.atelier .theme-toggle-btn #theme-toggle-icon {
     transition: none;
+  }
+}
+
+/* Contact polish: local time, icon rows that fill in on hover, a copy pill
+   for the email, a softer focus state on the form, quick starts and a
+   paper plane on the send button. Layered over the base contact rules. */
+html.atelier .atelier-contact-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 0.9rem;
+  margin: 0 0 1rem;
+}
+
+html.atelier .atelier-contact-meta .atelier-contact-status {
+  margin: 0;
+}
+
+html.atelier .atelier-contact-clock {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+html.atelier .atelier-contact-clock svg {
+  width: 0.95rem;
+  height: 0.95rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
+
+html.atelier .atelier-contact-clock svg path {
+  transform-origin: 12px 12px;
+  animation: contact-clock 12s linear infinite;
+}
+
+@keyframes contact-clock {
+  to { transform: rotate(360deg); }
+}
+
+html.atelier .atelier-contact-links li {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--line);
+}
+
+html.atelier .atelier-contact-links li > a {
+  flex: 1 1 auto;
+  min-width: 0;
+  align-items: center;
+  border-bottom: 0;
+  padding: 0.7rem 0.05rem;
+}
+
+html.atelier .atelier-contact-links a > span:first-child {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+html.atelier .atelier-contact-ico {
+  box-sizing: content-box;
+  width: 1.05rem;
+  height: 1.05rem;
+  padding: 0.42rem;
+  border-radius: 0.65rem;
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: background 0.3s ease, color 0.3s ease, transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+html.atelier .atelier-contact-leader {
+  position: relative;
+  transform: none;
+  align-self: center;
+}
+
+html.atelier .atelier-contact-leader::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1.5px;
+  border-bottom: 1.5px solid var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+html.atelier .atelier-contact-links a > span:last-child {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  transition: color 0.3s ease;
+}
+
+html.atelier .atelier-contact-go {
+  width: 0.95rem;
+  height: 0.95rem;
+  flex: none;
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0;
+  transform: translate(-0.3rem, 0.3rem);
+  transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+html.atelier .atelier-contact-links a:is(:hover, :focus-visible) > span:first-child {
+  transform: translateX(0.2rem);
+}
+
+html.atelier .atelier-contact-links a:is(:hover, :focus-visible) .atelier-contact-ico {
+  background: var(--accent);
+  color: var(--paper);
+  transform: rotate(-6deg) scale(1.06);
+}
+
+html.atelier .atelier-contact-links a:is(:hover, :focus-visible) .atelier-contact-leader::after {
+  transform: scaleX(1);
+}
+
+html.atelier .atelier-contact-links a:is(:hover, :focus-visible) .atelier-contact-go {
+  opacity: 1;
+  transform: none;
+}
+
+html.atelier .atelier-contact-clip {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.62rem;
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font: 600 0.7rem/1 var(--sans);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 0.25s ease, color 0.25s ease, background 0.25s ease, transform 0.2s ease;
+}
+
+html.atelier .atelier-contact-clip svg {
+  width: 0.85rem;
+  height: 0.85rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+html.atelier .atelier-contact-clip:hover,
+html.atelier .atelier-contact-clip:focus-visible {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+
+html.atelier .atelier-contact-clip:active {
+  transform: scale(0.95);
+}
+
+html.atelier .atelier-contact-clip.is-copied {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent);
+  animation: contact-pop 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes contact-pop {
+  40% { transform: scale(1.08); }
+}
+
+/* Form: the card lifts a little while someone is writing in it. */
+html.atelier .atelier-contact-form {
+  transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+html.atelier .atelier-contact-form:focus-within {
+  transform: translate(-2px, -3px);
+  box-shadow: 9px 12px 0 var(--ink);
+}
+
+html.atelier .atelier-contact-form label {
+  transition: color 0.25s ease;
+}
+
+html.atelier .atelier-contact-form .form-group:focus-within > label {
+  color: var(--ink);
+}
+
+html.atelier .atelier-contact-form .form-group:has(:is(input, textarea):required:valid) > label::after {
+  content: '\2713';
+  display: inline-block;
+  margin-left: 0.4rem;
+  color: var(--accent);
+  letter-spacing: 0;
+  animation: contact-pop 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+html.atelier body .contact-section input,
+html.atelier body .contact-section textarea {
+  transition: border-color 0.25s ease, box-shadow 0.3s ease;
+}
+
+html.atelier body .contact-section input:hover,
+html.atelier body .contact-section textarea:hover {
+  border-color: color-mix(in srgb, var(--ink) 30%, transparent) !important;
+}
+
+html.atelier body .contact-section input:focus,
+html.atelier body .contact-section textarea:focus {
+  border-color: var(--ink) !important;
+  box-shadow: 0 0 0 3.5px color-mix(in srgb, var(--accent) 18%, transparent) !important;
+}
+
+html.atelier .atelier-contact-field {
+  position: relative;
+}
+
+html.atelier .atelier-contact-field textarea {
+  display: block;
+  padding-bottom: 1.7rem;
+}
+
+html.atelier .atelier-contact-count {
+  position: absolute;
+  right: 0.85rem;
+  bottom: 0.55rem;
+  font-size: 0.68rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  opacity: 0.75;
+  pointer-events: none;
+  transition: color 0.25s ease;
+}
+
+html.atelier .atelier-contact-count.is-near {
+  color: var(--spin);
+  opacity: 1;
+}
+
+html.atelier .atelier-contact-starters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.6rem;
+}
+
+html.atelier .atelier-contact-starters button {
+  padding: 0.32rem 0.7rem;
+  border: 1.5px dashed color-mix(in srgb, var(--ink) 22%, transparent);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font: 500 0.76rem/1.2 var(--sans);
+  cursor: pointer;
+  transition: border-color 0.25s ease, color 0.25s ease, background 0.25s ease, transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+html.atelier .atelier-contact-starters button:hover,
+html.atelier .atelier-contact-starters button:focus-visible {
+  border-style: solid;
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-1px);
+}
+
+html.atelier .atelier-contact-starters button.is-picked {
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  animation: contact-pop 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+html.atelier body .contact-section button[type="submit"] {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  overflow: hidden;
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease;
+}
+
+html.atelier body .contact-section button[type="submit"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 color-mix(in srgb, var(--ink) 25%, transparent);
+}
+
+html.atelier body .contact-section button[type="submit"]:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+html.atelier .form-btn-plane {
+  width: 1rem;
+  height: 1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+html.atelier .contact-section button[type="submit"]:hover .form-btn-plane {
+  transform: translate(3px, -3px) rotate(-8deg);
+}
+
+html.atelier .contact-section button[type="submit"].is-sending .form-btn-plane {
+  animation: contact-fly 1.1s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+}
+
+html.atelier .contact-section button[type="submit"].is-sent .form-btn-plane {
+  animation: contact-sent 0.9s cubic-bezier(0.3, 0, 0.3, 1) both;
+}
+
+@keyframes contact-fly {
+  0% { transform: none; opacity: 1; }
+  45% { transform: translate(18px, -18px) rotate(-12deg); opacity: 0; }
+  46% { transform: translate(-18px, 18px); opacity: 0; }
+  100% { transform: none; opacity: 1; }
+}
+
+@keyframes contact-sent {
+  0% { transform: none; }
+  50% { transform: translate(22px, -22px) rotate(-14deg); opacity: 0; }
+  51% { transform: scale(0.4); opacity: 0; }
+  100% { transform: none; opacity: 1; }
+}
+
+@media (max-width: 800px) {
+  html.atelier .atelier-contact-links a > span:last-child {
+    margin-left: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.atelier .atelier-contact-clock svg path,
+  html.atelier .contact-section button[type="submit"] .form-btn-plane {
+    animation: none !important;
+  }
+
+  html.atelier .atelier-contact-form:focus-within {
+    transform: none;
   }
 }

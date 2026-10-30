@@ -73,6 +73,18 @@ const SHEETS = [
     faceOnly: [0, 1, 2, 3, 4, 5, 6, 7, 8],
     mask: 'mascots/deepika-face-mask-2.png',
   },
+  {
+    // The emotional ones (pleading, teary, fake crying…), treated like the
+    // sheet above.
+    src: 'tools/mascot-src/deepika-reactions3-raw.jpg',
+    out: 'mascots/deepika-reactions-3.webp',
+    columns: [{ from: 0 }, { from: 1 }, { from: 2 }],
+    frontFacing: [0, 1, 2],
+    alignFaces: true,
+    extra: true,
+    faceOnly: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+    mask: 'mascots/deepika-face-mask-3.png',
+  },
 ];
 
 // How far a reaction face may be moved onto the centre face, in output pixels.
