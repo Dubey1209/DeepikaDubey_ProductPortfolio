@@ -1659,12 +1659,12 @@ html.atelier .atelier-mascot-layer.is-look {
 /* Phones get a lighter copy of the direction sheet: the mascot is drawn at
    about 240px there, so the full-size cells are wasted bytes on slow links. */
 html.atelier {
-  --mascot-look: url('mascots/deepika-directions.webp?v=20261187');
+  --mascot-look: url('mascots/deepika-directions.webp?v=20261188');
 }
 
 @media (max-width: 760px) {
   html.atelier {
-    --mascot-look: url('mascots/deepika-directions-sm.webp?v=20261187');
+    --mascot-look: url('mascots/deepika-directions-sm.webp?v=20261188');
   }
 }
 
@@ -1673,7 +1673,7 @@ html.atelier {
    has loaded (it reads the URL from --mascot-react) and sets .has-reactions
    on <html> once it has decoded. */
 html.atelier {
-  --mascot-react: url('mascots/deepika-reactions.webp?v=20261187');
+  --mascot-react: url('mascots/deepika-reactions.webp?v=20261188');
 }
 
 /* mascot.js uses the second layer for direction frames too (.is-look), and
@@ -1695,7 +1695,7 @@ html.atelier.has-reactions .atelier-mascot-layer.is-react {
 }
 
 html.atelier.has-reactions .atelier-mascot-lids {
-  background-image: url('mascots/deepika-blinks.webp?v=20261187');
+  background-image: url('mascots/deepika-blinks.webp?v=20261188');
 }
 
 html.atelier .atelier-mascot-lids {
@@ -1721,12 +1721,12 @@ html.atelier .atelier-mascot.has-earrings .atelier-mascot-layer.is-look > .ateli
 
 html.atelier .atelier-mascot-ear.is-cover {
   inset: 0;
-  background-image: url('mascots/deepika-earcover.webp?v=20261187');
+  background-image: url('mascots/deepika-earcover.webp?v=20261188');
   background-size: 300% 300%;
 }
 
 html.atelier .atelier-mascot-ear.is-drop {
-  background-image: url('mascots/deepika-eardrops.webp?v=20261187');
+  background-image: url('mascots/deepika-eardrops.webp?v=20261188');
 }
 
 html.atelier .atelier-mascot-ear.is-left {
@@ -1748,14 +1748,14 @@ html.atelier .atelier-mascot-react {
    mask with the frame. Her hair, jaw and outline always come from the frame
    underneath; an oval reached the jaw and showed a second chin. */
 html.atelier.has-reactions .atelier-mascot-face {
-  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261187');
-  mask-image: url('mascots/deepika-face-mask.png?v=20261187');
+  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261188');
+  mask-image: url('mascots/deepika-face-mask.png?v=20261188');
 }
 
 /* The second reaction sheet (love, laugh, sleepy…), fetched after the first;
    mascot.js marks its cells .is-react2. */
 html.atelier {
-  --mascot-react-2: url('mascots/deepika-reactions-2.webp?v=20261187');
+  --mascot-react-2: url('mascots/deepika-reactions-2.webp?v=20261188');
 }
 
 html.atelier.has-reactions-2 .atelier-mascot-layer.is-react2 {
@@ -1763,13 +1763,13 @@ html.atelier.has-reactions-2 .atelier-mascot-layer.is-react2 {
 }
 
 html.atelier.has-reactions-2 .atelier-mascot-face.is-react2 {
-  -webkit-mask-image: url('mascots/deepika-face-mask-2.png?v=20261187');
-  mask-image: url('mascots/deepika-face-mask-2.png?v=20261187');
+  -webkit-mask-image: url('mascots/deepika-face-mask-2.png?v=20261188');
+  mask-image: url('mascots/deepika-face-mask-2.png?v=20261188');
 }
 
 /* The third: pleading, teary, a cute guilt trip (.is-react3). */
 html.atelier {
-  --mascot-react-3: url('mascots/deepika-reactions-3.webp?v=20261187');
+  --mascot-react-3: url('mascots/deepika-reactions-3.webp?v=20261188');
 }
 
 html.atelier.has-reactions-3 .atelier-mascot-layer.is-react3 {
@@ -1777,8 +1777,8 @@ html.atelier.has-reactions-3 .atelier-mascot-layer.is-react3 {
 }
 
 html.atelier.has-reactions-3 .atelier-mascot-face.is-react3 {
-  -webkit-mask-image: url('mascots/deepika-face-mask-3.png?v=20261187');
-  mask-image: url('mascots/deepika-face-mask-3.png?v=20261187');
+  -webkit-mask-image: url('mascots/deepika-face-mask-3.png?v=20261188');
+  mask-image: url('mascots/deepika-face-mask-3.png?v=20261188');
 }
 
 html.atelier .atelier-mascot-face {
@@ -6899,7 +6899,7 @@ html.atelier .sb-cameo-art {
 }
 
 html.atelier .sb-cameo-art.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261187');
+  background-image: url('mascots/deepika-reactions.webp?v=20261188');
 }
 
 html.atelier .sb-cameo-art.is-face {
@@ -9907,7 +9907,7 @@ html.atelier body:not(.dark-theme) #theme-toggle-icon svg path {
   }
 }
 
-/* Contact polish: local time, icon rows that fill in on hover, a copy pill
+/* Contact polish: icon rows that fill in on hover, a copy pill
    for the email, a softer focus state on the form, quick starts and a
    paper plane on the send button. Layered over the base contact rules. */
 html.atelier .atelier-contact-meta {
@@ -9920,34 +9920,6 @@ html.atelier .atelier-contact-meta {
 
 html.atelier .atelier-contact-meta .atelier-contact-status {
   margin: 0;
-}
-
-html.atelier .atelier-contact-clock {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  margin: 0;
-  font-size: 0.8rem;
-  font-variant-numeric: tabular-nums;
-  color: var(--muted);
-}
-
-html.atelier .atelier-contact-clock svg {
-  width: 0.95rem;
-  height: 0.95rem;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.8;
-  stroke-linecap: round;
-}
-
-html.atelier .atelier-contact-clock svg path {
-  transform-origin: 12px 12px;
-  animation: contact-clock 12s linear infinite;
-}
-
-@keyframes contact-clock {
-  to { transform: rotate(360deg); }
 }
 
 html.atelier .atelier-contact-links li {
@@ -10256,7 +10228,6 @@ html.atelier .contact-section button[type="submit"].is-sent .form-btn-plane {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html.atelier .atelier-contact-clock svg path,
   html.atelier .contact-section button[type="submit"] .form-btn-plane {
     animation: none !important;
   }
