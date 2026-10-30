@@ -1854,6 +1854,28 @@
     [0.46, 0.315, 0.755], [0.5, 0.34, 0.71], [0.545, 0.375, 0.68],
   ];
 
+  // Below the chin, the two curtains of hair over the sweater, measured off
+  // the centre frame: [y, left curtain from, to, right curtain from, to]. The
+  // left one falls in front of her shoulder, with the sleeve showing outside
+  // it from y .76; the right one is a narrow strip at the edge.
+  var HAIR_BELOW = [
+    [0.545, 0.11, 0.4, 0.68, 0.88], [0.6, 0.11, 0.4, 0.74, 0.9], [0.65, 0.12, 0.38, 0.75, 0.91],
+    [0.72, 0.08, 0.37, 0.8, 0.93], [0.76, 0.15, 0.38, 0.86, 0.94], [0.8, 0.16, 0.39, 0.87, 0.95],
+    [1, 0.16, 0.37, 0.88, 0.95],
+  ];
+
+  function hairBelow(y) {
+    for (var i = 1; i < HAIR_BELOW.length; i += 1) {
+      var a = HAIR_BELOW[i - 1];
+      var b = HAIR_BELOW[i];
+      if (y <= b[0]) {
+        var k = Math.max(0, (y - a[0]) / (b[0] - a[0]));
+        return [1, 2, 3, 4].map(function (j) { return a[j] + (b[j] - a[j]) * k; });
+      }
+    }
+    return HAIR_BELOW[HAIR_BELOW.length - 1].slice(1);
+  }
+
   function faceEdge(y) {
     for (var i = 1; i < FACE_EDGE.length; i += 1) {
       var a = FACE_EDGE[i - 1];
@@ -1877,8 +1899,12 @@
     if (y > 0.545) {
       if (y < 0.58 && x > 0.36 && x < 0.72) return 'chin';
       if (y < 0.7 && x > 0.4 && x < 0.66) return 'neck';
-      // Her hair falls over the sweater down both sides.
-      if (x < 0.4 || x > (y < 0.68 ? 0.7 : 0.78)) return 'hair';
+      // Her hair falls over the sweater in two curtains; around and between
+      // them, the shoulders and sleeves at the outer corners included, is
+      // sweater. A plain "outer 40% is hair" took the corners of the sweater
+      // for hair.
+      var curtain = hairBelow(y);
+      if ((x > curtain[0] && x < curtain[1]) || (x > curtain[2] && x < curtain[3])) return 'hair';
       return 'sweater';
     }
     if (y > 0.36 && y < 0.53 && ((x > 0.2 && x < 0.315) || (x > 0.72 && x < 0.79))) return 'ear';
