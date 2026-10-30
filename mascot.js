@@ -12,6 +12,9 @@
 //   reactions-2 9 love    10 laugh    11 sleepy
 //               12 excited 13 puppy   14 smug
 //               15 confused 16 sad    17 playful (tongue out)
+//   reactions-3 18 plead  19 teary    20 wail (fake crying)
+//               21 hopeful 22 guilt (side-eye) 23 brave "I'm fine"
+//               24 sulk   25 pretty please 26 happy tears
 //
 // What triggers each reaction:
 //   pointer arrives on her      grin (at most every 15s)
@@ -58,8 +61,9 @@
 // The reaction sheet (atelier.css, --mascot-react) loads once the page has,
 // so it doesn't compete with the fonts and the direction sheet for first
 // paint; .has-reactions switches it on everywhere (here and the lock door).
-// The second reaction sheet (--mascot-react-2) follows the first and sets
-// .has-reactions-2; until then its faces stand in with a first-sheet one.
+// The second and third reaction sheets (--mascot-react-2, -3) follow the
+// first and set .has-reactions-2 / -3; until then their faces stand in with a
+// first-sheet one.
 (function () {
   var root = document.documentElement;
   function fetchSheet(prop, cls, then) {
@@ -80,7 +84,9 @@
   }
   function load() {
     fetchSheet('--mascot-react', 'has-reactions', function () {
-      fetchSheet('--mascot-react-2', 'has-reactions-2');
+      fetchSheet('--mascot-react-2', 'has-reactions-2', function () {
+        fetchSheet('--mascot-react-3', 'has-reactions-3');
+      });
     });
   }
   function soon() {
@@ -126,8 +132,21 @@
   var SAD = 16;
   var PLAYFUL = 17;
   var STARRY = EXCITED;
-  // While the second sheet is still on its way, the nearest first-sheet face.
-  var STAND_IN = [SHY, GIGGLE, BLINK, GRIN, SHY, WINK, UNIMPRESSED, UNIMPRESSED, GIGGLE];
+  // The third sheet: cute, emotional, a little manipulative (index - 18).
+  var PLEAD = 18;
+  var TEARY = 19;
+  var WAIL = 20;
+  var HOPEFUL = 21;
+  var GUILT = 22;
+  var BRAVE = 23;
+  var SULK = 24;
+  var PRETTY_PLEASE = 25;
+  var HAPPY_TEARS = 26;
+  // While a later sheet is still on its way, the nearest first-sheet face.
+  var STAND_IN = [
+    SHY, GIGGLE, BLINK, GRIN, SHY, WINK, UNIMPRESSED, UNIMPRESSED, GIGGLE,
+    SHY, UNIMPRESSED, BLINK, GRIN, UNIMPRESSED, GRIN, UNIMPRESSED, GIGGLE, GIGGLE,
+  ];
   var CENTRE = 4;
   // Reactions whose drawing reaches outside the face (her hand), so they
   // replace the whole figure rather than only the face.
@@ -171,17 +190,20 @@
     // Until the reaction sheet has arrived, a reaction holds the centre frame
     // rather than fading to an empty layer.
     var html = document.documentElement;
-    if (sheet === 'react' && index >= 9 && !html.classList.contains('has-reactions-2')) index = STAND_IN[index - 9];
+    if (sheet === 'react' && index >= 18 && !html.classList.contains('has-reactions-3')) index = STAND_IN[index - 9];
+    if (sheet === 'react' && index >= 9 && index < 18 && !html.classList.contains('has-reactions-2')) index = STAND_IN[index - 9];
     if (sheet === 'react' && !html.classList.contains('has-reactions')) {
       sheet = 'look';
       index = CENTRE;
     }
-    var second = sheet === 'react' && index >= 9;
-    if (second) index -= 9;
+    // Which reaction sheet: 1, 2 or 3, nine faces each.
+    var page = sheet === 'react' ? Math.floor(index / 9) + 1 : 0;
+    index %= 9;
     var position = (index % 3) * 50 + '% ' + Math.floor(index / 3) * 50 + '%';
     layer.classList.toggle('is-look', sheet === 'look');
-    layer.classList.toggle('is-react', sheet === 'react' && !second);
-    layer.classList.toggle('is-react2', second);
+    layer.classList.toggle('is-react', page === 1);
+    layer.classList.toggle('is-react2', page === 2);
+    layer.classList.toggle('is-react3', page === 3);
     layer.style.backgroundPosition = position;
     // Face layers have one mask per reaction, laid out like the sheet.
     layer.style.webkitMaskPosition = position;
@@ -495,7 +517,15 @@
     } else if (index === SLEEPY) {
       moveBody('doze');
       burst('zzz');
-    } else if (index === PUPPY || index === SAD) {
+    } else if (index === PLEAD || index === HOPEFUL || index === PRETTY_PLEASE) {
+      blushFor(ms || 2400);
+      moveBody('lean');
+    } else if (index === HAPPY_TEARS) {
+      moveBody('hop');
+      burst('heart');
+    } else if (index === WAIL || index === TEARY) {
+      moveBody('shiver');
+    } else if (index === PUPPY || index === SAD || index === GUILT || index === BRAVE || index === SULK) {
       moveBody('tilt');
     } else if (index === THINKING || index === UNIMPRESSED || index === CONFUSED) {
       moveBody('tilt');
@@ -1174,6 +1204,9 @@
         'ouch! I can smell a Monday coming',
         [WINK, 'this nose can smell good snacks from a mile away'],
         [GIGGLE, 'achoo! …false alarm, carry on'],
+        [CONFUSED, 'did you just press my nose like a doorbell?'],
+        [SMUG, 'my nose has seen things. mostly Figma.'],
+        'nose: critical infrastructure. handle with care',
         [LAUGH, 'haha, okay, okay, that was a good boop'],
         [PLAYFUL, 'boop me again, I dare you. blep'],
       ],
@@ -1213,6 +1246,9 @@
         'eyes shut, mind still overthinking',
         [SHY, 'stop, you’re making me lose eye contact'],
         'blink… loading a dramatic eye roll',
+        [CONFUSED, 'everything’s blurry… is this the new UI?'],
+        'eye poke logged. severity: medium-cute',
+        [PLEAD, 'my eyes were doing their best…'],
         [SLEEPY, 'shh, my eyes are on a lunch break'],
         [PUPPY, 'careful… these are my puppy eyes, they’re fragile'],
       ],
@@ -1254,8 +1290,13 @@
         'aww, whoever you are, you’re doing great',
         'eep! pinker than a strawberry milkshake',
         [GIGGLE, 'hehe, chubby cheeks, happy heart'],
+        [HAPPY_TEARS, 'this is the sweetest poke I’ve ever received'],
+        'cheek status: pink. heart status: fuller',
+        [SMUG, 'yes, the blush is natural. no filter.'],
         [LOVE, 'okay, my heart did a little flip there'],
         [LOVE, 'you poked, I melted. that’s the whole story'],
+        [HOPEFUL, 'does this mean we’re friends now?'],
+        [PRETTY_PLEASE, 'one more cheek poke? pretty please?'],
       ],
     },
     mouth: {
@@ -1293,6 +1334,9 @@
         'mmf! okay fine, I’ll stop talking. for 5 seconds.',
         [GRIN, 'smiling because you clicked. that’s all it takes'],
         [WINK, 'lips sealed. the gossip stays in here'],
+        [CONFUSED, 'was I about to say something important? gone now.'],
+        'mmf! you just interrupted my best pitch ever',
+        [SMUG, 'these lips have said no to many bad features'],
         [PLAYFUL, 'blep! surprise feature, not in the release notes'],
         [LAUGH, 'hahaha, sorry, I just remembered a meme'],
       ],
@@ -1333,6 +1377,9 @@
         'boop! you reset my train of thought. thanks?',
         [THINKING, 'thinking about snacks. and products. mostly snacks.'],
         'careful, that’s where I keep my overthinking',
+        [SLEEPY, 'brain: 2% battery, please plug in chai'],
+        'tap! a user story just fell out',
+        [SMUG, 'big brain, small ego. mostly.'],
         [CONFUSED, 'wait, was that a new idea or an old bug?'],
         [EXCITED, 'ooh! you just poked a brilliant idea loose'],
       ],
@@ -1374,6 +1421,9 @@
         [SHY, 'long hair, soft heart, zero patience for knots'],
         'they’re long, they’re wavy, they’re a full-time job',
         [WINK, 'hair down means I’m in a good mood'],
+        [CONFUSED, 'is there a tangle? there’s always a tangle.'],
+        'curls: unpredictable, like stakeholder feedback',
+        [LOVE, 'a gentle hair touch? okay, you’re forgiven'],
       ],
     },
     // The third touch of her hair in a row: she minds, nicely.
@@ -1430,6 +1480,8 @@
         [GIGGLE, 'okay, I was never really angry. maybe a little.'],
         [PUPPY, 'fine, you win. but next time, ask first'],
         [GIGGLE, 'angry mode lasted 6 seconds. a new record'],
+        [BRAVE, 'it’s okay. they’ll untangle… someday'],
+        [TEARY, 'say sorry to my hair. it’s very sensitive'],
       ],
     },
     ear: {
@@ -1465,6 +1517,9 @@
         [SHY, 'aww, you noticed the little things. that’s rare'],
         [GIGGLE, 'they jingle, I giggle. fair trade'],
         [WINK, 'no headphones in, so yes, I’m listening'],
+        [SMUG, 'I hear user complaints before they’re typed'],
+        'earrings: tiny, but they’ve been to every launch',
+        [LOVE, 'you noticed my earrings? you’re a keeper'],
       ],
     },
     chin: {
@@ -1494,6 +1549,9 @@
         'eep! that’s my thinking pose, not a button',
         [GIGGLE, 'hehe, I giggle like a broken toy, sorry'],
         [WINK, 'chin up, coffee in, let’s go'],
+        [SMUG, 'chin up: the official PM posture'],
+        'hehe, my chin has no chill',
+        [PUPPY, 'okay, but gently, it’s my thinking spot'],
       ],
     },
     neck: {
@@ -1523,12 +1581,15 @@
         [SLEEPY, 'aww, now I want a nap'],
         'hehe, no tickling before coffee, please',
         [WINK, 'neck deep in cosiness. and work.'],
+        [SLEEPY, 'turtleneck + warm chai = instant nap'],
+        'eek! cosy zone breached',
+        [SMUG, 'black turtleneck: dressed for a product launch, always'],
       ],
     },
     sweater: {
       face: GIGGLE,
       lines: [
-        'hehe, that tickles!',
+        'hehe, sweater tickles are the worst. the best?',
         [GRIN, 'careful, it’s my launch sweater'],
         [GRIN, 'cozy sweater, shipped on time'],
         [WINK, 'stripes: consistent, like a design system'],
@@ -1557,6 +1618,9 @@
         [SHY, 'soft clothes, big dreams'],
         [SLEEPY, 'I could nap in this sweater right now'],
         [GRIN, 'stripes: because plain is too easy'],
+        [LOVE, 'this sweater and I have been through so much'],
+        'stripes: horizontal, like a good timeline',
+        [PLAYFUL, 'secret: there’s a snack in the pocket'],
       ],
     },
     hello: {
@@ -1580,6 +1644,9 @@
         [STARRY, 'hi! you just made my day a little brighter'],
         'hello! no mouse needed, I like your style',
         [GRIN, 'hi! drink some water today, okay?'],
+        [HOPEFUL, 'hi! I hope you find something you like here'],
+        'hey, keyboard explorer! respect',
+        [EXCITED, 'hello! you just made the mascot very happy'],
       ],
     },
   };
@@ -1610,6 +1677,8 @@
         'stop it, you’re too sweet',
         'okay, we’re friends now. it’s official',
         [PUPPY, 'aww, you keep coming back'],
+        [PLEAD, 'don’t stop… I mean, you can. but don’t.'],
+        [HAPPY_TEARS, 'this much attention? I might cry. happy tears.'],
       ],
     },
     {
@@ -1686,6 +1755,36 @@
       'psst… stretch your shoulders. yes, you.',
       'hmm, good ideas always arrive in the shower',
       'dreaming of a day with zero notifications',
+      'what if the onboarding is the product?',
+      [CONFUSED, 'why does every app want my notifications?'],
+      'a good PRD answers questions before they’re asked',
+      [SMUG, 'I can spot a dark pattern from three screens away'],
+      'hmm, what would my grandma find confusing here?',
+      [LOVE, 'a perfectly aligned button. chef’s kiss'],
+      'the user doesn’t care how hard it was to build',
+      [SLEEPY, 'one more sprint, then a real holiday. promise.'],
+      'if it needs a tooltip, maybe it needs a redesign',
+      [PLAYFUL, 'secret: I still say “Jetpack Compose” in a superhero voice'],
+      'Kotlin brain and product heart. weird combo, works great',
+      [EXCITED, 'new job, new problems to fall in love with'],
+      'Parse AI days: prototype fast, learn faster',
+      [CONFUSED, 'how do people decide without data? or with too much?'],
+      'a feature request is a symptom. what’s the illness?',
+      [HOPEFUL, 'maybe today someone reads the whole case study'],
+      'good design is invisible. bad design files tickets',
+      [SMUG, 'my Figma layers are named. all of them. yes, really.'],
+      'what if we asked users before the sprint, not after?',
+      [PUPPY, 'psst… my writing section is lonely'],
+      'empathy, then pixels, then code. that order.',
+      [SAD, 'a beautiful feature with zero adoption… pain'],
+      'every “quick fix” has a sequel',
+      [GIGGLE, 'I talk to my rubber duck. it gives great feedback'],
+      'the best meetings end early',
+      [LOVE, 'nothing beats a user saying “oh, that’s nice”'],
+      'roadmaps are promises. I keep mine small and real',
+      [CONFUSED, 'why is “simple” always the hardest thing to build?'],
+      'hmm… is this solving a problem or decorating one?',
+      [SMUG, 'I read the release notes. all of them. for fun.'],
       [LOVE, 'hmm… is it weird that I love a clean Figma file?'],
       [CONFUSED, 'why do meetings about saving time take an hour?'],
       [SLEEPY, 'chai first, opinions later'],
@@ -1777,6 +1876,89 @@
     return { face: typeof line === 'string' ? step.face : line[0], text: lastLine };
   }
 
+  // Thoughts that depend on the visitor's own clock: the hour, and whether it
+  // is the weekend. Now and then one of these replaces a general thought, so
+  // what she says shifts with the time of day and is harder to predict.
+  var TIMELY = {
+    morning: {
+      face: GRIN,
+      lines: [
+        'good morning! did you have chai yet? I did. twice.',
+        [SLEEPY, 'mornings: my brain is still loading'],
+        'fresh morning, fresh backlog, fresh optimism',
+        [SMUG, 'reading portfolios before 10am? very productive'],
+        [SLEEPY, 'shh, my coffee hasn’t reached my eyes yet'],
+        'morning standup energy: activated',
+        [EXCITED, 'early visitor! you get the first fun fact'],
+        'mornings are for deep work. and snacks.',
+      ],
+    },
+    afternoon: {
+      face: THINKING,
+      lines: [
+        [SLEEPY, 'post-lunch slump hitting hard…'],
+        'afternoon: peak meeting hours. stay strong',
+        [CONFUSED, 'how is it only 3pm?'],
+        'the 4pm chai is a sacred ritual',
+        [SMUG, 'lunch break portfolio scroll? I respect it'],
+        'afternoon brain: half roadmap, half samosa',
+        [PUPPY, 'is it snack o’clock yet? please say yes'],
+      ],
+    },
+    evening: {
+      face: SHY,
+      lines: [
+        'evening already? where did the day go?',
+        [GRIN, 'golden hour, golden ideas'],
+        'wrapping up the day with a little portfolio browsing?',
+        [SLEEPY, 'evening me: thinking about dinner, mostly'],
+        [HOPEFUL, 'end of the day, and you chose to visit me'],
+        'sunset mode: calm mind, open tabs',
+      ],
+    },
+    night: {
+      face: SLEEPY,
+      lines: [
+        'up this late? me too. let’s not tell anyone',
+        [SMUG, 'night owls make the best product decisions. allegedly'],
+        'midnight ideas hit different',
+        [CONFUSED, 'why do the best ideas come when I should be asleep?'],
+        [PUPPY, 'drink some water and sleep soon, okay?'],
+        'late night scroll? dark mode is on your side',
+        [SLEEPY, '*yawn* …I’m awake. I’m always awake.'],
+        [LOVE, 'a night-time visitor! cosy.'],
+      ],
+    },
+    weekend: {
+      face: GIGGLE,
+      lines: [
+        'reading portfolios on a weekend? dedicated.',
+        [SMUG, 'weekend me: zero meetings, full brain'],
+        [PLAYFUL, 'shh, it’s the weekend, no Jira allowed'],
+        'weekend plan: hair oil, a long nap, maybe a side project',
+        [EXCITED, 'weekend visitor! you get bonus cuteness'],
+        [SLEEPY, 'weekends are for sleeping in. I’m doing it right now'],
+      ],
+    },
+  };
+
+  function timeKey() {
+    var d = new Date();
+    var day = d.getDay();
+    if ((day === 0 || day === 6) && Math.random() < 0.5) return 'weekend';
+    var h = d.getHours();
+    return h >= 5 && h < 12 ? 'morning' : h < 17 ? 'afternoon' : h < 21 ? 'evening' : 'night';
+  }
+
+  // A general thought, or about one time in four, one for the hour.
+  function pickThought(key, step) {
+    if (Math.random() < 0.25) {
+      var k = timeKey();
+      return pickLine('time:' + k, TIMELY[k]);
+    }
+    return pickLine(key, step);
+  }
+
   // Long enough to read at an easy pace, never so long she seems stuck.
   function holdFor(text) {
     return Math.min(4800, 2200 + text.length * 45);
@@ -1816,7 +1998,89 @@
     { id: 'sulk', steps: [[SAD, 1200], [PUPPY, 1100], [GRIN, 800]], move: 'tilt', line: 'nobody read my case studies… kidding, you will' },
     { id: 'please', steps: [[PUPPY, 1600], [SHY, 800]], move: 'lean', blush: true, line: 'pretty please read one case study?' },
     { id: 'lost', steps: [[CONFUSED, 1400], [GIGGLE, 800]], move: 'shake', fx: 'ask', line: 'wait, which tab was I on?' },
+    // The emotional ones: a little guilt trip, played for cute.
+    { id: 'plead', steps: [[PLEAD, 1700], [HOPEFUL, 1000]], move: 'lean', blush: true, line: 'read just one case study? for me?' },
+    { id: 'drama', steps: [[TEARY, 1000], [WAIL, 1300], [BRAVE, 1200]], move: 'shiver', fx: 'sweat', line: 'nobody pokes me anymore… it’s fine. I’m fine.' },
+    { id: 'guilt', steps: [[GUILT, 1500], [SULK, 1100]], move: 'tilt', line: 'oh, so you’re just going to scroll past me? okay.' },
+    { id: 'pretty', steps: [[PRETTY_PLEASE, 1700]], move: 'bounce', fx: 'heart', blush: true, line: 'pretty pretty please stay a little longer?' },
+    { id: 'touched', steps: [[TEARY, 900], [HAPPY_TEARS, 1600]], move: 'hop', fx: 'heart', line: 'you poked me so gently… I’m not crying, you are' },
+    { id: 'brave', steps: [[SULK, 1100], [BRAVE, 1500]], move: 'tilt', line: 'no, go ahead, ignore the cute girl. totally fine' },
   ];
+
+  // Cute guilt trips: a face from the third sheet and a line to match.
+  var EMOTIONAL = {
+    face: PLEAD,
+    lines: [
+      'wait… you’re leaving? already?',
+      [TEARY, 'you didn’t even read my case studies…'],
+      [BRAVE, 'it’s okay. I’ll just be here. alone. smiling.'],
+      [GUILT, 'leaving without saying bye? bold.'],
+      [SULK, 'fine. go. I didn’t want a visitor anyway. (I did.)'],
+      [PRETTY_PLEASE, 'one more scroll? pretty please?'],
+      [WAIL, 'nooo, don’t go, I had more fun facts!'],
+      'I made this whole portfolio for you… okay, for recruiters, but still',
+      [HOPEFUL, 'if you stay, I’ll show you my best project'],
+      [GUILT, 'you’ll come back, right? …right?'],
+      [TEARY, 'my metrics say you’re about to bounce… please don’t'],
+      [BRAVE, 'bye! don’t worry about me. I’ll survive. probably.'],
+      [PLEAD, 'just tell me one thing you liked, then you can go'],
+      [SULK, 'and here I was, thinking we had something'],
+      [PLEAD, 'the case studies will miss you. I’ll miss you more'],
+      [TEARY, 'you didn’t even poke me goodbye…'],
+      [HOPEFUL, 'bookmark me? so you can come back?'],
+      [BRAVE, 'go, go. I’ll be fine. I have my earrings.'],
+    ],
+  };
+
+  var HAPPY_RETURN = {
+    face: HAPPY_TEARS,
+    lines: [
+      'you came back! I’m not crying, you are',
+      [HAPPY_TEARS, 'I knew you’d return. I just knew it'],
+      [HOPEFUL, 'back so soon? does that mean you liked it?'],
+      [PRETTY_PLEASE, 'yay! you’re back! stay this time?'],
+      'okay, I missed you. a normal amount. a lot.',
+      'you came back for me, didn’t you? admit it',
+    ],
+  };
+
+  // More words for each moment, beside its own line (see playMoment).
+  var MOMENT_LINES = {
+    hum: ['♪ shipping features, la la la ♪', 'humming my favourite song. badly.', '♪ do do do… roadmap… do do ♪'],
+    aha: ['wait wait wait… I’ve got it!', 'eureka! okay, small eureka', 'idea! writing it down before it escapes'],
+    sneeze: ['achoo! sorry, allergic to scope creep', 'a-a-achoo! bless me, I guess', 'achoo! that was a big one'],
+    shy: ['eep, why is my face warm?', 'don’t look at me like that, I’ll blush', 'hehe, okay, I’m a little flustered'],
+    dizzy: ['wheee… which way is up?', 'too many tabs, my head is spinning', 'okay, the room is doing a little dance'],
+    sleepy: ['I was just testing my eyelids', 'not asleep! just… loading', 'mm? yes, I’m listening. totally.'],
+    confused: ['hold on, what’s the question again?', 'I had a thought and it left', 'wait, did I already say that?'],
+    proud: ['did you see that? flawless', 'pat on my own back, thank you', 'that went better than planned'],
+    secret: ['psst… you’re my favourite visitor today', 'secret: I rehearse my pitch in the mirror', 'between us? I love this page too'],
+    judging: ['hmm. interesting choice.', 'I see you. I’m not saying anything.', 'okay… bold move.'],
+    tickled: ['hehe, stop, that tickles!', 'okay okay, I give up, I’m ticklish', 'hehehe, not fair!'],
+    nervous: ['uh… did something just break?', 'gulp. that wasn’t me, I promise', 'nervous laugh… haha… ha'],
+    aww: ['aww, that’s so sweet of you', 'you’re making my day, you know', 'stop, you’re too kind'],
+    startled: ['whoa! a little warning next time?', 'eek! my heart just skipped', 'you scared the roadmap out of me'],
+    agree: ['exactly what I was thinking', 'yes! a hundred percent', 'couldn’t have said it better'],
+    cool: ['cool, calm, and slightly caffeinated', 'smooth. very smooth.', 'yeah, I meant to do that'],
+    yawn: ['*yawn*… it’s not you, it’s the hour', '*yawn* okay, one more case study', 'sorry! long day of decisions'],
+    cheer: ['yay! you’re still here!', 'woohoo! best visitor ever', 'happy dance, happy dance!'],
+    pout: ['hmph. okay, but just one more', 'fine. you’re forgiven. barely.', 'pouting… but cutely'],
+    calc: ['running the numbers… looks good', 'carry the one… yep, still cute', 'data says: you have great taste'],
+    peek: ['boo! did I get you?', 'peek! still here', 'I see you!'],
+    wow: ['wow, okay, I’m impressed', 'whoa, that’s really nice of you', 'look at you, exploring everything'],
+    smitten: ['is it hot in here, or is it just this page?', 'heart eyes: activated', 'okay, I’m a little in love with this moment'],
+    lol: ['hahaha, I can’t stop', 'that was so funny, I don’t know why', 'haha, sorry, laughing at my own thought'],
+    blep: ['blep. that’s it. that’s the thought.', 'tongue out, worries out', 'blep! for science'],
+    sulk: ['nobody noticed my new earrings… sigh', 'I wrote a whole essay and… okay, I’m fine', 'a little sad, a little dramatic'],
+    please: ['just one more scroll? please?', 'please, the good part is just below', 'pretty please with chai on top?'],
+    lost: ['where was I going with this?', 'brain left the meeting early', 'hold on, rebooting my train of thought'],
+    plead: ['pleeease read one case study?', 'look at these eyes. can you say no?', 'for me? just one more section?'],
+    drama: ['sniff… I’m okay. totally okay.', 'no one appreciates a good portfolio anymore… sob', 'don’t mind me, just being dramatic'],
+    guilt: ['you’re not even looking at me, are you?', 'I see how it is', 'scrolling past me? noted. hurtfully.'],
+    pretty: ['stay, and I’ll tell you a secret', 'one more minute? I’ll be extra cute', 'please? I made this whole page for you'],
+    touched: ['you’re so kind, I might cry', 'happy tears only, I promise', 'okay, that was really sweet'],
+    brave: ['I’m strong. I’m independent. please poke me.', 'it’s fine. I’ll just talk to myself', 'totally okay. smiling through it'],
+  };
 
   var momentTimers = [];
   // A move already under way is allowed to finish: swapping it for another
@@ -1906,9 +2170,11 @@
     if (m.fx) momentTimers.push(setTimeout(function () { burst(m.fx); }, m.at || 120));
     if (m.blush) blushFor(total + 300);
     if (!quiet) {
-      var hold = Math.max(holdFor(m.line), total - (m.sayAt || 0));
-      momentTimers.push(setTimeout(function () { say(m.line, hold); }, m.sayAt || 180));
-      lastLine = m.line;
+      // Each moment has a few lines, dealt like the rest, so the same little
+      // scene doesn't always end on the same words.
+      var text = pickLine('moment:' + m.id, { face: -1, lines: [m.line].concat(MOMENT_LINES[m.id] || []) }).text;
+      var hold = Math.max(holdFor(text), total - (m.sayAt || 0));
+      momentTimers.push(setTimeout(function () { say(text, hold); }, m.sayAt || 180));
     }
     return total;
   }
@@ -2014,7 +2280,7 @@
     museTimer = setTimeout(function () {
       if (reacting >= 0 || now() - lastMuse < 20000 || now() - lastPokeAt < 4000) return;
       lastMuse = now();
-      var line = pickLine('muse', MUSINGS);
+      var line = pickThought('muse', MUSINGS);
       var hold = holdFor(line.text);
       react(line.face, hold, true);
       say(line.text, hold);
@@ -2262,7 +2528,10 @@
     if (!visible || now() - leftAt < 4000) return;
         setTimeout(function () {
       if (reacting >= 0) return;
-      var line = pickLine('back', WELCOME_BACK);
+      // After a guilt trip, coming back gets happy tears.
+      var missed = now() - lastGuilt < 10 * 60000 || Math.random() < 0.25;
+      var line = missed ? pickLine('returned', HAPPY_RETURN) : pickLine('back', WELCOME_BACK);
+      if (missed) burst('heart');
       var hold = holdFor(line.text);
       react(line.face, hold);
       say(line.text, hold);
@@ -2325,6 +2594,14 @@
       'your cursor is very calm. teach me',
       [THINKING, 'blinking… in a user-centred way'],
       'staring contest? I never lose. I blink in style',
+      [HOPEFUL, 'if you’re reading this, you have great taste'],
+      'still here? okay, I’ll tell you a secret: I love this page',
+      [CONFUSED, 'are you thinking? I’m thinking too. about snacks.'],
+      [PLAYFUL, 'this is my “waiting for a review” face'],
+      'quiet visitors are my favourite kind',
+      [GIGGLE, 'I just counted my earrings. still two.'],
+      [SMUG, 'patience: a core product skill. watch me.'],
+      [PUPPY, 'poke me? just once? for science?'],
       [SLEEPY, 'it’s so quiet… I might take a tiny nap'],
       [PUPPY, 'hello? anyone? I’ll be good, promise'],
       [SMUG, 'idle? no. I’m in deep focus mode'],
@@ -2436,7 +2713,7 @@
     // Now and then one of her little moments, to herself: humming, dozing
     // off, a sneeze, a happy wiggle.
     [10, function () {
-      var quietOnes = ['hum', 'sleepy', 'sneeze', 'shy', 'tickled', 'yawn', 'aha', 'peek', 'blep', 'lost', 'smitten'];
+      var quietOnes = ['hum', 'sleepy', 'sneeze', 'shy', 'tickled', 'yawn', 'aha', 'peek', 'blep', 'lost', 'smitten', 'guilt', 'plead'];
       var pick = quietOnes[Math.floor(Math.random() * quietOnes.length)];
       var m = MOMENTS.filter(function (x) { return x.id === pick; })[0];
       return playMoment(m, true) + 400;
@@ -2509,6 +2786,17 @@
       react(PUPPY, 2000, true);
       return 2500;
     }],
+    // Pleading, sparkly eyes, cheeks pink: please keep looking at me.
+    [5, function () {
+      react(PLEAD, 2200, true);
+      blushFor(2400);
+      return 2700;
+    }],
+    // A hopeful little smile.
+    [5, function () {
+      react(HOPEFUL, 2000, true);
+      return 2500;
+    }],
   ];
 
   function pickFrom(acts) {
@@ -2533,8 +2821,26 @@
       col = 1;
       row = 1;
       requestLook(CENTRE);
+      // Out through the top, towards the tabs and the close button: she
+      // tries, cutely, to make you stay.
+      if (e.clientY <= 8) guiltTrip();
     }
   });
+
+  var lastGuilt = 0;
+  function guiltTrip() {
+    if (!visible || asleep || now() - lastGuilt < 45000 || now() - lastPokeAt < 3000) return;
+    if (reacting >= 0 && reacting !== BLINK) return;
+    lastGuilt = now();
+    momentTimers.forEach(clearTimeout);
+    momentTimers = [];
+    var line = pickLine('emotional', EMOTIONAL);
+    var hold = holdFor(line.text) + 600;
+    react(line.face, hold, false, true);
+    say(line.text, hold);
+    if (line.face === PLEAD || line.face === PRETTY_PLEASE || line.face === HOPEFUL) blushFor(hold);
+    moveBody(line.face === WAIL || line.face === TEARY ? 'shiver' : 'lean');
+  }
 
   function scheduleIdle(ms) {
     clearTimeout(idleTimer);
@@ -2571,6 +2877,10 @@
       [GIGGLE, 'I dreamt the backlog was empty. beautiful'],
       [EXCITED, 'okay, fully recharged. let’s go!'],
       [SLEEPY, 'five more minutes? …no? okay, fine'],
+      [CONFUSED, 'did I miss a meeting? please say no'],
+      [GIGGLE, 'I was dreaming about a bug-free release'],
+      'oh! hi! I was… researching sleep. for a feature.',
+      [SHY, 'that was a very professional nap, I swear'],
     ],
   };
 
@@ -2632,7 +2942,7 @@
     if (quiet > 30000 && now() - lastIdleLine > 45000 && Math.random() < 0.4) {
       lastIdleLine = now();
       if (!pointer) gazeTo(CENTRE);
-      var line = pickLine('idle', IDLE_LINES);
+      var line = pickThought('idle', IDLE_LINES);
       var hold = holdFor(line.text);
       react(line.face, hold);
       say(line.text, hold);
