@@ -1659,12 +1659,12 @@ html.atelier .atelier-mascot-layer.is-look {
 /* Phones get a lighter copy of the direction sheet: the mascot is drawn at
    about 240px there, so the full-size cells are wasted bytes on slow links. */
 html.atelier {
-  --mascot-look: url('mascots/deepika-directions.webp?v=20261186');
+  --mascot-look: url('mascots/deepika-directions.webp?v=20261187');
 }
 
 @media (max-width: 760px) {
   html.atelier {
-    --mascot-look: url('mascots/deepika-directions-sm.webp?v=20261186');
+    --mascot-look: url('mascots/deepika-directions-sm.webp?v=20261187');
   }
 }
 
@@ -1673,7 +1673,7 @@ html.atelier {
    has loaded (it reads the URL from --mascot-react) and sets .has-reactions
    on <html> once it has decoded. */
 html.atelier {
-  --mascot-react: url('mascots/deepika-reactions.webp?v=20261186');
+  --mascot-react: url('mascots/deepika-reactions.webp?v=20261187');
 }
 
 /* mascot.js uses the second layer for direction frames too (.is-look), and
@@ -1695,7 +1695,7 @@ html.atelier.has-reactions .atelier-mascot-layer.is-react {
 }
 
 html.atelier.has-reactions .atelier-mascot-lids {
-  background-image: url('mascots/deepika-blinks.webp?v=20261186');
+  background-image: url('mascots/deepika-blinks.webp?v=20261187');
 }
 
 html.atelier .atelier-mascot-lids {
@@ -1721,12 +1721,12 @@ html.atelier .atelier-mascot.has-earrings .atelier-mascot-layer.is-look > .ateli
 
 html.atelier .atelier-mascot-ear.is-cover {
   inset: 0;
-  background-image: url('mascots/deepika-earcover.webp?v=20261186');
+  background-image: url('mascots/deepika-earcover.webp?v=20261187');
   background-size: 300% 300%;
 }
 
 html.atelier .atelier-mascot-ear.is-drop {
-  background-image: url('mascots/deepika-eardrops.webp?v=20261186');
+  background-image: url('mascots/deepika-eardrops.webp?v=20261187');
 }
 
 html.atelier .atelier-mascot-ear.is-left {
@@ -1748,14 +1748,14 @@ html.atelier .atelier-mascot-react {
    mask with the frame. Her hair, jaw and outline always come from the frame
    underneath; an oval reached the jaw and showed a second chin. */
 html.atelier.has-reactions .atelier-mascot-face {
-  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261186');
-  mask-image: url('mascots/deepika-face-mask.png?v=20261186');
+  -webkit-mask-image: url('mascots/deepika-face-mask.png?v=20261187');
+  mask-image: url('mascots/deepika-face-mask.png?v=20261187');
 }
 
 /* The second reaction sheet (love, laugh, sleepy…), fetched after the first;
    mascot.js marks its cells .is-react2. */
 html.atelier {
-  --mascot-react-2: url('mascots/deepika-reactions-2.webp?v=20261186');
+  --mascot-react-2: url('mascots/deepika-reactions-2.webp?v=20261187');
 }
 
 html.atelier.has-reactions-2 .atelier-mascot-layer.is-react2 {
@@ -1763,13 +1763,13 @@ html.atelier.has-reactions-2 .atelier-mascot-layer.is-react2 {
 }
 
 html.atelier.has-reactions-2 .atelier-mascot-face.is-react2 {
-  -webkit-mask-image: url('mascots/deepika-face-mask-2.png?v=20261186');
-  mask-image: url('mascots/deepika-face-mask-2.png?v=20261186');
+  -webkit-mask-image: url('mascots/deepika-face-mask-2.png?v=20261187');
+  mask-image: url('mascots/deepika-face-mask-2.png?v=20261187');
 }
 
 /* The third: pleading, teary, a cute guilt trip (.is-react3). */
 html.atelier {
-  --mascot-react-3: url('mascots/deepika-reactions-3.webp?v=20261186');
+  --mascot-react-3: url('mascots/deepika-reactions-3.webp?v=20261187');
 }
 
 html.atelier.has-reactions-3 .atelier-mascot-layer.is-react3 {
@@ -1777,8 +1777,8 @@ html.atelier.has-reactions-3 .atelier-mascot-layer.is-react3 {
 }
 
 html.atelier.has-reactions-3 .atelier-mascot-face.is-react3 {
-  -webkit-mask-image: url('mascots/deepika-face-mask-3.png?v=20261186');
-  mask-image: url('mascots/deepika-face-mask-3.png?v=20261186');
+  -webkit-mask-image: url('mascots/deepika-face-mask-3.png?v=20261187');
+  mask-image: url('mascots/deepika-face-mask-3.png?v=20261187');
 }
 
 html.atelier .atelier-mascot-face {
@@ -6899,7 +6899,7 @@ html.atelier .sb-cameo-art {
 }
 
 html.atelier .sb-cameo-art.is-react {
-  background-image: url('mascots/deepika-reactions.webp?v=20261186');
+  background-image: url('mascots/deepika-reactions.webp?v=20261187');
 }
 
 html.atelier .sb-cameo-art.is-face {
@@ -10263,5 +10263,248 @@ html.atelier .contact-section button[type="submit"].is-sent .form-btn-plane {
 
   html.atelier .atelier-contact-form:focus-within {
     transform: none;
+  }
+}
+/* ---- Small screens: contact and footer, laid out for a phone ------------
+   Contact links become one email card plus three tap tiles, the form
+   tightens up, and the footer folds into a three-column index. */
+@media (max-width: 640px) {
+  html.atelier .atelier-contact {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 1.5rem !important;
+  }
+
+  html.atelier .atelier-contact-copy > p:not(.atelier-contact-status) {
+    margin-bottom: 1.1rem;
+    font-size: 0.96rem;
+    line-height: 1.55;
+  }
+
+  html.atelier body .atelier-contact-links {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.5rem;
+    border-top: 0;
+  }
+
+  html.atelier body .atelier-contact-links li {
+    margin: 0;
+    border: 1.5px solid var(--line);
+    border-radius: 0.95rem;
+    background: color-mix(in srgb, var(--card) 70%, transparent);
+    transition: border-color 0.25s ease, transform 0.25s ease;
+  }
+
+  html.atelier body .atelier-contact-links li:active {
+    transform: scale(0.97);
+  }
+
+  html.atelier body .atelier-contact-links li:has(a:is(:hover, :focus-visible)) {
+    border-color: var(--accent);
+  }
+
+  html.atelier body .atelier-contact-links li > a {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.8rem 0.3rem 0.7rem;
+    text-align: center;
+  }
+
+  html.atelier body .atelier-contact-links a > span:first-child {
+    flex-direction: column;
+    gap: 0.4rem;
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+  }
+
+  html.atelier body .atelier-contact-links a:is(:hover, :focus-visible) > span:first-child {
+    transform: none;
+  }
+
+  html.atelier body .atelier-contact-links .atelier-contact-leader,
+  html.atelier body .atelier-contact-links li:not(:first-child) a > span:last-child {
+    display: none;
+  }
+
+  /* The email gets its own card: icon, label over address, copy. */
+  html.atelier body .atelier-contact-links li:first-child {
+    grid-column: 1 / -1;
+    padding-right: 0.6rem;
+  }
+
+  html.atelier body .atelier-contact-links li:first-child > a {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    justify-items: start;
+    gap: 0.1rem 0.7rem;
+    padding: 0.65rem 0.2rem 0.65rem 0.65rem;
+    text-align: left;
+  }
+
+  html.atelier body .atelier-contact-links li:first-child a > span:first-child {
+    display: contents;
+  }
+
+  html.atelier body .atelier-contact-links li:first-child .atelier-contact-ico {
+    grid-row: span 2;
+  }
+
+  html.atelier body .atelier-contact-links li:first-child a > span:last-child {
+    flex-basis: auto;
+    max-width: 100%;
+    margin: 0;
+    overflow: hidden;
+    color: var(--ink);
+    font-size: 0.86rem;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  html.atelier body .atelier-contact-links li:first-child .atelier-contact-go {
+    display: none;
+  }
+
+  html.atelier .atelier-contact-clip {
+    padding: 0.42rem 0.62rem;
+  }
+
+  html.atelier body .atelier-contact-form {
+    padding: 1.15rem 1.05rem 1.15rem;
+    border-radius: 1rem;
+    box-shadow: 4px 5px 0 var(--ink);
+  }
+
+  html.atelier body .atelier-contact-form:focus-within {
+    transform: none;
+    box-shadow: 4px 5px 0 var(--ink);
+  }
+
+  html.atelier body .atelier-contact-form h3 {
+    margin-bottom: 0.85rem;
+    font-size: 1.32rem !important;
+  }
+
+  html.atelier body .atelier-contact-form .form-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
+  }
+
+  html.atelier body .atelier-contact-form .form-group {
+    margin-bottom: 0.7rem;
+  }
+
+  html.atelier body .atelier-contact-form label {
+    margin-bottom: 0.3rem;
+    font-size: 0.66rem;
+  }
+
+  /* 16px keeps iOS from zooming the page when a field is tapped. */
+  html.atelier body .contact-section input,
+  html.atelier body .contact-section textarea {
+    padding: 0.62rem 0.75rem;
+    border-radius: 0.7rem;
+    font-size: 16px;
+  }
+
+  html.atelier body .contact-section textarea {
+    min-height: 6.2rem;
+  }
+
+  html.atelier .atelier-contact-starters {
+    flex-wrap: nowrap;
+    margin: 0.5rem -1.05rem 0;
+    padding: 0.1rem 1.05rem 0.2rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 1rem, #000 calc(100% - 1.6rem), transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 1rem, #000 calc(100% - 1.6rem), transparent);
+  }
+
+  html.atelier .atelier-contact-starters::-webkit-scrollbar {
+    display: none;
+  }
+
+  html.atelier .atelier-contact-starters button {
+    flex: none;
+    white-space: nowrap;
+  }
+
+  html.atelier body .contact-section button[type="submit"] {
+    width: 100%;
+    justify-content: center;
+    padding: 0.85rem 1.2rem;
+  }
+
+  html.atelier body .atelier-footer {
+    margin-top: 0.5rem;
+    padding: 2rem 0 1.1rem !important;
+  }
+
+  html.atelier body .atelier-footer-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.4rem 0.8rem;
+  }
+
+  html.atelier body .atelier-footer-brand {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+  }
+
+  html.atelier body .atelier-footer-brand p {
+    margin: 0;
+    padding-left: 0.9rem;
+    border-left: 1.5px solid var(--line);
+    font-size: 0.86rem;
+    line-height: 1.45;
+  }
+
+  html.atelier body .atelier-footer-label {
+    margin-bottom: 0.45rem;
+    font-size: 0.64rem;
+  }
+
+  html.atelier body .atelier-footer li {
+    margin: 0;
+  }
+
+  html.atelier body .atelier-footer li a {
+    display: inline-block;
+    padding: 0.3rem 0;
+    font-size: 0.86rem;
+  }
+
+  html.atelier body .fx-footer-mark {
+    margin-top: calc(1.4rem - 0.32em);
+    font-size: clamp(2.6rem, 15vw, 4rem);
+  }
+
+  html.atelier body .atelier-footer-bottom {
+    flex-direction: row;
+    align-items: center;
+    margin-top: 1.1rem;
+    padding-top: 0.85rem;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 360px) {
+  html.atelier body .atelier-contact-form .form-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  html.atelier body .atelier-contact-links li:first-child .atelier-contact-clip span {
+    display: none;
+  }
+
+  html.atelier body .atelier-footer li a {
+    font-size: 0.8rem;
   }
 }

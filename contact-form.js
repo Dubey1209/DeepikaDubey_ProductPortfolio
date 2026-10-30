@@ -145,19 +145,9 @@
     });
   }
 
-  // The small touches around the form: her local time, copying the email,
-  // quick starts for the message, and a character count.
+  // The small touches around the form: copying the email, quick starts
+  // for the message, and a character count.
   function initContactExtras() {
-    const clock = document.querySelector('[data-contact-clock]');
-    if (clock && typeof Intl !== 'undefined') {
-      const fmt = new Intl.DateTimeFormat('en-IN', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'Asia/Kolkata' });
-      const tick = function () {
-        clock.textContent = fmt.format(new Date()).toUpperCase() + ' in India';
-      };
-      tick();
-      setInterval(tick, 30000);
-    }
-
     document.querySelectorAll('.atelier-contact-clip').forEach(function (btn) {
       const text = btn.querySelector('span');
       let reset = 0;
