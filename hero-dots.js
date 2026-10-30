@@ -248,8 +248,9 @@
     home.addEventListener('pointermove', track);
     home.addEventListener('pointerleave', function () { tx = 0; ty = 0; wake(); });
 
-    span.addEventListener('click', function () {
+    body.pop = function (nudge) {
       vpop += 9;
+      if (nudge) vx += g.fs * nudge;
       var ring = document.createElement('span');
       ring.className = 'hd-ring';
       ring.style.left = g.cx + 'px';
@@ -258,7 +259,8 @@
       host.appendChild(ring);
       setTimeout(function () { ring.remove(); }, 750);
       wake();
-    });
+    };
+    span.addEventListener('click', function () { body.pop(); });
     return body;
   }
 
@@ -276,23 +278,30 @@
       title.classList.add('hd-live');
       var swing = apos && /[’']/.test(apos.textContent) ? tag(apos) : null;
       var b = heyDot && heyDot.textContent === '.' ? ball(heyDot, function (impact) {
-        if (swing && impact > 6) swing.push(-Math.min(260, impact * 9));
+        if (swing && impact > 6) swing.push(-Math.min(380, impact * 22));
       }) : null;
-      if (endDot && endDot.textContent === '.') jelly(endDot);
+      var j = endDot && endDot.textContent === '.' ? jelly(endDot) : null;
       [heyDot, apos, endDot].forEach(function (s) { if (s) s.classList.add('hd-glyph'); });
 
-      // Now and then the ball hops on its own, as an invitation.
-      if (b) {
-        var visible = true;
-        if ('IntersectionObserver' in window) {
-          new IntersectionObserver(function (en) { visible = en[0].isIntersecting; }).observe(title);
-        }
-        var idle = function () {
-          if (visible && !document.hidden) b.hop(0.32 + Math.random() * 0.2);
-          setTimeout(idle, 6500 + Math.random() * 5000);
-        };
-        setTimeout(idle, 2200);
+      // Opening beat on every load: the ball takes a big hop, its landing
+      // knocks the apostrophe swinging, then the last dot pops and wobbles.
+      if (b) setTimeout(function () { b.hop(1.5); }, 250);
+      if (b) setTimeout(function () { b.hop(0.6); }, 1500);
+      if (j) setTimeout(function () { j.pop(5); }, 2300);
+
+      // After that, now and then one of the dots moves on its own.
+      var visible = true;
+      if ('IntersectionObserver' in window) {
+        new IntersectionObserver(function (en) { visible = en[0].isIntersecting; }).observe(title);
       }
+      var idle = function () {
+        if (visible && !document.hidden) {
+          if (j && (!b || Math.random() < 0.3)) j.pop(Math.random() < 0.5 ? 4 : -4);
+          else if (b) b.hop(0.32 + Math.random() * 0.2);
+        }
+        setTimeout(idle, 6000 + Math.random() * 5000);
+      };
+      setTimeout(idle, 7000);
     };
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { setTimeout(go, 120); });
     else setTimeout(go, 300);
