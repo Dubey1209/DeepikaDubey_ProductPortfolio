@@ -1341,6 +1341,28 @@
         [LAUGH, 'hahaha, sorry, I just remembered a meme'],
       ],
     },
+    // A pat on the top of her head: affection, never the hair complaints.
+    head: {
+      face: SHY,
+      lines: [
+        'aww, a head pat! I’ll take it',
+        [GIGGLE, 'pat pat. I feel like a very good employee'],
+        [HAPPY_TEARS, 'a head pat? I didn’t know I needed this'],
+        'head pats: the most underrated feature',
+        [LOVE, 'okay, head pats are my weakness'],
+        [GIGGLE, 'hehe, pat pat, I’m a happy puppy now'],
+        [HOPEFUL, 'does this mean I did a good job?'],
+        [PRETTY_PLEASE, 'one more? pretty please?'],
+        'head pat received. morale: up 200%',
+        [SMUG, 'yes, I know, I’m very pat-able'],
+        [GRIN, 'pat pat! like a reward after a launch'],
+        'aww, that’s the sweetest kind of feedback',
+        [PLAYFUL, 'pat me like that and I’ll follow you around'],
+        [SHY, 'careful, you’ll make me purr. I’m not a cat. probably.'],
+        [GIGGLE, 'gentle! there’s a whole roadmap in there'],
+        [LOVE, 'head pats > performance reviews'],
+      ],
+    },
     forehead: {
       face: WINK,
       lines: [
@@ -1813,15 +1835,42 @@
     ],
   };
 
-  // Measured on the centre frame, as fractions of the box: eyes at y .36–.44,
-  // the nose tip at (.555, .47), the mouth at y .51, the face centred on .535,
-  // the ears and earrings at x .20–.315 and .72–.79 between y .36 and .53,
-  // the turtleneck at x .40–.66 from y .58 to .70.
+  // Measured on the centre frame, as fractions of the box: the top of her
+  // head at y .06, the crown down to the hairline at y .20, eyes at y
+  // .36–.44, the nose tip at (.555, .47), the mouth at y .51, the face centred
+  // on .535, the ears and earrings at x .20–.315 and .72–.79 between y .36 and
+  // .53, the turtleneck at x .40–.66 from y .58 to .70.
+  //
+  // The edges of her face (skin, with the bangs over the forehead counted as
+  // forehead), [y, left, right]: outside them, beside the face, is her long
+  // hair. Hair is only that, the curtains down her sides; the crown is her
+  // head, and a touch there is a pat, not a pull. Lumping the crown and the
+  // top of the forehead in with hair made a pat on the head set off the
+  // tangled-hair lines and, kept up, the angry ones.
+  var FACE_EDGE = [
+    [0.2, 0.37, 0.69], [0.26, 0.36, 0.7], [0.3, 0.345, 0.715], [0.34, 0.32, 0.73],
+    [0.46, 0.315, 0.755], [0.5, 0.34, 0.71], [0.545, 0.375, 0.68],
+  ];
+
+  function faceEdge(y) {
+    for (var i = 1; i < FACE_EDGE.length; i += 1) {
+      var a = FACE_EDGE[i - 1];
+      var b = FACE_EDGE[i];
+      if (y <= b[0]) {
+        var k = (y - a[0]) / (b[0] - a[0]);
+        return [a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k];
+      }
+    }
+    return [FACE_EDGE[FACE_EDGE.length - 1][1], FACE_EDGE[FACE_EDGE.length - 1][2]];
+  }
+
   function spotAt(e) {
     if (!e || typeof e.clientX !== 'number' || (e.clientX === 0 && e.clientY === 0)) return 'hello';
     var rect = el.getBoundingClientRect();
-    var x = (e.clientX - rect.left) / rect.width;
-    var y = (e.clientY - rect.top) / rect.height;
+    // Measured facing front; turned, her face sits a little elsewhere.
+    var off = FACE_OFFSET[body.key.indexOf('look:') === 0 ? +body.key.slice(5) : CENTRE] || [0, 0];
+    var x = (e.clientX - rect.left) / rect.width - off[0] / 100;
+    var y = (e.clientY - rect.top) / rect.height - off[1] / 100;
     var fx = x - 0.535;
     if (y > 0.545) {
       if (y < 0.58 && x > 0.36 && x < 0.72) return 'chin';
@@ -1831,7 +1880,11 @@
       return 'sweater';
     }
     if (y > 0.36 && y < 0.53 && ((x > 0.2 && x < 0.315) || (x > 0.72 && x < 0.79))) return 'ear';
-    if (y < 0.25 || Math.abs(fx) > 0.2) return 'hair';
+    // Above the hairline: the top of her head, except at the far sides,
+    // where it is already the hair falling away.
+    if (y < 0.2) return x > 0.29 && x < 0.77 ? 'head' : 'hair';
+    var edge = faceEdge(y);
+    if (x < edge[0] - 0.015 || x > edge[1] + 0.015) return 'hair';
     if (y < 0.345) return 'forehead';
     if (y < 0.445) return Math.abs(fx) < 0.05 ? 'nose' : 'eye';
     if (y < 0.495) return Math.abs(x - 0.555) < 0.045 ? 'nose' : 'cheek';
@@ -2249,7 +2302,10 @@
       return;
     }
 
-    if (streak < 5 && Math.random() < 0.5) {
+    // A pat on the head always gets a pat line: a random moment (a sneeze)
+    // there read as her not noticing it.
+    var pat = spot === 'head' && streak < 5;
+    if (!pat && streak < 5 && Math.random() < 0.5) {
       playMoment(pickMoment(), false, true);
       return;
     }
@@ -2259,6 +2315,10 @@
     var hold = holdFor(line.text);
     react(line.face, hold, false, true);
     say(line.text, hold);
+    if (pat) {
+      blushFor(hold);
+      moveBody('squish');
+    }
     if (streak >= 5 + TEASE.length - 1) streak = 0;
   }
 
